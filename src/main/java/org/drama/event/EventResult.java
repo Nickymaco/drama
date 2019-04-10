@@ -11,7 +11,7 @@ import java.util.Map;
 public class EventResult implements Serializable {
     private static final long serialVersionUID = 4555755009367480736L;
 
-    private Map<Object, EventResultValue> objectMap = new HashMap<>();
+    private Map<EventResultIndex, EventResultValue> objectMap = new HashMap<>();
     private Event event;
 
     public EventResult(Event event) {
@@ -28,7 +28,7 @@ public class EventResult implements Serializable {
      * @param key
      * @param value
      */
-    public void addResult(Object key, EventResultValue value) {
+    public void addResult(EventResultIndex key, EventResultValue value) {
         objectMap.put(key, value);
     }
 
@@ -38,7 +38,7 @@ public class EventResult implements Serializable {
      * @param key
      * @return
      */
-    public EventResultValue getResult(Object key) {
+    public EventResultValue getResult(EventResultIndex key) {
         return objectMap.get(key);
     }
 

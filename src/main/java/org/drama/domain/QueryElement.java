@@ -6,6 +6,7 @@ import org.drama.core.Layer;
 import org.drama.event.Event;
 import org.drama.event.EventArgument;
 import org.drama.event.EventResult;
+import org.drama.event.EventResultIndex;
 import org.drama.event.EventResultValue;
 import org.drama.vo.KeyValueObject;
 
@@ -65,8 +66,8 @@ public abstract class QueryElement implements Element {
         EventResult eventResult = event.getEventResult();
 
         if(eventResult != null) {
-            String keyName = String.format("%s::%s", event.getClass().getSimpleName(), objectClass.getSimpleName());
-            eventResult.addResult(keyName, new EventResultValue(new KeyValueObject<>("QueryResult", queryResult)));
+        	EventResultIndex index = new EventResultIndex(event.getClass(), this.getClass());
+            eventResult.addResult(index, new EventResultValue(new KeyValueObject<>("QueryResult", queryResult)));
         }
     }
 
