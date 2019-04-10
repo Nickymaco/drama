@@ -26,13 +26,13 @@ class LayerLoggingTemplate implements ILayerLoggingTemplate {
 	public void logBroadcast(Layer layer, Event event) {
 		String layerName = layer.getClass().getSimpleName();
 		String eventName = event.getClass().getSimpleName();
-		this.logging.info("{} Layer<{}> broadcast event {}", PREFIX, layerName, eventName);
+		this.logging.info("{} Layer<{}> broadcast event<{}>", PREFIX, layerName, eventName);
 	}
 
 	@Override
 	public void logHandingElement(Layer layer, Element element) {
 		String layerName = layer.getClass().getSimpleName();
 		String elementName = element.getClass().getSimpleName();
-		this.logging.info("{} Layer<{}> handing element {}", PREFIX, layerName, elementName);
+		this.logging.info("{} Layer<{}> handing element<{}>", PREFIX, layerName, elementName);
 	}
 }

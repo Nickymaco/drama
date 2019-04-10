@@ -124,9 +124,17 @@ public abstract class AbstractLayer implements Layer {
 			}
 			
 			Element elem = param.getParam1();
-			
+			ElementAction elemAction = getElementAction(elem);
 			try {
-				elem.handing(event, this);
+				if(elemAction != null) {
+					elemAction.preHanding(event.getContext());
+					
+					elem.handing(event, this);
+					
+					elemAction.preHanding(event.getContext());
+				} else {
+					elem.handing(event, this);
+				}
 			} catch (Exception e) {
 				throw OccurredException.occurredHandingError(e, this, elem);
 			}
@@ -142,7 +150,14 @@ public abstract class AbstractLayer implements Layer {
         return result;
     }
     
-    protected ILayerLoggingTemplate getLogging() {
+    protected ElementAction getElementAction(Element elem) {
+		if(elem instanceof ElementAction) {
+			return (ElementAction)elem;
+		}
+		return null;
+	}
+
+	protected ILayerLoggingTemplate getLogging() {
     	if(this.layerLogging == null) {
     		this.layerLogging = 
     				LoggingTemplateFactory.getLayerLoggingTemplate(LoggingAdapter.delegateLogging(() -> null));

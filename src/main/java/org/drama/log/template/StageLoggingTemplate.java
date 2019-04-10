@@ -35,11 +35,11 @@ class StageLoggingTemplate implements IStageLoggingTemplate {
 			build.append(events[i].getClass().getSimpleName());
 		}
 		
-		this.logging.info("{} recevie event {}", PREFIX, build);
+		this.logging.info("{} recevie event<{}>", PREFIX, build);
 	}
 
 	@Override
 	public void logDealEvent(Event event) {
-		this.logging.info("{} deal event {}", PREFIX, event.getClass().getSimpleName());
+		this.logging.info("{} deal event<{}>", PREFIX, event.getClass().getSimpleName());
 	}
 }

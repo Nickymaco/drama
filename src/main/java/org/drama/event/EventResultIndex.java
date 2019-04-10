@@ -10,8 +10,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class EventResultIndex implements Serializable {
 	private static final long serialVersionUID = -7453443690549858336L;
-	private static final String DEFAULT_NAMESPACE="Drama";
-	private static final String DEFAULT_GROUP="Default";
+	private static final String DEFAULT_NAMESPACE = "Drama";
+	private static final String DEFAULT_GROUP = "Default";
 
 	private Class<? extends Event> eventMeta;
 	private Class<?> sourceMeta;
