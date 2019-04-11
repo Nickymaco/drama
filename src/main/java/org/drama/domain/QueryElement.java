@@ -6,9 +6,6 @@ import org.drama.core.Layer;
 import org.drama.event.Event;
 import org.drama.event.EventArgument;
 import org.drama.event.EventResult;
-import org.drama.event.EventResultIndex;
-import org.drama.event.EventResultValue;
-import org.drama.vo.KeyValueObject;
 
 public abstract class QueryElement implements Element {
     private Broken cancelable = Broken.None;
@@ -63,15 +60,12 @@ public abstract class QueryElement implements Element {
             return;
         }
 
-        EventResult eventResult = event.getEventResult();
-
-        if(eventResult != null) {
-        	EventResultIndex index = new EventResultIndex(event.getClass(), this.getClass());
-            eventResult.addResult(index, new EventResultValue(new KeyValueObject<>("QueryResult", queryResult)));
-        }
+        RenderResult(event.getEventResult(), queryResult);
     }
 
-    protected void setCancelable(Broken cancelable) {
+    protected abstract void RenderResult(EventResult eventResult, Object queryResult);
+
+	protected void setCancelable(Broken cancelable) {
         this.cancelable = cancelable;
     }
 }

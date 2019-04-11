@@ -39,6 +39,11 @@ class LoggingProxy implements Logging {
 		if(!this.enableLevel(LoggingLevel.error)) {
 			return;
 		}
+		
+		if(this.enableLevel(LoggingLevel.debug)) {
+			e.printStackTrace();
+		}
+		
 		this.logging.error(e, message, args);
 	}
 

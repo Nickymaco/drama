@@ -4,7 +4,6 @@ import javax.annotation.PostConstruct;
 
 import org.drama.log.Logging;
 import org.drama.log.LoggingInteractor;
-import org.drama.log.LoggingLevel;
 
 public class BasicLoggingTemplate implements LoggingInteractor {
 	private Logging logging;
@@ -14,10 +13,7 @@ public class BasicLoggingTemplate implements LoggingInteractor {
 	}
 	
 	@Override
-	public void catchException(Exception e) {
-		if(this.logging.enableLevel(LoggingLevel.debug)) {
-			e.printStackTrace();
-		}
+	public void capture(Throwable e, Object... args) {
 		logging.error(e, e.getMessage());
 	}
 
