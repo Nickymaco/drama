@@ -7,41 +7,39 @@ public final class MessageTemplate {
 	private static MessageTemplate msgTemp;
 	private String renderError;
 	private String renderUnfoundEvent;
-
 	private String logStageDeal;
 	private String logStageRecevie;
 	private String logLayerBroadcast;
 	private String logLayerHanding;
-
 	private String exPlayError;
 	private String exCastLayer;
 	private String exIllegalEvent;
 	private String exIllegalBoradcast;
 	private String exElemHandingError;
 	
-	private MessageTemplate() {
-		Properties config = new Properties();
-		try {
-			config.load(this.getClass().getClassLoader().getResourceAsStream("messages.properties"));
-			this.renderError = config.getProperty("render.error");
-			this.renderUnfoundEvent = config.getProperty("render.unfound-event");
-			this.logStageDeal = config.getProperty("log.stage.deal");
-			this.logStageRecevie = config.getProperty("log.stage.recevie");
-			this.logLayerBroadcast = config.getProperty("log.layer.broadcast");
-			this.logLayerHanding = config.getProperty("log.layer.handing");
-			this.exPlayError = config.getProperty("ex.play-error");
-			this.exCastLayer = config.getProperty("ex.cast-layer");
-			this.exIllegalEvent = config.getProperty("ex.illegal-event");
-			this.exIllegalBoradcast = config.getProperty("ex.illegal-broadcast");
-			this.exElemHandingError = config.getProperty("ex.elem-handing-error");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	private MessageTemplate() throws IOException {
+		Properties prop = new Properties();
+		prop.load(this.getClass().getClassLoader().getResourceAsStream("messages.properties"));
+		this.renderError = prop.getProperty("render.error");
+		this.renderUnfoundEvent = prop.getProperty("render.unfound-event");
+		this.logStageDeal = prop.getProperty("log.stage.deal");
+		this.logStageRecevie = prop.getProperty("log.stage.recevie");
+		this.logLayerBroadcast = prop.getProperty("log.layer.broadcast");
+		this.logLayerHanding = prop.getProperty("log.layer.handing");
+		this.exPlayError = prop.getProperty("ex.play-error");
+		this.exCastLayer = prop.getProperty("ex.cast-layer");
+		this.exIllegalEvent = prop.getProperty("ex.illegal-event");
+		this.exIllegalBoradcast = prop.getProperty("ex.illegal-broadcast");
+		this.exElemHandingError = prop.getProperty("ex.elem-handing-error");
 	}
 	
 	public static MessageTemplate inst() {
 		if(msgTemp == null) {
-			msgTemp = new MessageTemplate();
+			try {
+				msgTemp = new MessageTemplate();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		return msgTemp;
 	}

@@ -11,15 +11,15 @@ public class LoggingAdapter<T extends LoggingInteractor> implements InvocationHa
         this.loggingInteractor = loggingInteractor;
     }
 
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    	return method.invoke(this.loggingInteractor, args);
+    }
+    
     @SuppressWarnings("unchecked")
     public static <R extends LoggingInteractor> R adapter(R subject) {
         Class<?> clazz = subject.getClass();
         return (R) Proxy.newProxyInstance(clazz.getClassLoader(), clazz.getInterfaces(), new LoggingAdapter<>(subject));
-    }
-
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-    	return method.invoke(this.loggingInteractor, args);
     }
     
     public static Logging delegateLogging(LoggingFactory loggingFactory)  {

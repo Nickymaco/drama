@@ -4,21 +4,9 @@ import org.drama.common.MessageTemplate;
 import org.drama.event.Event;
 import org.drama.log.Logging;
 
-class StageLoggingTemplate implements IStageLoggingTemplate {
-    private Logging logging;
-
+class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLoggingTemplate {
     public StageLoggingTemplate(Logging logging) {
-        this.logging = logging;
-    }
-
-    @Override
-    public void catchException(Exception e) {
-    	logging.error(e, "Stage occurred exception");
-    }
-
-    @Override
-    public Logging getLogging() {
-        return this.logging;
+        super(logging);
     }
 
 	@Override
@@ -36,11 +24,11 @@ class StageLoggingTemplate implements IStageLoggingTemplate {
 			build.append(events[i].getClass().getSimpleName());
 		}
 		
-		this.logging.info(MessageTemplate.inst().getLogStageRecevie(), PREFIX, build);
+		this.getLogging().info(MessageTemplate.inst().getLogStageRecevie(), PREFIX, build);
 	}
 
 	@Override
 	public void logDealEvent(Event event) {
-		this.logging.info(MessageTemplate.inst().getLogStageDeal(), PREFIX, event.getClass().getSimpleName());
+		this.getLogging().info(MessageTemplate.inst().getLogStageDeal(), PREFIX, event.getClass().getSimpleName());
 	}
 }
