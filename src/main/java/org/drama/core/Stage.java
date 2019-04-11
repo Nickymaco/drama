@@ -2,6 +2,7 @@ package org.drama.core;
 
 import java.util.Set;
 
+import org.drama.common.MessageTemplate;
 import org.drama.event.Event;
 import org.drama.exception.OccurredException;
 
@@ -43,6 +44,6 @@ public interface Stage {
      * @return
      */
     static Render defaultErrorRender() {
-    	return new StageRender(Render.ERROR, false, null, "服务发生异常");
+    	return new StageRender(Render.ERROR, false, null, MessageTemplate.inst().getRenderError());
     }
 }

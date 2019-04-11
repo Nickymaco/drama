@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.drama.annotation.ElementProperty;
+import org.drama.common.MessageTemplate;
 import org.drama.event.AbstractEvent;
 import org.drama.event.Event;
 import org.drama.event.EventResult;
@@ -46,7 +47,7 @@ public abstract class AbstractStage implements Stage, StagePlayNotification {
 	@Override
 	public Render play(Event... events) throws OccurredException {
         if(events == null || events.length == 0) {
-            return new StageRender(Render.WARNING, true, null, "找不到需要处理的事件");
+            return new StageRender(Render.WARNING, true, null, MessageTemplate.inst().getRenderUnfoundEvent());
         }
         
         this.getStageLoggingTemplate().logRecevieEvent(events);
