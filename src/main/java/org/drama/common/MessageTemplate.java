@@ -7,6 +7,7 @@ public final class MessageTemplate {
 	private static MessageTemplate msgTemp;
 	private String renderError;
 	private String renderUnfoundEvent;
+	private String renderAbend;
 	private String logStageDeal;
 	private String logStageRecevie;
 	private String logLayerBroadcast;
@@ -22,6 +23,7 @@ public final class MessageTemplate {
 		prop.load(this.getClass().getClassLoader().getResourceAsStream("messages.properties"));
 		this.renderError = prop.getProperty("render.error");
 		this.renderUnfoundEvent = prop.getProperty("render.unfound-event");
+		this.renderAbend = prop.getProperty("render.abend");
 		this.logStageDeal = prop.getProperty("log.stage.deal");
 		this.logStageRecevie = prop.getProperty("log.stage.recevie");
 		this.logLayerBroadcast = prop.getProperty("log.layer.broadcast");
@@ -86,5 +88,9 @@ public final class MessageTemplate {
 
 	public String getExElemHandingError() {
 		return exElemHandingError;
+	}
+
+	public String getRenderAbend() {
+		return renderAbend;
 	}
 }

@@ -3,6 +3,7 @@ package org.drama.core;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.drama.common.MessageTemplate;
 import org.drama.event.Event;
 import org.drama.exception.OccurredException;
 import org.drama.log.Logging;
@@ -57,7 +58,7 @@ class SequenceLayerStage extends AbstractStage {
             if(broadcastResult.getStatus() == BroadcastTracer.Breakdown) {
             	StageRender render = getCurrentRender();
             	render.setCode(Render.WARNING);
-            	render.setMessage("业务执行非正常结束");
+            	render.setMessage(MessageTemplate.inst().getRenderAbend());
                 break;
             }
         }
