@@ -1,47 +1,26 @@
 package org.drama.event;
 
-import java.lang.reflect.Constructor;
+import static org.joor.Reflect.on;
 
-public class EventBuilder<T extends AbstractEvent> {
+public class EventBuilder<T extends AbstractEvent<TT>, TT> {
     private Class<T> clazz;
-    private EventArgument<?> argument;
+    private EventArgument<TT> argument;
 
     public EventBuilder(Class<T> clazz) {
         this.clazz = clazz;
     }
 
-    public <V> EventBuilder<T> setArgument(V value) {
-        if(value.getClass().equals(EventArgument.class)) {
-            this.argument = (EventArgument<?>)value;
-        } else {
-            EventArgument<V> argument = new EventArgument<>();
-            argument.setArgument(value);
-            this.argument = argument;
-        }
+    public EventBuilder<T,TT> setArgument(TT value) {
+    	EventArgument<TT> argument = new EventArgument<>();
+        argument.setArgument(value);
+        this.argument = argument;
         return this;
     }
 
-    public T build(Object... paramters) {
-        T tEvent = null;
-
-        try {
-            if(paramters != null && paramters.length > 0) {
-                Class<?>[] paramterTypes = new Class<?>[paramters.length];
-
-                for (int i = 0; i < paramterTypes.length; i++) {
-                    paramterTypes[i] = paramters[0].getClass();
-                }
-
-                Constructor<T> constructor = this.clazz.getDeclaredConstructor(paramterTypes);
-                tEvent = constructor.newInstance(paramters);
-            } else {
-                tEvent = this.clazz.newInstance();
-            }
-
-            tEvent.setArgument(this.argument);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public T build(Object... paramters) throws Throwable {
+        T tEvent;
+        tEvent = on(clazz).create(paramters).get();
+        tEvent.setArgument(this.argument);
         return tEvent;
     }
 }

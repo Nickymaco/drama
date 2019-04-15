@@ -3,8 +3,8 @@ package org.drama.event;
 /**
  * 抽象事件，所以事件都应该派生于它
  */
-public abstract class AbstractEvent implements Event{
-	private EventArgument<?> argument;
+public abstract class AbstractEvent<T> implements Event{
+	private EventArgument<T> argument;
     private EventResult eventResult;
     private ThreadLocal<EventContext> contextLocal;
     
@@ -28,11 +28,11 @@ public abstract class AbstractEvent implements Event{
     }
 
     @Override
-    public EventArgument<?> getArgument() {
+    public EventArgument<T> getArgument() {
         return this.argument;
     }
 
-    public void setArgument(EventArgument<?> argument) {
+    public void setArgument(EventArgument<T> argument) {
         this.argument = argument;
     }
 }

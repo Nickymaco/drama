@@ -5,7 +5,7 @@ import org.drama.event.Event;
 /**
  * 逻辑处理层事件句柄
  */
-public interface Element extends Comparable<Object> {
+public interface Element extends Comparable<Element> {
     /**
      * 优先级
      * @return
@@ -23,7 +23,7 @@ public interface Element extends Comparable<Object> {
      */
     void handing(Event event, Layer layer);
 
-    default int compareTo(Object o) {
+    default int compareTo(Element o) {
         return 0;
     }
 }

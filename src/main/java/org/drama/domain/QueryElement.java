@@ -6,10 +6,12 @@ import org.drama.core.Layer;
 import org.drama.event.Event;
 import org.drama.event.EventArgument;
 import org.drama.event.EventResult;
+import org.drama.event.EventResultBuilder;
 
 public abstract class QueryElement implements Element {
     private Broken cancelable = Broken.None;
     private QueryFactory queryFactory;
+    private EventResultBuilder resultBuild;
 
     public QueryElement(QueryFactory queryFactory) {
         this.queryFactory = queryFactory;
@@ -30,7 +32,7 @@ public abstract class QueryElement implements Element {
         }
 
         Class<?> objectClass= object.getClass();
-        Queriable<Object> queriable = queryFactory.getQuerier(objectClass.getSimpleName());
+        Queriable<Object> queriable = queryFactory.getQuerier(objectClass);
 
         if(queriable == null) {
             return;
@@ -63,9 +65,50 @@ public abstract class QueryElement implements Element {
         RenderResult(event.getEventResult(), queryResult);
     }
 
-    protected abstract void RenderResult(EventResult eventResult, Object queryResult);
+    protected void RenderResult(EventResult eventResult, Object queryResult) {
+    	if(queryResult == null || eventResult == null) {
+			return;
+		}
+		
+		Class<? extends Event> evetMeta = eventResult.getEvent().getClass();
+		Class<?> sourceMeta = this.getClass();
+		String namespace = getNamespace();
+		String group = getGroup();
+		String artifact = getArtifact();
+		Boolean output = getOutput(eventResult.getEvent(), queryResult);
+		
+		getResultBuild()
+			.setNamespace(namespace)
+			.setArtifact(artifact)
+			.setGroup(group)
+			.setEventMeta(evetMeta)
+			.setSourceMeta(sourceMeta)
+			.setResult(queryResult)
+			.build(eventResult, output);
+    }
+
+	protected Boolean getOutput(Event event, Object queryResult) {
+		return true;
+	}
+
+	protected abstract String getArtifact();
+
+	protected abstract String getGroup();
+
+	protected abstract String getNamespace();
 
 	protected void setCancelable(Broken cancelable) {
         this.cancelable = cancelable;
     }
+
+	public EventResultBuilder getResultBuild() {
+		if(resultBuild == null) {
+			resultBuild = new EventResultBuilder();
+		}
+		return resultBuild;
+	}
+
+	protected void setResultBuild(EventResultBuilder resultBuild) {
+		this.resultBuild = resultBuild;
+	}
 }

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.reflect.InheritanceUtils;
 import org.drama.annotation.ElementProperty;
 import org.drama.common.MessageTemplate;
 import org.drama.event.AbstractEvent;
@@ -60,9 +61,8 @@ public abstract class AbstractStage implements Stage, StagePlayNotification {
 
         for(Event event : events) {
         	Class<?> eventClazz = event.getClass();
-        	Class<?> supperClass = eventClazz.getSuperclass();
         	// 检查注册事件类型范围
-            if(!eventClazz.equals(Event.class) && !supperClass.equals(AbstractEvent.class) && !supperClass.equals(Event.class)) {
+            if(!eventClazz.equals(Event.class) && InheritanceUtils.distance(eventClazz, AbstractEvent.class) == 0) {
                 throw OccurredException.illegalRegisterEvent(eventClazz);
             }
             // play开始通知
@@ -85,7 +85,7 @@ public abstract class AbstractStage implements Stage, StagePlayNotification {
             return;
         }
         
-        AbstractEvent abstractEvent = (AbstractEvent)event;
+        AbstractEvent<?> abstractEvent = (AbstractEvent<?>)event;
         abstractEvent.setEventResult(new EventResult(abstractEvent));
 
         playDeal(abstractEvent);
