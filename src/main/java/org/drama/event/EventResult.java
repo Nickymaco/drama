@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
+import org.drama.vo.KeyValueObject;
 
 /**
  * 事件结果
@@ -28,8 +31,21 @@ public class EventResult implements Serializable {
      * @param key
      * @param value
      */
-    public void addResult(EventResultIndex key, EventResultValue value) {
-        objectMap.put(key, value);
+    public void addResult(KeyValueObject<EventResultIndex, EventResultValue> param) {
+        objectMap.put(param.getKey(), param.getValue());
+    }
+    
+    /**
+     * 添加时间结果
+     * @param uuid ArtifactId
+     * @param evt 事件
+     * @param src 触发石建元
+     * @param ent 事件结果
+     */
+    public void addResult(String uuid, Class<? extends Event> evt, Class<?> src, EventResultEntity ent, boolean out) {
+    	EventResultIndex index = new EventResultIndex(evt, src, UUID.fromString(uuid));
+    	EventResultValue value = new EventResultValue(ent, out);
+    	addResult(new KeyValueObject<>(index, value));
     }
 
     /**
@@ -48,4 +64,6 @@ public class EventResult implements Serializable {
     public Collection<EventResultValue> allResults() {
         return objectMap.values();
     }
+    
+    
 }

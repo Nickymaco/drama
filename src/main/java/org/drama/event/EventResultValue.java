@@ -2,31 +2,21 @@ package org.drama.event;
 
 import java.io.Serializable;
 
-import org.drama.vo.KeyValueObject;
-
 /**
  * 事件结果值包装器
  */
 public class EventResultValue implements Serializable {
 	private static final long serialVersionUID = -3647983190859217981L;
-	private KeyValueObject<String, Object> value;
-    private boolean isOutput = false;
+	private EventResultEntity value;
+    private boolean isOutput;
     
-	public EventResultValue(KeyValueObject<String, Object> value) {
-		this.value = value;
+	public EventResultValue(EventResultEntity value) {
+		this(value, false);
 	}
 	
-	public EventResultValue(KeyValueObject<String, Object> value, boolean isOutput) {
-		this.value = value;
+	public EventResultValue(EventResultEntity value, boolean isOutput) {
+		this.setValue(value);
 		this.isOutput = isOutput;
-	}
-
-	public String getKey() {
-		return this.value.getKey();
-	}
-	
-	public Object getValue() {
-		return this.value.getValue();
 	}
 
 	public boolean isOutput() {
@@ -35,5 +25,13 @@ public class EventResultValue implements Serializable {
 
 	public void setOutput(boolean isOutput) {
 		this.isOutput = isOutput;
+	}
+
+	public EventResultEntity getValue() {
+		return value;
+	}
+
+	public void setValue(EventResultEntity value) {
+		this.value = value;
 	}
 }

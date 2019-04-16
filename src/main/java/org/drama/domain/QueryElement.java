@@ -1,17 +1,20 @@
 package org.drama.domain;
 
+import static org.drama.delegate.Delegator.action;
+
+import java.util.function.Consumer;
+
 import org.drama.core.Broken;
 import org.drama.core.Element;
 import org.drama.core.Layer;
 import org.drama.event.Event;
 import org.drama.event.EventArgument;
-import org.drama.event.EventResult;
-import org.drama.event.EventResultBuilder;
+import org.drama.vo.BiParameterValueObject;
 
 public abstract class QueryElement implements Element {
     private Broken cancelable = Broken.None;
     private QueryFactory queryFactory;
-    private EventResultBuilder resultBuild;
+    private Consumer<BiParameterValueObject<Event, Object>> resultRenderHandler;
 
     public QueryElement(QueryFactory queryFactory) {
         this.queryFactory = queryFactory;
@@ -24,22 +27,29 @@ public abstract class QueryElement implements Element {
 
     @Override
     public void handing(Event event, Layer layer) {
-        EventArgument<?> argument = event.getArgument();
+        Object queryResult = doQuery(event);
+
+        action(getResultRenderHandler(), new BiParameterValueObject<>(event, queryResult));
+    }
+
+	protected Object doQuery(Event event) {
+		EventArgument<?> argument = event.getArgument();
         Object object = argument.getArgument();
 
         if(!(object instanceof Operate)) {
-           return;
+           return null;
         }
 
         Class<?> objectClass= object.getClass();
         Queriable<Object> queriable = queryFactory.getQuerier(objectClass);
 
         if(queriable == null) {
-            return;
+            return null;
         }
 
-        Operate operate = (Operate)object;
         Object queryResult = null;
+        Operate operate = (Operate)object;
+        
         switch (operate.operate()) {
             case Create:
                 queryResult = queriable.create(object);
@@ -57,58 +67,19 @@ public abstract class QueryElement implements Element {
                 queryResult = queriable.retrieveList(object);
                 break;
         }
-
-        if(queryResult == null) {
-            return;
-        }
-
-        RenderResult(event.getEventResult(), queryResult);
-    }
-
-    protected void RenderResult(EventResult eventResult, Object queryResult) {
-    	if(queryResult == null || eventResult == null) {
-			return;
-		}
-		
-		Class<? extends Event> evetMeta = eventResult.getEvent().getClass();
-		Class<?> sourceMeta = this.getClass();
-		String namespace = getNamespace();
-		String group = getGroup();
-		String artifact = getArtifact();
-		Boolean output = getOutput(eventResult.getEvent(), queryResult);
-		
-		getResultBuild()
-			.setNamespace(namespace)
-			.setArtifact(artifact)
-			.setGroup(group)
-			.setEventMeta(evetMeta)
-			.setSourceMeta(sourceMeta)
-			.setResult(queryResult)
-			.build(eventResult, output);
-    }
-
-	protected Boolean getOutput(Event event, Object queryResult) {
-		return true;
+        
+		return queryResult;
 	}
-
-	protected abstract String getArtifact();
-
-	protected abstract String getGroup();
-
-	protected abstract String getNamespace();
 
 	protected void setCancelable(Broken cancelable) {
         this.cancelable = cancelable;
     }
 
-	public EventResultBuilder getResultBuild() {
-		if(resultBuild == null) {
-			resultBuild = new EventResultBuilder();
-		}
-		return resultBuild;
+	public Consumer<BiParameterValueObject<Event, Object>> getResultRenderHandler() {
+		return resultRenderHandler;
 	}
 
-	protected void setResultBuild(EventResultBuilder resultBuild) {
-		this.resultBuild = resultBuild;
+	protected void setResultRenderHandler(Consumer<BiParameterValueObject<Event, Object>> resultRenderHandler) {
+		this.resultRenderHandler = resultRenderHandler;
 	}
 }

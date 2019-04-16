@@ -7,12 +7,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.InheritanceUtils;
 import org.drama.annotation.ElementProperty;
+import org.drama.annotation.EventResultProperties;
 import org.drama.common.MessageTemplate;
 import org.drama.event.AbstractEvent;
 import org.drama.event.Event;
 import org.drama.event.EventResult;
+import org.drama.event.EventResultEntity;
 import org.drama.event.EventResultValue;
 import org.drama.exception.OccurredException;
 import org.drama.log.template.IStageLoggingTemplate;
@@ -95,7 +98,19 @@ public abstract class AbstractStage implements Stage, StagePlayNotification {
         
         resultValues.stream()
         	.filter((r) -> r.isOutput())
-        	.forEach((r) -> modelMap.put(r.getKey(), r.getValue()));
+        	.forEach((r) -> {
+        		Class<?> clzR = r.getValue().getClass();
+        		EventResultProperties prop = clzR.getAnnotation(EventResultProperties.class);
+        		
+        		if(prop != null && StringUtils.isNotBlank(prop.alias())) {
+        			modelMap.put(prop.alias(), r.getValue());
+        		} else {
+        			EventResultEntity entity = r.getValue();
+        			Class<?> clzEntity = entity.getClass();
+        			String simpleName = clzEntity.getSimpleName();
+        			modelMap.put(simpleName, entity);
+        		}
+        	});
     }
     
     @Override
