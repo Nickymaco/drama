@@ -6,7 +6,6 @@ package org.drama.core;
  *
  */
 public enum BroadcastTracer {
-	Conitnue,
-	Breakdown,
+	Processing,
 	Completed
 }

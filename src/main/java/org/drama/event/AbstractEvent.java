@@ -10,7 +10,7 @@ public abstract class AbstractEvent<T> implements Event{
     
     public AbstractEvent() {
     	contextLocal = new ThreadLocal<>();
-    	contextLocal.set(new EventContext());
+    	contextLocal.set(new EventContext(this));
     }
     
     @Override

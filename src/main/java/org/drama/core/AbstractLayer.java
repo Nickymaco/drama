@@ -1,5 +1,6 @@
 package org.drama.core;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -50,8 +51,10 @@ public abstract class AbstractLayer implements Layer {
 	}
 	
     private static Map<String, Set<TriParameterValueObject<Element, ElementProperty, List<Class<? extends Event>>>>> pool;
+    private final List<ElementNotification> elemNotifyList = new ArrayList<>();
     private ILayerLoggingTemplate layerLogging;
     private Class<?> thisClazz = this.getClass();
+    
 
     static {
     	pool = new HashMap<>();
@@ -83,7 +86,21 @@ public abstract class AbstractLayer implements Layer {
     	param.setCompareDelegate(new ElementComparator(param));
     	
         elementSet.add(param);
+        
+        addElementNotification(element);
     }
+
+	protected void addElementNotification(Element element) {
+		if(!(element instanceof ElementNotification)) {
+			return;
+		}
+		
+		ElementNotification elemNotify = (ElementNotification)element;
+		
+		if(!elemNotifyList.contains(elemNotify)) {
+			elemNotifyList.add(elemNotify);
+		}
+	}
 
 	@Override
     public int compareTo(Layer o) {
@@ -98,7 +115,7 @@ public abstract class AbstractLayer implements Layer {
 
     @Override
     public BroadcastResult broadcast(Event event) throws OccurredException {
-		BroadcastResult result = new BroadcastResult(BroadcastTracer.Conitnue);
+		BroadcastResult result = new BroadcastResult(BroadcastTracer.Processing);
 		
 		if(event == null) {
 		    throw OccurredException.illegalBroadcastEvent(this, event);
@@ -124,17 +141,9 @@ public abstract class AbstractLayer implements Layer {
 			}
 			
 			Element elem = param.getParam1();
-			ElementAction elemAction = getElementAction(elem);
+			
 			try {
-				if(elemAction != null) {
-					elemAction.preHanding(event.getContext());
-					
-					elem.handing(event, this);
-					
-					elemAction.preHanding(event.getContext());
-				} else {
-					elem.handing(event, this);
-				}
+				elem.handing(event);
 			} catch (Exception e) {
 				throw OccurredException.occurredHandingError(e, this, elem);
 			}
@@ -143,18 +152,20 @@ public abstract class AbstractLayer implements Layer {
 				break;
 			}
 			if(elem.cancelable() == Broken.Stage) {
-				result.setStatus(BroadcastTracer.Breakdown);
+				result.setStatus(BroadcastTracer.Completed);
 				break;
 			}
 		}
+		
+		notifyLayerCompleted(event);
+		
         return result;
     }
-    
-    protected ElementAction getElementAction(Element elem) {
-		if(elem instanceof ElementAction) {
-			return (ElementAction)elem;
+
+	protected void notifyLayerCompleted(Event event) {
+		for(ElementNotification elem : elemNotifyList) {
+			elem.onLayerCompleted(event);
 		}
-		return null;
 	}
 
 	protected ILayerLoggingTemplate getLogging() {
@@ -170,4 +181,8 @@ public abstract class AbstractLayer implements Layer {
     		this.layerLogging = LoggingTemplateFactory.getLayerLoggingTemplate(logging);
     	}
     }
+
+	protected List<ElementNotification> getElemNotifyList() {
+		return elemNotifyList;
+	}
 }

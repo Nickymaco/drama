@@ -21,7 +21,7 @@ public interface Element extends Comparable<Element> {
      * 触发事件关联行为
      * @param event
      */
-    void handing(Event event, Layer layer);
+    void handing(Event event);
 
     default int compareTo(Element o) {
         return 0;

@@ -6,7 +6,6 @@ import java.util.function.Consumer;
 
 import org.drama.core.Broken;
 import org.drama.core.Element;
-import org.drama.core.Layer;
 import org.drama.event.Event;
 import org.drama.event.EventArgument;
 import org.drama.vo.BiParameterValueObject;
@@ -26,7 +25,7 @@ public abstract class QueryElement implements Element {
     }
 
     @Override
-    public void handing(Event event, Layer layer) {
+    public void handing(Event event) {
         Object queryResult = doQuery(event);
 
         action(getResultRenderHandler(), new BiParameterValueObject<>(event, queryResult));

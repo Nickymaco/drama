@@ -1,5 +1,6 @@
 package org.drama.core;
 
+import java.util.List;
 import java.util.Set;
 
 import org.drama.common.MessageTemplate;
@@ -15,6 +16,14 @@ public interface Stage {
      * @param layer
      */
     void addLayer(Layer layer);
+    
+    /**
+     * 批量增加逻辑处理层
+     * @param layers
+     */
+    default void addLayer(List<Layer> layers) {
+    	layers.stream().forEach((l) -> addLayer(l));
+    }
 
     /**
      * 去掉逻辑处理层
@@ -44,6 +53,6 @@ public interface Stage {
      * @return
      */
     static Render defaultErrorRender() {
-    	return new StageRender(Render.ERROR, false, null, MessageTemplate.inst().getRenderError());
+    	return new StageRender(Render.FAILURE, null, MessageTemplate.inst().getRenderError());
     }
 }

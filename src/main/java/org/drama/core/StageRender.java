@@ -3,24 +3,19 @@ package org.drama.core;
 class StageRender implements Render {
 	private static final long serialVersionUID = 4805058851279820776L;
 	private int code;
-	private boolean success;
 	private Object model;
 	private String message;
 
 	public StageRender() {
-		code = Render.SUCCESS;
-		success = true;
+		this(Render.SUCCESS, null);
 	}
 
-	public StageRender(int code, boolean success, Object model) {
-		this.code = code;
-		this.success = success;
-		this.model = model;
+	public StageRender(int code, Object model) {
+		this(code, model, "");
 	}
 
-	public StageRender(int code, boolean success, Object model, String message) {
+	public StageRender(int code, Object model, String message) {
 		this.code = code;
-		this.success = success;
 		this.model = model;
 		this.message = message;
 	}
@@ -28,11 +23,6 @@ class StageRender implements Render {
 	@Override
 	public int getCode() {
 		return this.code;
-	}
-
-	@Override
-	public boolean getSuccess() {
-		return this.success;
 	}
 
 	@Override
@@ -47,10 +37,6 @@ class StageRender implements Render {
 
 	public void setCode(int code) {
 		this.code = code;
-	}
-
-	public void setSuccess(boolean success) {
-		this.success = success;
 	}
 
 	public void setModel(Object model) {

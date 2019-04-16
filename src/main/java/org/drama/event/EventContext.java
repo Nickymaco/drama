@@ -10,6 +10,14 @@ public class EventContext implements Serializable {
 	private static final long serialVersionUID = 7285410254463046346L;
 	private Map<Object, Object> context = new ConcurrentHashMap<>();
 	private Layer currentLayer;
+	private Event currentEvent;
+	
+	public EventContext() {
+	}
+	
+	public EventContext(Event event) {
+		setCurrentEvent(event);
+	}
 	
 	public void addParameter(Object key, Object value) {
        context.put(key, value);
@@ -31,5 +39,13 @@ public class EventContext implements Serializable {
 
 	public void setCurrentLayer(Layer currentLayer) {
 		this.currentLayer = currentLayer;
+	}
+
+	public Event getCurrentEvent() {
+		return currentEvent;
+	}
+
+	public void setCurrentEvent(Event currentEvent) {
+		this.currentEvent = currentEvent;
 	}
 }

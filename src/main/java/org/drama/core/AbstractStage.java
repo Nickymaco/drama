@@ -50,15 +50,16 @@ public abstract class AbstractStage implements Stage, StagePlayNotification {
 
 	@Override
 	public Render play(Event... events) throws OccurredException {
+		currentRender.set(getCurrentRender());
+		
         if(events == null || events.length == 0) {
-            return new StageRender(Render.WARNING, true, null, MessageTemplate.inst().getRenderUnfoundEvent());
+        	this.currentRender.get().setCode(Render.FAILURE);
+        	this.currentRender.get().setMessage(MessageTemplate.inst().getRenderUnfoundEvent());
+        	this.currentRender.get().setModel(null);
+        	return this.getCurrentRender();
         }
         
         this.getStageLoggingTemplate().logRecevieEvent(events);
-        
-        StageRender render = new StageRender();
-        
-        setCurrentRender(render);
 
         Map<String, Object> modelMap = new HashMap<>();
 
@@ -77,11 +78,12 @@ public abstract class AbstractStage implements Stage, StagePlayNotification {
             action(this.afterPlayAction, event);
         }
 
-        render.setModel(modelMap);
-        return render;
+        this.currentRender.get().setCode(Render.SUCCESS);
+        this.currentRender.get().setModel(modelMap);
+        return this.currentRender.get();
 	}
 
-    private void playDeal(Event event, Map<String, Object> modelMap) throws OccurredException {
+	private void playDeal(Event event, Map<String, Object> modelMap) throws OccurredException {
     	this.getStageLoggingTemplate().logDealEvent(event);
     	
         if(!(event instanceof AbstractEvent)) {
@@ -91,7 +93,7 @@ public abstract class AbstractStage implements Stage, StagePlayNotification {
         AbstractEvent<?> abstractEvent = (AbstractEvent<?>)event;
         abstractEvent.setEventResult(new EventResult(abstractEvent));
 
-        playDeal(abstractEvent);
+        playDealEvent(abstractEvent);
 
         EventResult eventResult = abstractEvent.getEventResult();
         Collection<EventResultValue> resultValues = eventResult.allResults();
@@ -112,8 +114,46 @@ public abstract class AbstractStage implements Stage, StagePlayNotification {
         		}
         	});
     }
+	
+	/**
+	 * 默认严格策略，只要有一个逻辑处理层返回不成功则不继续往下执行
+	 */
+	protected void playDealEvent(Event event) throws OccurredException {
+        if(event == null) {
+            return;
+        }
+
+        if(getLayers() == null || getLayers().size() == 0) {
+            return;
+        }
+        
+        for(Layer layer : getLayers()) {
+            BroadcastResult broadcastResult = null;
+            
+			try {
+				broadcastResult = layer.broadcast(event);
+			} catch (OccurredException e) {
+				throw OccurredException.occurredPlayError(e, event);
+			}
+
+            if(broadcastResult.getStatus() == BroadcastTracer.Completed) {
+            	StageRender render = getCurrentRender();
+            	render.setCode(Render.SUCCESS);
+            	render.setMessage(MessageTemplate.inst().getRenderAbend());
+                break;
+            }
+        }
+        // 通知元素当前时间已走完舞台
+        notifyStageCompleted(event);
+	}
     
-    @Override
+    protected void notifyStageCompleted(Event event) {
+    	getLayers().stream().forEach((l) -> {
+    		((AbstractLayer)l).getElemNotifyList().stream().forEach((e) -> e.onStageCompleted(event));
+    	});
+    };
+
+	@Override
 	public void registerElement(Element... elements) throws OccurredException {
     	if(elements == null || elements.length == 0) {
     		return;
@@ -136,26 +176,10 @@ public abstract class AbstractStage implements Stage, StagePlayNotification {
 	    	layer.addElement(element);
     	}
 	}
-
-    /**
-     * 具体事件通知
-     * @param event
-     * @param stageContext
-     * @throws Exception
-     */
-    public abstract void playDeal(Event event) throws OccurredException;
     
-    /**
-     * 获取日志
-     * @return
-     */
     protected abstract IStageLoggingTemplate getStageLoggingTemplate();
     
-    private void setCurrentRender(StageRender render) {
-    	this.currentRender.set(render);
-    }
-
-	public StageRender getCurrentRender() {
-		return currentRender.get();
+    protected StageRender getCurrentRender() {
+		return new StageRender();
 	}
 }
