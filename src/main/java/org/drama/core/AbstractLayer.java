@@ -163,9 +163,7 @@ public abstract class AbstractLayer implements Layer {
     }
 
 	protected void notifyLayerCompleted(Event event) {
-		for(ElementNotification elem : elemNotifyList) {
-			elem.onLayerCompleted(event);
-		}
+		elemNotifyList.stream().forEach((elem) -> elem.onLayerCompleted(event));
 	}
 
 	protected ILayerLoggingTemplate getLogging() {
