@@ -22,8 +22,15 @@ public interface Element extends Comparable<Element> {
      * @param event
      */
     void handing(Event event);
-
-    default int compareTo(Element o) {
-        return 0;
-    }
+    
+	@Override
+	default int compareTo(Element o) {
+		if(o == null) {
+            return 1;
+        } else if (o.getPriority() == getPriority()) {
+            return 0;
+        } else {
+            return o.getPriority() > getPriority() ? -1 : 1;
+        }
+	}
 }

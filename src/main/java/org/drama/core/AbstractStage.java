@@ -53,13 +53,13 @@ public abstract class AbstractStage implements Stage, StagePlayNotification {
 		currentRender.set(getCurrentRender());
 		
         if(events == null || events.length == 0) {
-        	this.currentRender.get().setCode(Render.FAILURE);
-        	this.currentRender.get().setMessage(MessageTemplate.inst().getRenderUnfoundEvent());
-        	this.currentRender.get().setModel(null);
-        	return this.getCurrentRender();
+        	currentRender.get().setCode(Render.FAILURE);
+        	currentRender.get().setMessage(MessageTemplate.inst().getRenderUnfoundEvent());
+        	currentRender.get().setModel(null);
+        	return getCurrentRender();
         }
         
-        this.getStageLoggingTemplate().logRecevieEvent(events);
+        getStageLoggingTemplate().logRecevieEvent(events);
 
         Map<String, Object> modelMap = new HashMap<>();
 
@@ -70,21 +70,21 @@ public abstract class AbstractStage implements Stage, StagePlayNotification {
                 throw OccurredException.illegalRegisterEvent(eventClazz);
             }
             // play开始通知
-            action(this.prePalyAction, event);
+            action(prePalyAction, event);
 
             playDeal(event, modelMap);
 
             // play结束通知
-            action(this.afterPlayAction, event);
+            action(afterPlayAction, event);
         }
 
-        this.currentRender.get().setCode(Render.SUCCESS);
-        this.currentRender.get().setModel(modelMap);
-        return this.currentRender.get();
+        currentRender.get().setCode(Render.SUCCESS);
+        currentRender.get().setModel(modelMap);
+        return currentRender.get();
 	}
 
 	private void playDeal(Event event, Map<String, Object> modelMap) throws OccurredException {
-    	this.getStageLoggingTemplate().logDealEvent(event);
+    	getStageLoggingTemplate().logDealEvent(event);
     	
         if(!(event instanceof AbstractEvent)) {
             return;

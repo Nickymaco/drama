@@ -24,4 +24,15 @@ public interface Layer extends Comparable<Layer> {
      * 广播事件
      */
     BroadcastResult broadcast(Event event) throws OccurredException;
+
+	@Override
+	default int compareTo(Layer o) {
+		if(o == null) {
+            return 1;
+        } else if (o.getPriority() == getPriority()) {
+            return 0;
+        } else {
+            return o.getPriority() > getPriority() ? -1 : 1;
+        }
+	} 
 }
