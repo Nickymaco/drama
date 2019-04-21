@@ -1,55 +1,57 @@
 package org.drama.log;
 
+import java.util.Objects;
+
 /**
- * Logging类静态代理
+ * Logging 类代理
  */
 class LoggingProxy implements Logging {
 	private Logging logging;
 	
-	public LoggingProxy(Logging logging) {
+	private LoggingProxy(Logging logging) {
 		this.logging = logging;
 	}
 
 	@Override
 	public void debug(String message, Object... args) {
-		if(!this.enableLevel(LoggingLevel.debug)) {
+		if(!enableLevel(LoggingLevel.debug)) {
 			return;
 		}
-		this.logging.debug(message, args);
+		logging.debug(message, args);
 	}
 
 	@Override
 	public void info(String message, Object... args) {
-		if(!this.enableLevel(LoggingLevel.info)) {
+		if(!enableLevel(LoggingLevel.info)) {
 			return;
 		}
-		this.logging.info(message, args);
+		logging.info(message, args);
 	}
 
 	@Override
 	public void warn(String message, Object... args) {
-		if(!this.enableLevel(LoggingLevel.warn)) {
+		if(!enableLevel(LoggingLevel.warn)) {
 			return;
 		}
-		this.logging.warn(message, args);
+		logging.warn(message, args);
 	}
 
 	@Override
 	public void error(Throwable e, String message, Object... args) {
-		if(!this.enableLevel(LoggingLevel.error)) {
+		if(!enableLevel(LoggingLevel.error)) {
 			return;
 		}
 		
-		if(this.enableLevel(LoggingLevel.debug)) {
+		if(enableLevel(LoggingLevel.debug)) {
 			e.printStackTrace();
 		}
 		
-		this.logging.error(e, message, args);
+		logging.error(e, message, args);
 	}
 
 	@Override
 	public boolean enableLevel(LoggingLevel level) {
-		if(this.logging == null) {
+		if(Objects.isNull(logging)) {
 			return false;
 		}
 		return this.logging.enableLevel(level);
@@ -62,7 +64,7 @@ class LoggingProxy implements Logging {
 
 	@Override
 	public boolean equals(Object obj) {
-		if(obj == null || this.logging == null) {
+		if(Objects.isNull(obj) || Objects.isNull(logging)) {
 			return false;
 		}
 
@@ -72,10 +74,24 @@ class LoggingProxy implements Logging {
 
 		LoggingProxy compareObj = (LoggingProxy)obj;
 
-		if(compareObj.logging == null) {
+		if(Objects.isNull(compareObj.logging)) {
 			return false;
 		}
 
 		return this.logging.equals(compareObj.logging);
 	}
+	
+	public static Logging newInstance(LoggingFactory loggingFactory)  {
+    	Logging logging = null;
+    	
+    	if(Objects.nonNull(loggingFactory)) {
+    		logging = loggingFactory.getLogging();
+    	}
+    	    	
+    	if(logging instanceof LoggingProxy) {
+    		return logging;
+    	}
+    
+    	return new LoggingProxy(logging);
+    }
 }

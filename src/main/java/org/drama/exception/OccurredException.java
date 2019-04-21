@@ -1,85 +1,74 @@
 package org.drama.exception;
 
-import org.drama.common.MessageTemplate;
 import org.drama.core.Element;
 import org.drama.core.Layer;
 import org.drama.event.Event;
-import org.drama.vo.BiParameterValueObject;
 
 public class OccurredException extends Exception {
-	static class ExceptionTracer<T> {
-		private T target;
-		
-		public ExceptionTracer() {
-		}
-		
-		public ExceptionTracer(T target) {
-			setTarget(target);
-		}
-
-		public T getTarget() {
-			return target;
-		}
-
-		public void setTarget(T target) {
-			this.target = target;
-		}
-	}
+	public static final String EmptyEventMsg = "Without any event registered";
+	public static final String EmptyElemensMsg = "Without any elemen registered";
+	public static final String ErrorRegisterEventMsg = "Event registered occurred error";
+	public static final String ErrorRegisterElemensMsg = "Elemen registered  occurred error";
+	public static final	String PlayErrorMsg = "Occurred errer on play";
+	public static final String IllegalEventMsg = "Illegal event<$s>. It should be inherit AbstractEvent";
+	public static final String IllegalBroadcastMsg = "Illegal broadcast event on layer<%s>";
+	public static final String ElemHandingError = "Element occurring error on handing. Layer<%s>-element<%s>";
 	
 	private static final long serialVersionUID = -7337990653787626209L;
-	private ExceptionTracer<?> trace;
 	
 	protected OccurredException(String message) {
 		super(message);
 	}
 	
-	public OccurredException(String message, Throwable e) {
+	protected OccurredException(String message, Throwable e) {
 		super(message, e);
 	}
 
-	public ExceptionTracer<?> getTrace() {
-		return trace;
-	}
-
-	public void setTrace(ExceptionTracer<?> trace) {
-		this.trace = trace;
-	}
 	
-	public static OccurredException occurredPlayError(Throwable e, Event event) {
-		OccurredException except = new OccurredException(MessageTemplate.inst().getExPlayError(), e);
-		except.setTrace(new ExceptionTracer<>(event));
+	public static OccurredException emptyRegisterEvents() {
+		OccurredException except = new OccurredException(EmptyEventMsg);
 		return except;
 	}
 	
-	public static OccurredException occurredCastLayer(Layer layer) {
-		String msg = String.format(MessageTemplate.inst().getExCastLayer(), layer);
-		OccurredException except = new OccurredException(msg);
-		except.setTrace(new ExceptionTracer<>(layer));
+	public static OccurredException emptyRegisterElements() {
+		OccurredException except = new OccurredException(EmptyElemensMsg);
+		return except;
+	}
+	
+	public static OccurredException errorRegisterEvents() {
+		OccurredException except = new OccurredException(ErrorRegisterEventMsg);
+		return except;
+	}
+	
+	public static OccurredException errorRegisterElements() {
+		OccurredException except = new OccurredException(ErrorRegisterElemensMsg);
+		return except;
+	}
+	
+	public static OccurredException occurredPlayError(Throwable e, Event event) {
+		OccurredException except = new OccurredException(PlayErrorMsg, e);
 		return except;
 	}
 	
 	public static OccurredException illegalRegisterEvent(Class<?> event) {
 		String eventName = event.getSimpleName();
-		String message = String.format(MessageTemplate.inst().getExIllegalEvent(), eventName);
+		String message = String.format(IllegalEventMsg, eventName);
 		OccurredException except = new OccurredException(message);
-		except.setTrace(new ExceptionTracer<>(event));
 		return except;
 	}
 	
 	public static OccurredException illegalBroadcastEvent(Layer layer, Event event) {
 		String layerName = layer.getClass().getSimpleName();
-		String msg = String.format(MessageTemplate.inst().getExIllegalBoradcast(), layerName);
+		String msg = String.format(IllegalBroadcastMsg, layerName);
 		OccurredException except = new OccurredException(msg);
-		except.setTrace(new ExceptionTracer<>(new BiParameterValueObject<>(layer, event)));
 		return except;
 	}
 	
 	public static OccurredException occurredHandingError(Throwable e, Layer layer, Element elem) {
 		String layerName = layer.getClass().getSimpleName();
 		String elemName = elem.getClass().getSimpleName();
-		String msg = String.format(MessageTemplate.inst().getExElemHandingError(), layerName, elemName);
+		String msg = String.format(ElemHandingError, layerName, elemName);
 		OccurredException except = new OccurredException(msg, e);
-		except.setTrace(new ExceptionTracer<>(new BiParameterValueObject<>(layer, elem)));
 		return except;
 	}
 }

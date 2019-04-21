@@ -1,37 +1,31 @@
 package org.drama.log.template;
 
-import static org.joor.Reflect.on;
+import java.util.Objects;
 
-import org.drama.log.Logging;
+import org.drama.log.LoggingFactory;
 import org.drama.log.LoggingInteractor;
 
 public class LoggingTemplateFactory {
-	private static LoggingInteractor basicLoggingInteractor;
-	private static ILayerLoggingTemplate layerLoggingTemplate;
-	private static IStageLoggingTemplate stageLoggingTemplate;
+	private static StageLoggingTemplate loggingTemplate;
 	
-	public static LoggingInteractor getBasicLoggingTemplate(Logging logging) {
-		if(basicLoggingInteractor == null) {
-			basicLoggingInteractor = new BasicLoggingTemplate(logging);
+	public static LoggingInteractor getBasicLoggingTemplate(LoggingFactory loggingFactory) {
+		if(Objects.isNull(loggingTemplate)) {
+			loggingTemplate = new StageLoggingTemplate(loggingFactory.logging());
 		}
-		return basicLoggingInteractor;
+		return loggingTemplate;
 	}
 	
-	public static ILayerLoggingTemplate getLayerLoggingTemplate(Logging logging) {
-		if (layerLoggingTemplate == null) {
-			layerLoggingTemplate = getTemplate(LayerLoggingTemplate.class, logging);
+	public static ILayerLoggingTemplate getLayerLoggingTemplate(LoggingFactory loggingFactory) {
+		if(Objects.isNull(loggingTemplate)) {
+			loggingTemplate = new StageLoggingTemplate(loggingFactory.logging());
 		}
-		return layerLoggingTemplate;
+		return loggingTemplate;
 	}
 	
-	public static IStageLoggingTemplate getStageLoggingTemplate(Logging logging) {
-		if(stageLoggingTemplate == null) {
-			stageLoggingTemplate = getTemplate(StageLoggingTemplate.class, logging);
+	public static IStageLoggingTemplate getStageLoggingTemplate(LoggingFactory loggingFactory) {
+		if(Objects.isNull(loggingTemplate)) {
+			loggingTemplate = new StageLoggingTemplate(loggingFactory.logging());
 		}
-		return stageLoggingTemplate;
-	}
-	
-	public static <T extends LoggingInteractor> T getTemplate(Class<? extends T> clazz, Object... args) {
-		return on(clazz).create(args).get();
+		return loggingTemplate;
 	}
 }

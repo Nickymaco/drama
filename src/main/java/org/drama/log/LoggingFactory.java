@@ -1,5 +1,10 @@
 package org.drama.log;
 
-public interface LoggingFactory {
-	Logging getLogging();
+public abstract class LoggingFactory {
+	
+	public Logging logging() {
+		return LoggingProxy.newInstance(this);
+	}
+	
+	protected abstract Logging getLogging();
 }

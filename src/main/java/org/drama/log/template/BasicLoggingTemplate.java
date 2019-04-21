@@ -6,6 +6,11 @@ import org.drama.log.Logging;
 import org.drama.log.LoggingInteractor;
 
 public class BasicLoggingTemplate implements LoggingInteractor {
+	public static final String StageDeal = "{} deal event<{}>";
+	public static final String StageRecevie = "{} recevie event<{}>";
+	public static final String LayerBroadcast = "{} Layer<{}> broadcast event<{}>";
+	public static final String LayerHanding="{} Layer<{}> handing element<{}>";
+	
 	private Logging logging;
 	
 	protected BasicLoggingTemplate(Logging logging) {

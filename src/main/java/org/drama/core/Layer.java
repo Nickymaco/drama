@@ -1,38 +1,27 @@
 package org.drama.core;
 
+import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
 import org.drama.exception.OccurredException;
+import org.drama.log.LoggingFactory;
 
 /**
- * 逻辑处理层，每一个逻辑处理层负责发起通知
+ * 逻辑处理层，每一个逻辑处理层负责发起通知,实现接口时应该重写 equals 方法和 hashcode 方法
  */
-public interface Layer extends Comparable<Layer> {
+public interface Layer {
+	void setKernel(Kernel kernel);
     /**
-     * 逻辑处理层优先级，用于在舞台优先走到那个逻辑处理层
+     * 当前逻辑处理层有哪些注册元素
      * @return
      */
-    int getPriority();
-
+    ImmutableSet<Element> getElements();
     /**
-     * 注册事件
-     * @param event
-     * @param element
+     * 添加日志
+     * @param loggingFactory
      */
-    void addElement(Element element) throws OccurredException;
-
+    void setLoggingFactory(LoggingFactory loggingFactory);
     /**
      * 广播事件
      */
     BroadcastResult broadcast(Event event) throws OccurredException;
-
-	@Override
-	default int compareTo(Layer o) {
-		if(o == null) {
-            return 1;
-        } else if (o.getPriority() == getPriority()) {
-            return 0;
-        } else {
-            return o.getPriority() > getPriority() ? -1 : 1;
-        }
-	} 
 }
