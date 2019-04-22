@@ -66,9 +66,9 @@ public class DramaStage implements Stage {
 	protected IStageLoggingTemplate getLogging() {
 		return logging;
 	}
-
+	
 	@Override
-	public Render play(Event... events) throws OccurredException {
+	public Render play(PlayLisenter lisenter, Event... events) throws OccurredException {
 		currentRender.set(new StageRender());
 
 		if (ArrayUtils.isEmpty(events)) {
@@ -82,10 +82,15 @@ public class DramaStage implements Stage {
 
 		Map<String, Object> modelMap = new HashMap<>();
 		
-		BroadcastLisenter lisenter = ObjectUtils.defaultIfNull(getBroadcastLisenter(), new DramaBroadcastLisenter());
+		BroadcastLisenter broadcastlisenter = ObjectUtils.defaultIfNull(getBroadcastLisenter(), new DramaBroadcastLisenter());
+		PlayLisenter playLisenter = ObjectUtils.defaultIfNull(lisenter, PlayLisenter.Null);
 
 		for (Event event : events) {
-			lisenter.setHandingStatus(HandingStatus.Transmit);
+			if(playLisenter.onBeforePlay(event)) {
+				break;
+			}
+			
+			broadcastlisenter.setHandingStatus(HandingStatus.Transmit);
 			
 			Class<?> eventClazz = event.getClass();
 			// 检查注册事件类型范围
@@ -93,9 +98,11 @@ public class DramaStage implements Stage {
 				throw OccurredException.illegalRegisterEvent(eventClazz);
 			}
 
-			playDeal(event, modelMap, lisenter);
+			playDeal(event, modelMap, broadcastlisenter);
+			// 触发事件
+			playLisenter.onCompletedPlay(event);
 			
-			if (Objects.equals(lisenter.getHandingStatus(), HandingStatus.Exit)) {
+			if (Objects.equals(broadcastlisenter.getHandingStatus(), HandingStatus.Exit)) {
 				break;
 			}
 		}
@@ -104,6 +111,11 @@ public class DramaStage implements Stage {
 		currentRender.get().setModel(modelMap);
 		
 		return currentRender.get();
+	}
+
+	@Override
+	public Render play(Event... events) throws OccurredException {
+		return play(null, events);
 	}
 	
 	protected void playDeal(Event event, Map<String, Object> modelMap, BroadcastLisenter lisenter) throws OccurredException {

@@ -55,6 +55,14 @@ public interface Stage {
      */
     Render play(Event... events) throws OccurredException;
     /**
+     * 演出
+     * @param lisenter
+     * @param events
+     * @return
+     * @throws OccurredException
+     */
+    Render play(PlayLisenter lisenter, Event... events) throws OccurredException;
+    /**
      * 启动
      */
     void setup() throws OccurredException;
