@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.InheritanceUtils;
 import org.drama.annotation.AliasAnno;
@@ -36,6 +37,8 @@ public class DramaStage implements Stage {
 	
 	private RegisterElementFactory registerElementFactory;
 	private RegisterEventFactory registerEventFactory;
+	
+	private BroadcastLisenter broadcastLisenter;
 
 	@Override
 	public final Kernel getKernel() {
@@ -52,6 +55,12 @@ public class DramaStage implements Stage {
 			layers = getKernel().getlayers();
 		}
 		return layers;
+	}
+	
+	protected void setLayers(ImmutableSet<Layer> layers) {
+		if(!Objects.equals(this.layers, layers)) {
+			this.layers = layers;
+		}
 	}
 	
 	protected IStageLoggingTemplate getLogging() {
@@ -72,15 +81,23 @@ public class DramaStage implements Stage {
 		getLogging().logRecevieEvent(events);
 
 		Map<String, Object> modelMap = new HashMap<>();
+		
+		BroadcastLisenter lisenter = ObjectUtils.defaultIfNull(getBroadcastLisenter(), new DramaBroadcastLisenter());
 
 		for (Event event : events) {
+			lisenter.setHandingStatus(HandingStatus.Transmit);
+			
 			Class<?> eventClazz = event.getClass();
 			// 检查注册事件类型范围
 			if (!eventClazz.equals(Event.class) && InheritanceUtils.distance(eventClazz, AbstractEvent.class) == 0) {
 				throw OccurredException.illegalRegisterEvent(eventClazz);
 			}
 
-			playDeal(event, modelMap);
+			playDeal(event, modelMap, lisenter);
+			
+			if (Objects.equals(lisenter.getHandingStatus(), HandingStatus.Exit)) {
+				break;
+			}
 		}
 
 		currentRender.get().setCode(Render.SUCCESS);
@@ -89,7 +106,7 @@ public class DramaStage implements Stage {
 		return currentRender.get();
 	}
 	
-	protected void playDeal(Event event, Map<String, Object> modelMap) throws OccurredException {
+	protected void playDeal(Event event, Map<String, Object> modelMap, BroadcastLisenter lisenter) throws OccurredException {
 		getLogging().logDealEvent(event);
 
 		if (!(event instanceof AbstractEvent)) {
@@ -99,7 +116,7 @@ public class DramaStage implements Stage {
 		AbstractEvent<?> abstractEvent = (AbstractEvent<?>) event;
 		abstractEvent.setEventResult(new EventResult(abstractEvent));
 
-		playDealEvent(abstractEvent);
+		playDealEvent(abstractEvent, lisenter);
 
 		EventResult eventResult = abstractEvent.getEventResult();
 		Collection<EventResultValue> resultValues = eventResult.allResults();
@@ -120,29 +137,21 @@ public class DramaStage implements Stage {
 	}
 
 	/**
-	 * 默认严格策略，只要有一个逻辑处理层返回不成功则不继续往下执行
+	 * 根据监听器判断是否继续往下执行
 	 */
-	protected void playDealEvent(Event event) throws OccurredException {
-		if (event == null) {
+	protected void playDealEvent(Event event, BroadcastLisenter lisenter) throws OccurredException {
+		if (Objects.isNull(event) || CollectionUtils.isEmpty(getLayers())) {
 			return;
 		}
-
-		if (getLayers() == null || getLayers().size() == 0) {
-			return;
-		}
-
+		
 		for (Layer layer : getLayers()) {
-			BroadcastResult broadcastResult = null;
-
 			try {
-				broadcastResult = layer.broadcast(event);
-			} catch (OccurredException e) {
+				layer.broadcast(event, lisenter);
+			} catch (Throwable e) {
 				throw OccurredException.occurredPlayError(e, event);
 			}
 
-			if (broadcastResult.getStatus() == BroadcastTracer.Completed) {
-				currentRender.get().setCode(Render.SUCCESS);
-				currentRender.get().setMessage(Render.AbendMsg);
+			if (Objects.equals(lisenter.getHandingStatus(), HandingStatus.Exit)) {
 				break;
 			}
 		}
@@ -199,6 +208,9 @@ public class DramaStage implements Stage {
 			throw OccurredException.emptyRegisterElements();
 		}
 		
+		// 清空逻辑处理层，以便可以重新获取
+		setLayers(null);
+		
 		if(registerEvent(registerEventFactory.events())) {
 			throw OccurredException.errorRegisterEvents();
 		}
@@ -233,5 +245,15 @@ public class DramaStage implements Stage {
 		getKernel().regeisterEvent(events);
 		
 		return true;
+	}
+
+	@Override
+	public BroadcastLisenter getBroadcastLisenter() {
+		return broadcastLisenter;
+	}
+
+	@Override
+	public void setBroadcastLisenter(BroadcastLisenter lisenter) {
+		this.broadcastLisenter = lisenter;
 	}
 }

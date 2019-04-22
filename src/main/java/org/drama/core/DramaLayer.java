@@ -4,7 +4,6 @@ import java.util.Objects;
 
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
-import org.drama.exception.OccurredException;
 import org.drama.log.LoggingFactory;
 import org.drama.log.template.ILayerLoggingTemplate;
 import org.drama.log.template.LoggingTemplateFactory;
@@ -31,35 +30,25 @@ public class DramaLayer implements Layer {
 	}
 
     @Override
-    public BroadcastResult broadcast(Event event) throws OccurredException {
-		BroadcastResult result = new BroadcastResult(BroadcastTracer.Processing);
-		
-		if(event == null) {
-		    throw OccurredException.illegalBroadcastEvent(this, event);
+    public void broadcast(Event event, BroadcastLisenter broadcasetListener) {
+		if(Objects.isNull(event)) {
+		    return;
 		}
 		
 		// 设置当前逻辑处理层
 		event.getContext().setCurrentLayer(this);
+		
 		// 打印日志
 		getLogging().logBroadcast(this, event);
 		
-		handingElement(event, result);
-		
-        return result;
+		handingElement(event, broadcasetListener);
     }
 
-	protected void handingElement(Event event, final BroadcastResult result) throws OccurredException {
-		getKernel().notifyHandler(this, event, (b) -> {
-			if(b == Broken.Layer) {
-				return true;
+	protected void handingElement(Event event, BroadcastLisenter broadcasetListener) {
+		getKernel().notifyHandler(this, event, (e) -> {
+			if(Objects.nonNull(broadcasetListener)) {
+				broadcasetListener.setHandingStatus(e.getHandingStatus());
 			}
-			
-			if(b == Broken.Stage) {
-				result.setStatus(BroadcastTracer.Completed);
-				return true;
-			}
-			
-			return false;
 		});
 	}
 	

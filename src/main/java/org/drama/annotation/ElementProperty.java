@@ -2,7 +2,6 @@ package org.drama.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -14,14 +13,18 @@ import org.drama.event.Event;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-@Inherited
 public @interface ElementProperty {
+	/**
+	 * 优先级
+	 * @return
+	 */
+	int priority() default 0;
 	/**
 	 * 元素要监听的时间
 	 * 
 	 * @return
 	 */
-	Class<? extends Event>[] registerEvent();
+	Class<? extends Event>[] events();
 
 	/**
 	 * 指定具体逻辑处理层，需要提供一个无参构造函数

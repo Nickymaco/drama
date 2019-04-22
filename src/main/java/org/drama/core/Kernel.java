@@ -1,6 +1,7 @@
 package org.drama.core;
 
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.drama.annotation.LayerProperty;
@@ -25,9 +26,9 @@ public interface Kernel {
 	 * 通知事件句柄
 	 * @param layer
 	 * @param event
-	 * @param onCompleted
+	 * @param onCompleted 事件完成回调，如果 {@code true} 则退出当前逻辑层不再往下执行
 	 */
-	void notifyHandler(Layer layer, Event event, Function<Broken, Boolean> onCompleted);
+	void notifyHandler(Layer layer, Event event, Consumer<Element> onCompleted);
 	/**
 	 * 获取逻辑处理层
 	 * @return

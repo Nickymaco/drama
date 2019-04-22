@@ -4,24 +4,19 @@ import static org.drama.delegate.Delegator.action;
 
 import java.util.function.Consumer;
 
-import org.drama.core.Broken;
 import org.drama.core.Element;
+import org.drama.core.HandingStatus;
 import org.drama.event.Event;
 import org.drama.event.EventArgument;
 import org.drama.vo.BiParameterValueObject;
 
 public abstract class QueryElement implements Element {
-    private Broken cancelable = Broken.None;
+	private HandingStatus handingStatus = HandingStatus.Transmit;
     private QueryFactory queryFactory;
     private Consumer<BiParameterValueObject<Event, Object>> resultRenderHandler;
 
     public QueryElement(QueryFactory queryFactory) {
         this.queryFactory = queryFactory;
-    }
-
-    @Override
-    public Broken cancelable() {
-        return this.cancelable;
     }
 
     @Override
@@ -70,15 +65,20 @@ public abstract class QueryElement implements Element {
 		return queryResult;
 	}
 
-	protected void setCancelable(Broken cancelable) {
-        this.cancelable = cancelable;
-    }
-
 	public Consumer<BiParameterValueObject<Event, Object>> getResultRenderHandler() {
 		return resultRenderHandler;
 	}
 
 	protected void setResultRenderHandler(Consumer<BiParameterValueObject<Event, Object>> resultRenderHandler) {
 		this.resultRenderHandler = resultRenderHandler;
+	}
+
+	@Override
+	public HandingStatus getHandingStatus() {
+		return handingStatus;
+	}
+
+	public void setHandingStatus(HandingStatus handingStatus) {
+		this.handingStatus = handingStatus;
 	}
 }

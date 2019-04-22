@@ -19,6 +19,16 @@ public interface Stage {
 	 * @param layerFactory
 	 */
 	void setLayerFactory(LayerFactory layerFactory);
+	/**
+	 * 事件传播监听器
+	 * @return
+	 */
+	BroadcastLisenter getBroadcastLisenter();
+	/**
+	 * 设置时间传播监听器
+	 * @param lisenter
+	 */
+	void setBroadcastLisenter(BroadcastLisenter lisenter);
     /**
      * 注册元素
      * @param element

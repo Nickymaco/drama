@@ -1,5 +1,6 @@
 package org.drama.core;
 
+import static org.drama.delegate.Delegator.action;
 import static org.drama.delegate.Delegator.func;
 import static org.joor.Reflect.on;
 
@@ -10,6 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -30,7 +32,7 @@ import org.drama.vo.KeyValueObject;
  */
 class DramaKernel implements Kernel {
 	private static final Set<Class<? extends Event>> registeredEvents = new HashSet<>();
-	private static final Map<KeyValueObject<Class<? extends Event>, LayerContainer>, Set<Element>> eventHandingPool = new HashMap<>();
+	private static final Map<KeyValueObject<Class<? extends Event>, LayerContainer>, Set<ElementContainer>> eventHandingPool = new HashMap<>();
 	private static final Set<LayerContainer> layerContainers = new TreeSet<>();
 
 	private Function<BiParameterValueObject<Class<? extends Layer>, LayerProperty>, Layer> layerGenerator;
@@ -61,7 +63,7 @@ class DramaKernel implements Kernel {
 			return null;
 		}
 
-		Class<? extends Event>[] events = prop.registerEvent();
+		Class<? extends Event>[] events = prop.events();
 
 		if (ArrayUtils.isEmpty(events)) {
 			return null;
@@ -76,16 +78,16 @@ class DramaKernel implements Kernel {
 		// 注册全局元素
 		if (ArrayUtils.contains(events, Event.class)) {
 			registeredEvents.forEach((clazz) -> {
-				Set<Element> elemSet = getElemSet(clazz, LayerContainer);
-				bindElementHandler(element, elemSet);
+				Set<ElementContainer> elemSet = getElemSet(clazz, LayerContainer);
+				bindElementHandler(element, prop, elemSet);
 			});
 		} else {
 			// 注册非全局元素
 			for (Class<? extends Event> clazz : events) {
 				registeredEvents.forEach((registeredEvent) -> {
 					if (Objects.equals(clazz, registeredEvent)) {
-						Set<Element> elemSet = getElemSet(clazz, LayerContainer);
-						bindElementHandler(element, elemSet);
+						Set<ElementContainer> elemSet = getElemSet(clazz, LayerContainer);
+						bindElementHandler(element, prop, elemSet);
 					}
 				});
 			}
@@ -94,9 +96,9 @@ class DramaKernel implements Kernel {
 		return LayerContainer.getLayer();
 	}
 
-	protected Set<Element> getElemSet(Class<? extends Event> clazz, LayerContainer LayerContainer) {
+	protected Set<ElementContainer> getElemSet(Class<? extends Event> clazz, LayerContainer LayerContainer) {
 		KeyValueObject<Class<? extends Event>, LayerContainer> idx = new KeyValueObject<>(clazz, LayerContainer);
-		Set<Element> elemSet = eventHandingPool.get(idx);
+		Set<ElementContainer> elemSet = eventHandingPool.get(idx);
 
 		if (elemSet == null) {
 			elemSet = new TreeSet<>();
@@ -172,32 +174,36 @@ class DramaKernel implements Kernel {
 		layerGenerator = generator;
 	}
 
-	private void bindElementHandler(Element element, Set<Element> elemSet) {
-		Element elemProxy = DramaElement.proxy(element);
-
-		if (!elemSet.contains(elemProxy)) {
-			elemSet.add(elemProxy);
+	private void bindElementHandler(Element element, ElementProperty prop, Set<ElementContainer> elemSet) {
+		ElementContainer elemCon = new ElementContainer(element);
+		elemCon.setPriority(prop.priority());
+		
+		if (!elemSet.contains(elemCon)) {
+			elemSet.add(elemCon);
 		}
 	}
 
 	@Override
-	public void notifyHandler(Layer layer, final Event event, final Function<Broken, Boolean> onCompleted) {
+	public void notifyHandler(final Layer layer, final Event event, final Consumer<Element> onCompleted) {
 		final Class<?> eventClass = event.getClass();
 
 		eventHandingPool.keySet().stream().filter((k) -> Objects.equals(k.getValue().getLayer(), layer)
 				&& !k.getValue().getDisabled() && Objects.equals(k.getKey(), eventClass)).forEach((k) -> {
-					Set<Element> elemSet = eventHandingPool.get(k);
+					
+					Set<ElementContainer> elemSet = eventHandingPool.get(k);
 
 					if (CollectionUtils.isEmpty(elemSet)) {
 						return;
 					}
 
-					for (Element elem : elemSet) {
+					for (ElementContainer elemCon : elemSet) {
+						Element elem = elemCon.getInvocator();
+						
 						elem.handing(event);
-
-						boolean ret = func(onCompleted, elem.cancelable());
-
-						if (ret) {
+						
+						action(onCompleted, elem);
+						
+						if(!Objects.equals(elem.getHandingStatus(), HandingStatus.Transmit)) {
 							break;
 						}
 					}

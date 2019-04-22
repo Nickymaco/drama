@@ -2,7 +2,6 @@ package org.drama.core;
 
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
-import org.drama.exception.OccurredException;
 import org.drama.log.LoggingFactory;
 
 /**
@@ -23,5 +22,5 @@ public interface Layer {
     /**
      * 广播事件
      */
-    BroadcastResult broadcast(Event event) throws OccurredException;
+    void broadcast(Event event, BroadcastLisenter broadcasetListener);
 }
