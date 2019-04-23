@@ -37,7 +37,6 @@ public interface Stage {
     /**
      * 注册事件
      * @param events
-     * @throws OccurredException
      */
     void setRegisterEventFactory(RegisterEventFactory registerEventFactory);
     /**

@@ -1,18 +1,20 @@
 package org.drama.exception;
 
+import java.util.Objects;
+
 import org.drama.core.Element;
 import org.drama.core.Layer;
 import org.drama.event.Event;
 
-public class OccurredException extends Exception {
-	public static final String EmptyEventMsg = "Without any event registered";
-	public static final String EmptyElemensMsg = "Without any elemen registered";
-	public static final String ErrorRegisterEventMsg = "Event registered occurred error";
-	public static final String ErrorRegisterElemensMsg = "Elemen registered  occurred error";
-	public static final	String PlayErrorMsg = "Occurred errer on play";
-	public static final String IllegalEventMsg = "Illegal event<$s>. It should be inherit AbstractEvent";
-	public static final String IllegalBroadcastMsg = "Illegal broadcast event on layer<%s>";
-	public static final String ElemHandingError = "Element occurring error on handing. Layer<%s>-element<%s>";
+public class OccurredException extends RuntimeException {
+	static final String EmptyEventMsg = "Without any event registered";
+	static final String EmptyElemensMsg = "Without any elemen registered";
+	static final String ErrorRegisterEventMsg = "Event registered occurred error";
+	static final String ErrorRegisterElemensMsg = "Elemen registered  occurred error";
+	static final String PlayErrorMsg = "Occurred errer on play";
+	static final String IllegalEventMsg = "Illegal event<$s>. It should be inherited AbstractEvent";
+	static final String IllegalBroadcastMsg = "Illegal broadcast event on layer<%s>";
+	static final String ElemHandingError = "Element occurring error on handing. Layer<%s>-element<%s>";
 	
 	private static final long serialVersionUID = -7337990653787626209L;
 	
@@ -26,49 +28,42 @@ public class OccurredException extends Exception {
 
 	
 	public static OccurredException emptyRegisterEvents() {
-		OccurredException except = new OccurredException(EmptyEventMsg);
-		return except;
+		return new OccurredException(EmptyEventMsg);
 	}
 	
 	public static OccurredException emptyRegisterElements() {
-		OccurredException except = new OccurredException(EmptyElemensMsg);
-		return except;
+		return new OccurredException(EmptyElemensMsg);
 	}
 	
 	public static OccurredException errorRegisterEvents() {
-		OccurredException except = new OccurredException(ErrorRegisterEventMsg);
-		return except;
+		return new OccurredException(ErrorRegisterEventMsg);
 	}
 	
 	public static OccurredException errorRegisterElements() {
-		OccurredException except = new OccurredException(ErrorRegisterElemensMsg);
-		return except;
+		return new OccurredException(ErrorRegisterElemensMsg);
 	}
 	
 	public static OccurredException occurredPlayError(Throwable e, Event event) {
-		OccurredException except = new OccurredException(PlayErrorMsg, e);
-		return except;
+		return new OccurredException(PlayErrorMsg, e);
 	}
 	
 	public static OccurredException illegalRegisterEvent(Class<?> event) {
 		String eventName = event.getSimpleName();
 		String message = String.format(IllegalEventMsg, eventName);
-		OccurredException except = new OccurredException(message);
-		return except;
+		return new OccurredException(message);
 	}
 	
 	public static OccurredException illegalBroadcastEvent(Layer layer, Event event) {
 		String layerName = layer.getClass().getSimpleName();
 		String msg = String.format(IllegalBroadcastMsg, layerName);
-		OccurredException except = new OccurredException(msg);
-		return except;
+		
+		return Objects.isNull(event) ? new OccurredException(msg, new NullPointerException()) : new OccurredException(msg);
 	}
 	
 	public static OccurredException occurredHandingError(Throwable e, Layer layer, Element elem) {
 		String layerName = layer.getClass().getSimpleName();
 		String elemName = elem.getClass().getSimpleName();
 		String msg = String.format(ElemHandingError, layerName, elemName);
-		OccurredException except = new OccurredException(msg, e);
-		return except;
+		return new OccurredException(msg, e);
 	}
 }

@@ -2,17 +2,20 @@ package org.drama.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.drama.core.DramaLayer;
 import org.drama.core.Layer;
+import org.drama.core.LayerDescriptor;
 import org.drama.event.Event;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
+@Inherited
 public @interface ElementProperty {
 	/**
 	 * 优先级
@@ -32,10 +35,10 @@ public @interface ElementProperty {
 	 * @return
 	 */
 	Class<? extends Layer> layer() default DramaLayer.class;
-
+	
 	/**
 	 * 逻辑处理层描述，如果{@code layer}里找到描述则不会用此属性覆盖
 	 * @return
 	 */
-	LayerProperty layerInfo() default @LayerProperty(name = "Drama", priority = 3290, uuid = "A66A23C6-1A62-4B53-AD80-6DDB58D900D");
+	LayerDescription layerDesc() default @LayerDescription(desc = LayerDescriptor.Default.class, target = Layer.DefaultName); 
 }

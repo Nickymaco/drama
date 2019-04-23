@@ -4,7 +4,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.drama.annotation.LayerProperty;
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
 import org.drama.exception.OccurredException;
@@ -38,5 +37,5 @@ public interface Kernel {
 	 * Layer 生成器
 	 * @param generator
 	 */
-	void addLayerGenerator(Function<BiParameterValueObject<Class<? extends Layer>, LayerProperty>, Layer> generator);
+	void addLayerGenerator(Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> generator);
 }

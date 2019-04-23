@@ -18,5 +18,5 @@ public interface LayerFactory {
 	 * @param priority
 	 * @return
 	 */
-	Layer getLayer(String name, int priority);
+	Layer getLayer(LayerDescriptor descriptor);
 }

@@ -118,7 +118,7 @@ public class DramaStage implements Stage {
 		return play(null, events);
 	}
 	
-	protected void playDeal(Event event, Map<String, Object> modelMap, BroadcastLisenter lisenter) throws OccurredException {
+	protected void playDeal(Event event, Map<String, Object> modelMap, BroadcastLisenter lisenter) {
 		getLogging().logDealEvent(event);
 
 		if (!(event instanceof AbstractEvent)) {
@@ -151,7 +151,7 @@ public class DramaStage implements Stage {
 	/**
 	 * 根据监听器判断是否继续往下执行
 	 */
-	protected void playDealEvent(Event event, BroadcastLisenter lisenter) throws OccurredException {
+	protected void playDealEvent(Event event, BroadcastLisenter lisenter) {
 		if (Objects.isNull(event) || CollectionUtils.isEmpty(getLayers())) {
 			return;
 		}
@@ -183,7 +183,7 @@ public class DramaStage implements Stage {
 			layer = layerFactory.getLayer(p.getParam1());
 			
 			if(Objects.isNull(layer)) {
-				layer = layerFactory.getLayer(p.getParam2().name(), p.getParam2().priority());
+				layer = layerFactory.getLayer(p.getParam2());
 			}
 			
 			return layer;
@@ -223,11 +223,11 @@ public class DramaStage implements Stage {
 		// 清空逻辑处理层，以便可以重新获取
 		setLayers(null);
 		
-		if(registerEvent(registerEventFactory.events())) {
+		if(!registerEvent(registerEventFactory.events())) {
 			throw OccurredException.errorRegisterEvents();
 		}
 		
-		if(registerElement(registerElementFactory.elements())) {
+		if(!registerElement(registerElementFactory.elements())) {
 			throw OccurredException.emptyRegisterElements();
 		}
 	}

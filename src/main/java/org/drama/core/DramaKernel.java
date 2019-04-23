@@ -18,9 +18,11 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.drama.annotation.ElementProperty;
+import org.drama.annotation.LayerDescription;
 import org.drama.annotation.LayerProperty;
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
+import org.drama.exception.OccurredException;
 import org.drama.vo.BiParameterValueObject;
 import org.drama.vo.KeyValueObject;
 
@@ -35,7 +37,7 @@ class DramaKernel implements Kernel {
 	private static final Map<KeyValueObject<Class<? extends Event>, LayerContainer>, Set<ElementContainer>> eventHandingPool = new HashMap<>();
 	private static final Set<LayerContainer> layerContainers = new TreeSet<>();
 
-	private Function<BiParameterValueObject<Class<? extends Layer>, LayerProperty>, Layer> layerGenerator;
+	private Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> layerGenerator;
 
 	@Override
 	public boolean regeisterEvent(Set<Class<? extends Event>> eventClzs) {
@@ -54,7 +56,7 @@ class DramaKernel implements Kernel {
 	@Override
 	public Layer registerElement(Element element) {
 		if (CollectionUtils.isEmpty(registeredEvents)) {
-			return null;
+			throw OccurredException.emptyRegisterEvents();
 		}
 
 		ElementProperty prop = element.getClass().getAnnotation(ElementProperty.class);
@@ -63,15 +65,15 @@ class DramaKernel implements Kernel {
 			return null;
 		}
 
-		Class<? extends Event>[] events = prop.events();
-
-		if (ArrayUtils.isEmpty(events)) {
-			return null;
-		}
-
 		LayerContainer LayerContainer = getLayerContainer(prop);
 
 		if (Objects.isNull(LayerContainer)) {
+			return null;
+		}
+		
+		Class<? extends Event>[] events = prop.events();
+
+		if (ArrayUtils.isEmpty(events)) {
 			return null;
 		}
 
@@ -117,14 +119,31 @@ class DramaKernel implements Kernel {
 		}
 
 		LayerProperty layerProp = layerClazz.getAnnotation(LayerProperty.class);
+		LayerDescriptor layerDescriptor = null;
 
 		// 如果指定的 layer 有描述注解，则按描述注解进行查找和分配
 		if (Objects.nonNull(layerProp)) {
-			layerContainer = getLayerContainer(layerClazz, layerProp);
+			layerDescriptor = getLayerDescriptor(layerProp.uuid(), layerProp.name(), layerProp.priority(),layerProp.disabled());
+			layerContainer = getLayerContainer(layerClazz, layerDescriptor);
 		} else {
-			// 根据指定的 layer 没有找到，则通过 ElementProperty 提供给的 layerInfo 进行分配
-			layerProp = prop.layerInfo();
-			layerContainer = getLayerContainer(layerClazz, layerProp);
+			// 根据指定的 layer 没有找到，则通过 ElementProperty 提供给的 layerDesc 进行分配
+			LayerDescription layerDesc = Objects.requireNonNull(prop.layerDesc());
+
+			String enumTargetName = layerDesc.target();
+			Enum<? extends LayerDescriptor>[] enumerators = layerDesc.desc().getEnumConstants();
+
+			for (Enum<? extends LayerDescriptor> e : enumerators) {
+				if (!(e instanceof LayerDescriptor)) {
+					continue;
+				}
+
+				layerDescriptor = (LayerDescriptor) e;
+
+				if (Objects.equals(enumTargetName, layerDescriptor.getName())) {
+					layerContainer = getLayerContainer(layerClazz, layerDescriptor);
+					break;
+				}
+			}
 		}
 
 		if (Objects.nonNull(layerContainer) && !layerContainers.contains(layerContainer)) {
@@ -134,34 +153,58 @@ class DramaKernel implements Kernel {
 		return layerContainer;
 	}
 
-	private LayerContainer getLayerContainer(final Class<? extends Layer> layerClz, final LayerProperty layerProp) {
+	private LayerDescriptor getLayerDescriptor(String uuid, String name, int priority, boolean disabled) {
+		return new LayerDescriptor() {
+			@Override
+			public String getName() {
+				return name;
+			}
+
+			@Override
+			public int getPriority() {
+				return priority;
+			}
+
+			@Override
+			public String getUUID() {
+				return uuid;
+			}
+
+			@Override
+			public boolean getDisabled() {
+				return disabled;
+			}
+		};
+	}
+
+	private LayerContainer getLayerContainer(final Class<? extends Layer> clz, LayerDescriptor desc) {
+		final UUID identity = UUID.fromString(desc.getUUID());
+		
 		LayerContainer layerContainer = null;
 
-		final UUID identity = UUID.fromString(layerProp.uuid());
-
-		layerContainer = layerContainers.stream().filter((c) -> Objects.equals(c.getIndentity(), identity)).findFirst()
-				.get();
+		for(LayerContainer layerCon : layerContainers) {
+			if(Objects.equals(layerCon.getIndentity(), identity)) {
+				layerContainer = layerCon;
+				break;
+			}
+		}
 
 		if (Objects.nonNull(layerContainer)) {
 			return layerContainer;
 		} else {
-			Layer layer = null;
-
-			if (Objects.nonNull(layerGenerator)) {
-				layer = func(layerGenerator, new BiParameterValueObject<>(layerClz, layerProp));
-			}
+			Layer layer = func(layerGenerator, new BiParameterValueObject<>(clz, desc));
 
 			if (Objects.isNull(layer)) {
-				layer = on(layerClz).get();
+				layer = on(clz).create().get();
 			}
 
 			if (Objects.nonNull(layer)) {
 				layer.setKernel(this);
 
-				layerContainer = new LayerContainer(layer, UUID.fromString(layerProp.uuid()));
-				layerContainer.setName(layerProp.name());
-				layerContainer.setPriority(layerProp.priority());
-				layerContainer.setDisable(layerProp.disabled());
+				layerContainer = new LayerContainer(layer, identity);
+				layerContainer.setName(desc.getName());
+				layerContainer.setPriority(desc.getPriority());
+				layerContainer.setDisable(desc.getDisabled());
 			}
 		}
 
@@ -170,14 +213,15 @@ class DramaKernel implements Kernel {
 
 	@Override
 	public void addLayerGenerator(
-			Function<BiParameterValueObject<Class<? extends Layer>, LayerProperty>, Layer> generator) {
+			Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> generator) {
+
 		layerGenerator = generator;
 	}
 
 	private void bindElementHandler(Element element, ElementProperty prop, Set<ElementContainer> elemSet) {
 		ElementContainer elemCon = new ElementContainer(element);
 		elemCon.setPriority(prop.priority());
-		
+
 		if (!elemSet.contains(elemCon)) {
 			elemSet.add(elemCon);
 		}
@@ -189,7 +233,7 @@ class DramaKernel implements Kernel {
 
 		eventHandingPool.keySet().stream().filter((k) -> Objects.equals(k.getValue().getLayer(), layer)
 				&& !k.getValue().getDisabled() && Objects.equals(k.getKey(), eventClass)).forEach((k) -> {
-					
+
 					Set<ElementContainer> elemSet = eventHandingPool.get(k);
 
 					if (CollectionUtils.isEmpty(elemSet)) {
@@ -197,13 +241,17 @@ class DramaKernel implements Kernel {
 					}
 
 					for (ElementContainer elemCon : elemSet) {
+						elemCon.setCurrentLayer(layer);
+						
 						Element elem = elemCon.getInvocator();
-						
+
 						elem.handing(event);
-						
+
 						action(onCompleted, elem);
 						
-						if(!Objects.equals(elem.getHandingStatus(), HandingStatus.Transmit)) {
+						elemCon.setCurrentLayer(null);
+
+						if (!Objects.equals(elem.getHandingStatus(), HandingStatus.Transmit)) {
 							break;
 						}
 					}

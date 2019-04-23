@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
+import org.drama.exception.OccurredException;
 import org.drama.log.LoggingFactory;
 import org.drama.log.template.ILayerLoggingTemplate;
 import org.drama.log.template.LoggingTemplateFactory;
@@ -32,7 +33,7 @@ public class DramaLayer implements Layer {
     @Override
     public void broadcast(Event event, BroadcastLisenter broadcasetListener) {
 		if(Objects.isNull(event)) {
-		    return;
+			throw OccurredException.illegalBroadcastEvent(this, event);
 		}
 		
 		// 设置当前逻辑处理层
