@@ -1,5 +1,7 @@
 package org.drama.core;
 
+import static org.joor.Reflect.on;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -172,22 +174,6 @@ public class DramaStage implements Stage {
 	@Override
 	public void setLayerFactory(final LayerFactory layerFactory) {
 		this.layerFactory = layerFactory;
-		
-		getKernel().addLayerGenerator((p) -> {
-			if(Objects.isNull(layerFactory)) {
-				return null;
-			}
-			
-			Layer layer = null;
-			
-			layer = layerFactory.getLayer(p.getParam1());
-			
-			if(Objects.isNull(layer)) {
-				layer = layerFactory.getLayer(p.getParam2());
-			}
-			
-			return layer;
-		});
 	}
 
 	private void setLogging(IStageLoggingTemplate logging) {
@@ -212,6 +198,24 @@ public class DramaStage implements Stage {
 
 	@Override
 	public void setup() throws OccurredException {
+		getKernel().addLayerGenerator((p) -> {			
+			if(Objects.equals(Layer.Null.class, p.getParam1())) {
+				return on("org.drama.core.DramaLayer", this.getClass().getClassLoader()).create().get();
+			}
+			
+			if(Objects.isNull(layerFactory)) {
+				return null;
+			}
+			
+			Layer layer = layerFactory.getLayer(p.getParam1());
+			
+			if(Objects.isNull(layer)) {
+				layer = layerFactory.getLayer(p.getParam2());
+			}
+			
+			return layer;
+		});
+		
 		if(Objects.isNull(registerEventFactory)) {
 			throw OccurredException.emptyRegisterEvents();
 		}

@@ -1,6 +1,5 @@
 package org.drama.annotation;
 
-
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Documented;
@@ -11,7 +10,7 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
+@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE })
 @Inherited
 public @interface AliasAnno {
 	String value();

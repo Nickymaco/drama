@@ -7,7 +7,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.drama.core.DramaLayer;
 import org.drama.core.Layer;
 import org.drama.core.LayerDescriptor;
 import org.drama.event.Event;
@@ -34,7 +33,7 @@ public @interface ElementProperty {
 	 * 
 	 * @return
 	 */
-	Class<? extends Layer> layer() default DramaLayer.class;
+	Class<? extends Layer> layer() default Layer.Null.class;
 	
 	/**
 	 * 逻辑处理层描述，如果{@code layer}里找到描述则不会用此属性覆盖

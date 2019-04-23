@@ -6,6 +6,11 @@ package org.drama.core;
  *
  */
 public interface LayerDescriptor {
+	/**
+	 * 占位符，默认描述
+	 * @author john
+	 *
+	 */
 	enum Default implements LayerDescriptor {
 		Drama(Layer.DefaultName, Layer.DefaultUUID, Layer.DefaultPriority);
 		

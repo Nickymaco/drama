@@ -12,6 +12,26 @@ public interface Layer {
 	static final String DefaultUUID = "A66A23C6-1A62-4B53-AD80-6DDB58D900D";
 	static final int DefaultPriority = 3290;
 	/**
+	 * 占位符
+	 * @author john
+	 *
+	 */
+	static class Null implements Layer {
+		@Override
+		public void setKernel(Kernel kernel) {	
+		}
+		@Override
+		public ImmutableSet<Element> getElements() {
+			return null;
+		}
+		@Override
+		public void setLoggingFactory(LoggingFactory loggingFactory) {
+		}
+		@Override
+		public void broadcast(Event event, BroadcastLisenter broadcasetListener) {
+		}
+	}
+	/**
 	 * 提供内核
 	 * @param kernel
 	 */

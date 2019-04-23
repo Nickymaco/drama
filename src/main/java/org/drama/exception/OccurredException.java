@@ -16,6 +16,7 @@ public class OccurredException extends RuntimeException {
 	static final String IllegalBroadcastMsg = "Illegal broadcast event on layer<%s>";
 	static final String ElemHandingError = "Element occurring error on handing. Layer<%s>-element<%s>";
 	static final String OnlyGlobaleEventMsg = "Element<%s> register more event, Global Event only. don't need any other event";
+	static final String NoSpecialLayerPropMsg = "Layer<%s> must special a LayerProperty annotaioin";
 	
 	private static final long serialVersionUID = -7337990653787626209L;
 	
@@ -71,5 +72,9 @@ public class OccurredException extends RuntimeException {
 	public static OccurredException onlyGlobaleEvent(Class<? extends Element> elem) {
 		String message = String.format(IllegalEventMsg, elem.getName());
 		return new OccurredException(message);
+	}
+	
+	public static OccurredException noSpecialLayerProp(Class<? extends Layer> layer) {
+		return new OccurredException(String.format(NoSpecialLayerPropMsg, layer.getName()));
 	}
 }
