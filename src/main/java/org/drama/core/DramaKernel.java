@@ -97,8 +97,6 @@ class DramaKernel implements Kernel {
 			Layer layer = func(layerGenerator, new BiParameterValueObject<>(clz, desc));
 
 			if (Objects.nonNull(layer)) {
-				layer.setKernel(this);
-
 				layerContainer = new LayerContainer(layer, identity);
 				layerContainer.setName(desc.getName());
 				layerContainer.setPriority(desc.getPriority());
@@ -173,7 +171,7 @@ class DramaKernel implements Kernel {
 	}
 
 	@Override
-	public void notifyHandler(final Layer layer, final Event event, final Consumer<Element> onCompleted) {
+	public void notifyHandler(final Layer layer, final Event event, final Consumer<LayerContainer> onPreHanding, final Consumer<Element> onCompleted) {
 		final Class<?> eventClass = event.getClass();
 
 		eventHandingPool.keySet().stream().filter((k) -> Objects.equals(k.getValue().getLayer(), layer)
@@ -184,6 +182,8 @@ class DramaKernel implements Kernel {
 					if (CollectionUtils.isEmpty(elemSet)) {
 						return;
 					}
+					
+					action(onPreHanding, k.getValue());
 
 					for (ElementContainer elemCon : elemSet) {
 						elemCon.setCurrentLayer(layer);

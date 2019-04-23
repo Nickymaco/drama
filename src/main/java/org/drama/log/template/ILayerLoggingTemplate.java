@@ -12,10 +12,10 @@ public interface ILayerLoggingTemplate extends LoggingInteractor {
 	 * 记录传播事件
 	 * @param event
 	 */
-	void logBroadcast(Layer layer, Event event);
+	void broadcast(String layerName, Event event);
 	/**
 	 * 记录元素handing
 	 * @param element
 	 */
-	void logHandingElement(Layer layer, Element element);
+	void handingElement(Layer layer, Element element);
 }

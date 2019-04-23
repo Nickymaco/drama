@@ -27,7 +27,7 @@ public interface Kernel {
 	 * @param event
 	 * @param onCompleted 事件完成回调，如果 {@code true} 则退出当前逻辑层不再往下执行
 	 */
-	void notifyHandler(Layer layer, Event event, Consumer<Element> onCompleted);
+	void notifyHandler(Layer layer, Event event, Consumer<LayerContainer> onPreHanding, Consumer<Element> onCompleted);
 	/**
 	 * 获取逻辑处理层
 	 * @return

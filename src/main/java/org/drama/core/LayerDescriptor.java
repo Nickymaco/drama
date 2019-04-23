@@ -11,7 +11,7 @@ public interface LayerDescriptor {
 	 * @author john
 	 *
 	 */
-	enum Default implements LayerDescriptor {
+	static enum Default implements LayerDescriptor {
 		Drama(Layer.DefaultName, Layer.DefaultUUID, Layer.DefaultPriority);
 		
 		private String name;

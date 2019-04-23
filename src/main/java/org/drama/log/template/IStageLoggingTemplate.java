@@ -10,10 +10,10 @@ public interface IStageLoggingTemplate extends LoggingInteractor {
 	 * 收到事件
 	 * @param events
 	 */
-	void logRecevieEvent(Event[] events);
+	void recevieEvent(Event[] events);
 	/**
 	 * 处理事件
 	 * @param event
 	 */
-	void logDealEvent(Event event);
+	void dealEvent(Event event);
 }

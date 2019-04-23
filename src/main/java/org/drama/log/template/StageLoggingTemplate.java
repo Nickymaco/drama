@@ -11,7 +11,7 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
     }
 
 	@Override
-	public void logRecevieEvent(Event[] events) {
+	public void recevieEvent(Event[] events) {
 		if(events == null || events.length == 0) {
 			return;
 		}
@@ -29,19 +29,18 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
 	}
 
 	@Override
-	public void logDealEvent(Event event) {
+	public void dealEvent(Event event) {
 		this.getLogging().info(StageDeal, IStageLoggingTemplate.PREFIX, event.getClass().getSimpleName());
 	}
 
 	@Override
-	public void logBroadcast(Layer layer, Event event) {
-		String layerName = layer.getClass().getSimpleName();
+	public void broadcast(String layerName, Event event) {
 		String eventName = event.getClass().getSimpleName();
 		this.getLogging().info(LayerBroadcast, ILayerLoggingTemplate.PREFIX, layerName, eventName);
 	}
 
 	@Override
-	public void logHandingElement(Layer layer, Element element) {
+	public void handingElement(Layer layer, Element element) {
 		String layerName = layer.getClass().getSimpleName();
 		String elementName = element.getClass().getSimpleName();
 		this.getLogging().info(LayerHanding, ILayerLoggingTemplate.PREFIX, layerName, elementName);

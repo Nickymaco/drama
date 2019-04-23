@@ -21,7 +21,6 @@ import org.drama.event.EventResult;
 import org.drama.event.EventResultEntity;
 import org.drama.event.EventResultValue;
 import org.drama.exception.OccurredException;
-import org.drama.log.LoggingFactory;
 import org.drama.log.template.IStageLoggingTemplate;
 import org.drama.log.template.LoggingTemplateFactory;
 
@@ -29,32 +28,15 @@ import org.drama.log.template.LoggingTemplateFactory;
  * 默认舞台，执行逻辑处理层时按照线性关系依次执行
  */
 public class DramaStage implements Stage {
-	private final Kernel kernel = new DramaKernel();
 	private final ThreadLocal<StageRender> currentRender = new ThreadLocal<>();
-	
 	private IStageLoggingTemplate logging;
-	private LoggingFactory loggingFactory;
-	private LayerFactory layerFactory;
 	private ImmutableSet<Layer> layers;
-	
-	private RegisterElementFactory registerElementFactory;
-	private RegisterEventFactory registerEventFactory;
-	
-	private BroadcastLisenter broadcastLisenter;
-
-	@Override
-	public final Kernel getKernel() {
-		return kernel;
-	}
-
-	public LayerFactory getLayerFactory() {
-		return layerFactory;
-	}
+	private Configuration configuration;
 	
 	@Override
 	public ImmutableSet<Layer> getLayers() {
 		if(Objects.isNull(layers)) {
-			layers = getKernel().getlayers();
+			layers = configuration.getKernel().getlayers();
 		}
 		return layers;
 	}
@@ -80,11 +62,10 @@ public class DramaStage implements Stage {
 			return currentRender.get();
 		}
 
-		getLogging().logRecevieEvent(events);
+		getLogging().recevieEvent(events);
 
 		Map<String, Object> modelMap = new HashMap<>();
-		
-		BroadcastLisenter broadcastlisenter = ObjectUtils.defaultIfNull(getBroadcastLisenter(), new DramaBroadcastLisenter());
+		BroadcastLisenter broadcastlisenter = configuration.getBroadcastLisenter();
 		PlayLisenter playLisenter = ObjectUtils.defaultIfNull(lisenter, PlayLisenter.Null);
 
 		for (Event event : events) {
@@ -121,7 +102,7 @@ public class DramaStage implements Stage {
 	}
 	
 	protected void playDeal(Event event, Map<String, Object> modelMap, BroadcastLisenter lisenter) {
-		getLogging().logDealEvent(event);
+		getLogging().dealEvent(event);
 
 		if (!(event instanceof AbstractEvent)) {
 			return;
@@ -172,57 +153,37 @@ public class DramaStage implements Stage {
 	}
 
 	@Override
-	public void setLayerFactory(final LayerFactory layerFactory) {
-		this.layerFactory = layerFactory;
-	}
-
-	private void setLogging(IStageLoggingTemplate logging) {
-		this.logging = logging;
-	}
-
-	@Override
-	public void setLoggingFactory(LoggingFactory loggingFactory) {
-		this.loggingFactory = loggingFactory;
-		setLogging(LoggingTemplateFactory.getStageLoggingTemplate(loggingFactory));
-	}
-
-	@Override
-	public void setRegisterElementFactory(RegisterElementFactory registerElementFactory) {
-		this.registerElementFactory = registerElementFactory;
-	}
-
-	@Override
-	public void setRegisterEventFactory(RegisterEventFactory registerEventFactory) {
-		this.registerEventFactory = registerEventFactory;
-	}
-
-	@Override
-	public void setup() throws OccurredException {
-		getKernel().addLayerGenerator((p) -> {			
-			if(Objects.equals(Layer.Null.class, p.getParam1())) {
-				return on("org.drama.core.DramaLayer", this.getClass().getClassLoader()).create().get();
-			}
-			
-			if(Objects.isNull(layerFactory)) {
-				return null;
-			}
-			
-			Layer layer = layerFactory.getLayer(p.getParam1());
-			
-			if(Objects.isNull(layer)) {
-				layer = layerFactory.getLayer(p.getParam2());
-			}
-			
-			return layer;
-		});
+	public void setup(Configuration configuration) throws OccurredException {
+		this.configuration = Objects.requireNonNull(configuration);
+		// 获取注册事件工厂
+		final RegisterEventFactory registerEventFactory = configuration.getRegisterEventFactory();
 		
 		if(Objects.isNull(registerEventFactory)) {
 			throw OccurredException.emptyRegisterEvents();
 		}
+		// 获取注册元素工厂
+		final RegisterElementFactory registerElementFactory = configuration.getRegisterElementFactory();
 		
 		if(Objects.isNull(registerElementFactory)) {
 			throw OccurredException.emptyRegisterElements();
 		}
+		// 自定义逻辑处理层构建工厂
+		final LayerFactory layerFacotry = configuration.getLayerFactory();
+		
+		configuration.getKernel().addLayerGenerator((p) -> {			
+			if(Objects.equals(Layer.Null.class, p.getParam1())) {
+				return on("org.drama.core.DramaLayer", this.getClass().getClassLoader()).create().get();
+			}else if(Objects.isNull(layerFacotry)) {
+				return null;
+			} else {
+				Layer layer = layerFacotry.getLayer(p.getParam1());
+				
+				if(Objects.isNull(layer)) {
+					layer = layerFacotry.getLayer(p.getParam2());
+				}
+				return layer;
+			}
+		});
 		
 		// 清空逻辑处理层，以便可以重新获取
 		setLayers(null);
@@ -234,6 +195,8 @@ public class DramaStage implements Stage {
 		if(!registerElement(registerElementFactory.elements())) {
 			throw OccurredException.emptyRegisterElements();
 		}
+		
+		logging = LoggingTemplateFactory.getStageLoggingTemplate(configuration.getLoggingFactory());
 	}
 	
 	protected boolean registerElement(Set<Element> elements) {
@@ -241,14 +204,16 @@ public class DramaStage implements Stage {
 			return false;
 		}
 		
+		Kernel kernel = Objects.requireNonNull(configuration.getKernel());
+		
 		for (Element element : elements) {
-			Layer layer = getKernel().registerElement(element);
+			Layer layer = kernel.registerElement(element);
 			
 			if(Objects.isNull(layer)) {
 				return false;
 			}
 			
-			layer.setLoggingFactory(loggingFactory);
+			layer.setConfiguration(configuration);
 		}
 		return true;
 	}
@@ -257,19 +222,15 @@ public class DramaStage implements Stage {
 		if (CollectionUtils.isEmpty(events)) {
 			return false;
 		}
-
-		getKernel().regeisterEvent(events);
+		
+		Kernel kernel = Objects.requireNonNull(configuration.getKernel());
+		kernel.regeisterEvent(events);
 		
 		return true;
 	}
 
 	@Override
-	public BroadcastLisenter getBroadcastLisenter() {
-		return broadcastLisenter;
-	}
-
-	@Override
-	public void setBroadcastLisenter(BroadcastLisenter lisenter) {
-		this.broadcastLisenter = lisenter;
+	public Configuration getConfiguration() {
+		return configuration;
 	}
 }

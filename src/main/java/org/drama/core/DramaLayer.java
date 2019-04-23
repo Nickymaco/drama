@@ -14,20 +14,13 @@ import org.drama.log.template.LoggingTemplateFactory;
  */
 public class DramaLayer implements Layer {
     private ILayerLoggingTemplate logging;
+    private LoggingFactory loggingFactory;
     private Kernel kernel;
+    private Configuration configuration;
 
     @Override
 	public ImmutableSet<Element> getElements() {
 		return null;
-	}
-
-	public final Kernel getKernel() {
-		return kernel;
-	}
-
-	@Override
-	public void setKernel(Kernel kernel) {
-		this.kernel = kernel;
 	}
 
     @Override
@@ -39,32 +32,46 @@ public class DramaLayer implements Layer {
 		// 设置当前逻辑处理层
 		event.getContext().setCurrentLayer(this);
 		
-		// 打印日志
-		getLogging().logBroadcast(this, event);
+		final DramaLayer that = this;
 		
-		handingElement(event, broadcasetListener);
-    }
-
-	protected void handingElement(Event event, BroadcastLisenter broadcasetListener) {
-		getKernel().notifyHandler(this, event, (e) -> {
+		kernel.notifyHandler(this, event, (l) -> {
+			// 打印日志
+			that.getLogging().broadcast(l.getName(), event);
+		},(e) -> {
 			if(Objects.nonNull(broadcasetListener)) {
 				broadcasetListener.setHandingStatus(e.getHandingStatus());
 			}
 		});
-	}
-	
-	@Override
-	public void setLoggingFactory(LoggingFactory loggingFactory) {
-		if(Objects.isNull(loggingFactory)) {
-			return;
-		}
-		
-		logging = LoggingTemplateFactory.getLayerLoggingTemplate(loggingFactory);
-	}
+    }
 
 	protected ILayerLoggingTemplate getLogging() {
+		if(Objects.isNull(logging)) {
+			logging = LoggingTemplateFactory.getLayerLoggingTemplate(LoggingFactory.Null);
+		}
     	return logging;
     }
 
-	
+	@Override
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+
+	@Override
+	public void setConfiguration(Configuration configuration) {
+		if(Objects.equals(configuration, this.configuration)) {
+			return;
+		}
+		
+		this.configuration = configuration;
+		
+		if(Objects.nonNull(configuration)) {
+			if(!Objects.equals(kernel, configuration.getKernel())) {
+				kernel = Objects.requireNonNull(configuration.getKernel());
+			}
+			
+			if(!Objects.equals(loggingFactory, configuration.getLoggingFactory())) {
+				loggingFactory = configuration.getLoggingFactory();
+			}
+		}
+	}
 }
