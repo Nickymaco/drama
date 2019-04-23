@@ -12,9 +12,10 @@ public class OccurredException extends RuntimeException {
 	static final String ErrorRegisterEventMsg = "Event registered occurred error";
 	static final String ErrorRegisterElemensMsg = "Elemen registered  occurred error";
 	static final String PlayErrorMsg = "Occurred errer on play";
-	static final String IllegalEventMsg = "Illegal event<$s>. It should be inherited AbstractEvent";
+	static final String IllegalEventMsg = "Illegal event<%s>. It should be inherited AbstractEvent";
 	static final String IllegalBroadcastMsg = "Illegal broadcast event on layer<%s>";
 	static final String ElemHandingError = "Element occurring error on handing. Layer<%s>-element<%s>";
+	static final String OnlyGlobaleEventMsg = "Element<%s> register more event, Global Event only. don't need any other event";
 	
 	private static final long serialVersionUID = -7337990653787626209L;
 	
@@ -65,5 +66,10 @@ public class OccurredException extends RuntimeException {
 		String elemName = elem.getClass().getSimpleName();
 		String msg = String.format(ElemHandingError, layerName, elemName);
 		return new OccurredException(msg, e);
+	}
+	
+	public static OccurredException onlyGlobaleEvent(Class<? extends Element> elem) {
+		String message = String.format(IllegalEventMsg, elem.getName());
+		return new OccurredException(message);
 	}
 }

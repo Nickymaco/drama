@@ -74,11 +74,14 @@ class DramaKernel implements Kernel {
 		Class<? extends Event>[] events = prop.events();
 
 		if (ArrayUtils.isEmpty(events)) {
-			return null;
+			throw OccurredException.emptyRegisterEvents();
 		}
 
 		// 注册全局元素
 		if (ArrayUtils.contains(events, Event.class)) {
+			if(events.length != 1) {
+				throw OccurredException.onlyGlobaleEvent(element.getClass());
+			}
 			registeredEvents.forEach((clazz) -> {
 				Set<ElementContainer> elemSet = getElemSet(clazz, LayerContainer);
 				bindElementHandler(element, prop, elemSet);
