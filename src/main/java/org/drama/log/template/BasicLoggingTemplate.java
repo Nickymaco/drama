@@ -6,14 +6,14 @@ import org.drama.log.Logging;
 import org.drama.log.LoggingInteractor;
 
 public class BasicLoggingTemplate implements LoggingInteractor {
-	protected static final String STAGE_DEAL = "{} deal event<{}>";
-	protected static final String STAGE_RECEVIE = "{} recevie event<{}>";
-	protected static final String LAYER_BROADCAST = "{} Layer<{}> broadcast event<{}>";
-	protected static final String LAYER_HANDING="{} Layer<{}> handing element<{}>";
-	protected static final String STAGE_IS_RUNNING = "{} Stage<{}> is running!";
-    protected static final String REGISTERED_LAYER = "{} registered Layer<{}>";
-    protected static final String REGISTERED_ELEMENT = "{} registered element<{}>";
-    protected static final String REGISTERED_EVENT = "{} registered event<{}>";
+	protected static final String STAGE_DEAL = IStageLoggingTemplate.PREFIX + " deal event<{}>";
+	protected static final String STAGE_RECEVIE = IStageLoggingTemplate.PREFIX + " recevie event<{}>";
+	protected static final String LAYER_BROADCAST = ILayerLoggingTemplate.PREFIX + " Layer<{}> broadcast event<{}>";
+	protected static final String LAYER_HANDING = ILayerLoggingTemplate.PREFIX + " Layer<{}> handing element<{}>";
+	protected static final String STAGE_IS_RUNNING = IStageLoggingTemplate.PREFIX + " Stage<{}> is running!";
+    protected static final String REGISTERED_LAYER = IStageLoggingTemplate.PREFIX + " registered Layer<{}>";
+    protected static final String REGISTERED_ELEMENT = IStageLoggingTemplate.PREFIX + " registered element<{}>";
+    protected static final String REGISTERED_EVENT = IStageLoggingTemplate.PREFIX + " registered event<{}>";
 	
 	private Logging logging;
 	

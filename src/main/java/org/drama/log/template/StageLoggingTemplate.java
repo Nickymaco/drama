@@ -27,25 +27,25 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
 			build.append(events[i].getClass().getSimpleName());
 		}
 		
-		getLogging().info(STAGE_RECEVIE, IStageLoggingTemplate.PREFIX, build);
+		getLogging().info(STAGE_RECEVIE, build);
 	}
 
 	@Override
 	public void dealEvent(Event event) {
-		getLogging().info(STAGE_DEAL, IStageLoggingTemplate.PREFIX, event.getClass().getSimpleName());
+		getLogging().info(STAGE_DEAL, event.getClass().getSimpleName());
 	}
 
 	@Override
 	public void broadcast(String layerName, Event event) {
 		String eventName = event.getClass().getSimpleName();
-		getLogging().info(LAYER_BROADCAST, ILayerLoggingTemplate.PREFIX, layerName, eventName);
+		getLogging().info(LAYER_BROADCAST, layerName, eventName);
 	}
 
 	@Override
 	public void handingElement(Layer layer, Element element) {
 		String layerName = layer.getClass().getSimpleName();
 		String elementName = element.getClass().getSimpleName();
-		getLogging().info(LAYER_HANDING, ILayerLoggingTemplate.PREFIX, layerName, elementName);
+		getLogging().info(LAYER_HANDING, layerName, elementName);
 	}
 
 	@Override
@@ -54,7 +54,7 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
 			return;
 		}
 		for(Class<?> event : events) {
-			getLogging().info(REGISTERED_EVENT, IStageLoggingTemplate.PREFIX, event.getName());
+			getLogging().info(REGISTERED_EVENT, event.getName());
 		}
 		
 	}
@@ -65,7 +65,7 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
 			return;
 		}
 		for(Class<?> elem : elements) {
-			getLogging().info(REGISTERED_ELEMENT, IStageLoggingTemplate.PREFIX, elem.getName());
+			getLogging().info(REGISTERED_ELEMENT, elem.getName());
 		}
 	}
 
@@ -75,12 +75,12 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
 			return;
 		}
 		for(String layerName : layers) {
-			getLogging().info(REGISTERED_LAYER, IStageLoggingTemplate.PREFIX, layerName);
+			getLogging().info(REGISTERED_LAYER, layerName);
 		}
 	}
 
 	@Override
 	public void setup(Stage stage) {
-		getLogging().info(STAGE_IS_RUNNING, IStageLoggingTemplate.PREFIX, stage.getClass().getName());
+		getLogging().info(STAGE_IS_RUNNING, stage.getClass().getName());
 	}
 }

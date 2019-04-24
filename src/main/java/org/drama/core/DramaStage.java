@@ -121,8 +121,8 @@ public class DramaStage implements Stage {
 		resultValues.stream().filter((r) -> r.isOutput()).forEach((r) -> {
 			Class<?> clzR = r.getValue().getClass();
 			AliasAnno aliasName = clzR.getAnnotation(AliasAnno.class);
-
-			if (aliasName != null && StringUtils.isNotBlank(aliasName.value())) {
+			
+			if (Objects.nonNull(aliasName) && StringUtils.isNotBlank(aliasName.value())) {
 				modelMap.put(aliasName.value(), r.getValue());
 			} else {
 				EventResultEntity entity = r.getValue();

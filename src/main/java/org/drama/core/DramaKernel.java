@@ -127,7 +127,6 @@ class DramaKernel implements Kernel {
 						.filter((e) -> Objects.equals(e.getName(), enumTargetName))
 						.findFirst();
 			
-			
 			if(optDesc.isPresent()) {
 				layerContainer = getLayerContainer(layerClazz, optDesc.get());
 			}
@@ -223,23 +222,9 @@ class DramaKernel implements Kernel {
 			throw OccurredException.emptyRegisterEvents();
 		}
 
-		ElementProperty prop = element.getClass().getAnnotation(ElementProperty.class);
-
-		if (Objects.isNull(prop)) {
-			return null;
-		}
-
-		LayerContainer LayerContainer = getLayerContainer(prop);
-
-		if (Objects.isNull(LayerContainer)) {
-			return null;
-		}
-		
-		Class<? extends Event>[] events = prop.events();
-
-		if (ArrayUtils.isEmpty(events)) {
-			throw OccurredException.emptyRegisterEvents();
-		}
+		ElementProperty prop = Objects.requireNonNull(element.getClass().getAnnotation(ElementProperty.class));
+		LayerContainer LayerContainer = Objects.requireNonNull(getLayerContainer(prop));
+		Class<? extends Event>[] events = Objects.requireNonNull(prop.events());
 
 		// 注册全局元素
 		if (ArrayUtils.contains(events, Event.class)) {
@@ -261,7 +246,6 @@ class DramaKernel implements Kernel {
 				});
 			}
 		}
-
 		return LayerContainer.getLayer();
 	}
 }
