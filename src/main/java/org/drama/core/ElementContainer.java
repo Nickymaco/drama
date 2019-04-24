@@ -9,7 +9,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.drama.exception.OccurredException;
 
-class ElementContainer implements InvocationHandler, Comparable<ElementContainer> {
+final class ElementContainer implements InvocationHandler, Comparable<ElementContainer> {
 	private int priority;
 	private final Element elem;
 	private final Object invodicator;
