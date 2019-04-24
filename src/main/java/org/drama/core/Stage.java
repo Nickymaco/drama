@@ -39,6 +39,6 @@ public interface Stage {
      * @return
      */
     static Render defaultErrorRender() {
-    	return new StageRender(Render.FAILURE, null, Render.ErrorMsg);
+    	return new StageRender(Render.FAILURE, null, Render.ERROR_MSG);
     }
 }

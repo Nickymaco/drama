@@ -12,7 +12,7 @@ public interface LayerDescriptor {
 	 *
 	 */
 	static enum Default implements LayerDescriptor {
-		Drama(Layer.DefaultName, Layer.DefaultUUID, Layer.DefaultPriority);
+		Drama(Layer.DEFAULT_NAME, Layer.DEFAULT_UUID, Layer.DEFAULT_PRIORITY);
 		
 		private String name;
 		private String UUID;

@@ -4,12 +4,12 @@ import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
 
 /**
- * 逻辑处理层，每一个逻辑处理层负责发起通知,实现接口时应该重写 equals 方法和 hashcode 方法
+ * 逻辑处理层，每一个逻辑处理层负责发起通知
  */
 public interface Layer {
-	static final String DefaultName = "Drama";
-	static final String DefaultUUID = "A66A23C6-1A62-4B53-AD80-6DDB58D900D";
-	static final int DefaultPriority = 3290;
+	static final String DEFAULT_NAME = "Drama";
+	static final String DEFAULT_UUID = "A66A23C6-1A62-4B53-AD80-6DDB58D900D";
+	static final int DEFAULT_PRIORITY = 3290;
 	/**
 	 * 占位符
 	 * @author john

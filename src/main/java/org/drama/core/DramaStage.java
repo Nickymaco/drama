@@ -2,8 +2,10 @@ package org.drama.core;
 
 import static org.joor.Reflect.on;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -57,7 +59,7 @@ public class DramaStage implements Stage {
 
 		if (ArrayUtils.isEmpty(events)) {
 			currentRender.get().setCode(Render.FAILURE);
-			currentRender.get().setMessage(Render.UnfoundEventMsg);
+			currentRender.get().setMessage(Render.UNFOUND_EVENT_MSG);
 			currentRender.get().setModel(null);
 			return currentRender.get();
 		}
@@ -155,6 +157,10 @@ public class DramaStage implements Stage {
 	@Override
 	public void setup(Configuration configuration) throws OccurredException {
 		this.configuration = Objects.requireNonNull(configuration);
+		
+		logging = LoggingTemplateFactory.getStageLoggingTemplate(configuration.getLoggingFactory());		
+		logging.setup(this);
+		
 		// 获取注册事件工厂
 		final RegisterEventFactory registerEventFactory = configuration.getRegisterEventFactory();
 		
@@ -170,19 +176,28 @@ public class DramaStage implements Stage {
 		// 自定义逻辑处理层构建工厂
 		final LayerFactory layerFacotry = configuration.getLayerFactory();
 		
-		configuration.getKernel().addLayerGenerator((p) -> {			
+		// 注册逻辑处理层
+		final List<LayerDescriptor> layerDescList = new ArrayList<>();
+		
+		configuration.getKernel().addLayerGenerator((p) -> {	
+			Layer layer = null;
+			
 			if(Objects.equals(Layer.Null.class, p.getParam1())) {
-				return on("org.drama.core.DramaLayer", this.getClass().getClassLoader()).create().get();
+				layer = on("org.drama.core.DramaLayer", this.getClass().getClassLoader()).create().get();
 			}else if(Objects.isNull(layerFacotry)) {
 				return null;
 			} else {
-				Layer layer = layerFacotry.getLayer(p.getParam1());
+				layer = layerFacotry.getLayer(p.getParam1());
 				
 				if(Objects.isNull(layer)) {
 					layer = layerFacotry.getLayer(p.getParam2());
 				}
-				return layer;
 			}
+			
+			if(Objects.nonNull(layer) && !layerDescList.contains(p.getParam2())) {
+				layerDescList.add(p.getParam2());
+			}
+			return layer;
 		});
 		
 		// 清空逻辑处理层，以便可以重新获取
@@ -195,8 +210,10 @@ public class DramaStage implements Stage {
 		if(!registerElement(registerElementFactory.elements())) {
 			throw OccurredException.emptyRegisterElements();
 		}
-		
-		logging = LoggingTemplateFactory.getStageLoggingTemplate(configuration.getLoggingFactory());
+		// 输出日志
+		layerDescList.forEach((desc) -> {
+			getLogging().regeisteredLayer(new String[] { desc.getName() });
+		});
 	}
 	
 	protected boolean registerElement(Set<Element> elements) {
@@ -214,6 +231,8 @@ public class DramaStage implements Stage {
 			}
 			
 			layer.setConfiguration(configuration);
+			
+			getLogging().regeisteredElement(new Class<?>[] {element.getClass()});
 		}
 		return true;
 	}
@@ -225,6 +244,8 @@ public class DramaStage implements Stage {
 		
 		Kernel kernel = Objects.requireNonNull(configuration.getKernel());
 		kernel.regeisterEvent(events);
+		
+		getLogging().registeredEvent(events.toArray(new Class<?>[events.size()]));
 		
 		return true;
 	}

@@ -39,5 +39,5 @@ public @interface ElementProperty {
 	 * 逻辑处理层描述，如果{@code layer}里找到描述则不会用此属性覆盖
 	 * @return
 	 */
-	LayerDescription layerDesc() default @LayerDescription(desc = LayerDescriptor.Default.class, target = Layer.DefaultName); 
+	LayerDescription layerDesc() default @LayerDescription(desc = LayerDescriptor.Default.class, target = Layer.DEFAULT_NAME); 
 }
