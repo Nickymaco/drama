@@ -30,6 +30,7 @@ import org.drama.log.template.LoggingTemplateFactory;
  * 默认舞台，执行逻辑处理层时按照线性关系依次执行
  */
 public class DramaStage implements Stage {
+	protected static final String DEFAULT_LAYER_CLASS = "org.drama.core.DramaLayer";
 	private final ThreadLocal<StageRender> currentRender = new ThreadLocal<>();
 	private IStageLoggingTemplate logging;
 	private ImmutableSet<Layer> layers;
@@ -183,7 +184,7 @@ public class DramaStage implements Stage {
 			Layer layer = null;
 			
 			if(Objects.equals(Layer.Null.class, p.getParam1())) {
-				layer = on("org.drama.core.DramaLayer", this.getClass().getClassLoader()).create().get();
+				layer = on(DEFAULT_LAYER_CLASS, this.getClass().getClassLoader()).create().get();
 			}else if(Objects.isNull(layerFacotry)) {
 				return null;
 			} else {
