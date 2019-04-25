@@ -11,11 +11,11 @@ public interface Layer {
 	static final String DEFAULT_UUID = "A66A23C6-1A62-4B53-AD80-6DDB58D900D";
 	static final int DEFAULT_PRIORITY = 3290;
 	/**
-	 * 占位符
+	 * 占位符,防空指针
 	 * @author john
 	 *
 	 */
-	static class Null implements Layer {
+	static final class Null implements Layer {
 		@Override
 		public ImmutableSet<Element> getElements() {
 			return null;

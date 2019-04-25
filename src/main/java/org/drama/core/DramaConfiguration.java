@@ -49,7 +49,7 @@ public class DramaConfiguration implements Configuration {
 
 	@Override
 	public LoggingFactory getLoggingFactory() {
-		return ObjectUtils.defaultIfNull(loggingFactory, LoggingFactory.Null);
+		return ObjectUtils.defaultIfNull(loggingFactory, LoggingFactory.NULL);
 	}
 
 	public void setLoggingFactory(LoggingFactory loggingFactory) {

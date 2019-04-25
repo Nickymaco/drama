@@ -6,14 +6,14 @@ public abstract class LoggingFactory {
 	 * @author john
 	 *
 	 */
-	static class Null extends LoggingFactory {
+	static final class Null extends LoggingFactory {
 		@Override
 		protected Logging getLogging() {
 			return LoggingProxy.newInstance(null);
 		}
 	}
 	
-	public static LoggingFactory Null = new LoggingFactory.Null();
+	public static final LoggingFactory NULL = new LoggingFactory.Null();
 	
 	public Logging logging() {
 		return LoggingProxy.newInstance(this);

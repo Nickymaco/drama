@@ -46,7 +46,7 @@ public class DramaLayer implements Layer {
 
 	protected ILayerLoggingTemplate getLogging() {
 		if(Objects.isNull(logging)) {
-			logging = LoggingTemplateFactory.getLayerLoggingTemplate(LoggingFactory.Null);
+			logging = LoggingTemplateFactory.getLayerLoggingTemplate(LoggingFactory.NULL);
 		}
     	return logging;
     }

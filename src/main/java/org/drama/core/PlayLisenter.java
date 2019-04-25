@@ -6,7 +6,7 @@ public interface PlayLisenter {
 	/**
 	 * 占位符，防止抛空指针异常
 	 */
-	static PlayLisenter Null = new PlayLisenter() {
+	static final PlayLisenter NULL = new PlayLisenter() {
 		@Override
 		public void onCompletedPlay(Event event) {
 		}

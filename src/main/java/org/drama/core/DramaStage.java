@@ -68,7 +68,7 @@ public class DramaStage implements Stage {
 
 		Map<String, Object> modelMap = new HashMap<>();
 		BroadcastLisenter broadcastlisenter = configuration.getBroadcastLisenter();
-		PlayLisenter playLisenter = ObjectUtils.defaultIfNull(lisenter, PlayLisenter.Null);
+		PlayLisenter playLisenter = ObjectUtils.defaultIfNull(lisenter, PlayLisenter.NULL);
 
 		for (Event event : events) {
 			if(playLisenter.onBeforePlay(event)) {
