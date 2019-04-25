@@ -7,7 +7,6 @@ import java.io.Serializable;
  * @param <T>
  */
 public class EventArgument<T> implements Serializable {
-
     private static final long serialVersionUID = -2894669687322825883L;
 
     private T argument;

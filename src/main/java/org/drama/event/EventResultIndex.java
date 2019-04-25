@@ -1,7 +1,10 @@
 package org.drama.event;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
+
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * 事件结果索引，对事件结果做一个逻辑上的业务元数据描述
@@ -13,12 +16,7 @@ public class EventResultIndex implements Serializable {
 	private Class<?> sourceMeta;
 	private UUID artifactId;
 	
-	public EventResultIndex(Class<? extends Event> eventMeta, Class<?> sourceMeta) {
-		this(eventMeta, sourceMeta, new UUID(0,0));
-	}
-	
-	
-	public EventResultIndex(Class<? extends Event> eventMeta, Class<?> sourceMeta, UUID artifact) {
+	public EventResultIndex(UUID artifact, Class<? extends Event> eventMeta, Class<?> sourceMeta) {
 		setArtifactId(artifact);
 	}
 	
@@ -43,25 +41,26 @@ public class EventResultIndex implements Serializable {
 	}
 
 	public void setArtifactId(UUID artifact) {
-		this.artifactId = artifact;
+		this.artifactId = Objects.requireNonNull(artifact);
 	}
 
 	@Override
 	public int hashCode() {
-		return super.hashCode();
+		HashCodeBuilder hcb = new HashCodeBuilder();
+		hcb.append(artifactId);
+		hcb.append(super.hashCode());
+		return hcb.toHashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof EventResultIndex)) {
+		if (Objects.isNull(obj) || !(obj instanceof EventResultIndex)) {
 			return false;
 		}
 		
-		EventResultIndex newObj = (EventResultIndex)obj;
+		EventResultIndex idx = (EventResultIndex)obj;
 		
-		return newObj.getEventMeta().equals(this.getEventMeta())
-				&& newObj.getSourceMeta().equals(this.getSourceMeta())
-				&& newObj.getArtifactId().equals(this.getArtifactId());
+		return Objects.equals(idx.artifactId, artifactId);
 	}
 
 	@Override

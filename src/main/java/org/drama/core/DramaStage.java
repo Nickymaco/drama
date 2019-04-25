@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.InheritanceUtils;
 import org.drama.annotation.AliasAnno;
 import org.drama.collections.ImmutableSet;
-import org.drama.event.AbstractEvent;
+import org.drama.event.DramaEvent;
 import org.drama.event.Event;
 import org.drama.event.EventResult;
 import org.drama.event.EventResultEntity;
@@ -80,7 +80,7 @@ public class DramaStage implements Stage {
 			
 			Class<?> eventClazz = event.getClass();
 			// 检查注册事件类型范围
-			if (!eventClazz.equals(Event.class) && InheritanceUtils.distance(eventClazz, AbstractEvent.class) == 0) {
+			if (!eventClazz.equals(Event.class) && InheritanceUtils.distance(eventClazz, DramaEvent.class) == 0) {
 				throw OccurredException.illegalRegisterEvent(eventClazz);
 			}
 
@@ -107,11 +107,11 @@ public class DramaStage implements Stage {
 	protected void playDeal(Event event, Map<String, Object> modelMap, BroadcastLisenter lisenter) {
 		getLogging().dealEvent(event);
 
-		if (!(event instanceof AbstractEvent)) {
+		if (!(event instanceof DramaEvent)) {
 			return;
 		}
 
-		AbstractEvent<?> abstractEvent = (AbstractEvent<?>) event;
+		DramaEvent<?> abstractEvent = (DramaEvent<?>) event;
 		abstractEvent.setEventResult(new EventResult(abstractEvent));
 
 		playDealEvent(abstractEvent, lisenter);
@@ -119,7 +119,7 @@ public class DramaStage implements Stage {
 		EventResult eventResult = abstractEvent.getEventResult();
 		Collection<EventResultValue> resultValues = eventResult.allResults();
 
-		resultValues.stream().filter((r) -> r.isOutput()).forEach((r) -> {
+		resultValues.stream().filter((r) -> r.getOutput()).forEach((r) -> {
 			Class<?> clzR = r.getValue().getClass();
 			AliasAnno aliasName = clzR.getAnnotation(AliasAnno.class);
 			

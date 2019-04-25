@@ -2,7 +2,7 @@ package org.drama.event;
 
 import static org.joor.Reflect.on;
 
-public class EventBuilder<T extends AbstractEvent<TT>, TT> {
+public class EventBuilder<T extends DramaEvent<TT>, TT> {
     private Class<T> clazz;
     private EventArgument<TT> argument;
 

@@ -2,9 +2,9 @@ package org.drama.event;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.drama.vo.KeyValueObject;
 
@@ -14,7 +14,7 @@ import org.drama.vo.KeyValueObject;
 public class EventResult implements Serializable {
     private static final long serialVersionUID = 4555755009367480736L;
 
-    private Map<EventResultIndex, EventResultValue> objectMap = new HashMap<>();
+    private Map<EventResultIndex, EventResultValue> objectMap = new ConcurrentHashMap<>();
     private Event event;
 
     public EventResult(Event event) {
@@ -39,11 +39,11 @@ public class EventResult implements Serializable {
      * 添加时间结果
      * @param uuid ArtifactId
      * @param evt 事件
-     * @param src 触发石建元
+     * @param src 触发事件源
      * @param ent 事件结果
      */
     public void addResult(String uuid, Class<? extends Event> evt, Class<?> src, EventResultEntity ent, boolean out) {
-    	EventResultIndex index = new EventResultIndex(evt, src, UUID.fromString(uuid));
+    	EventResultIndex index = new EventResultIndex(UUID.fromString(uuid), evt, src);
     	EventResultValue value = new EventResultValue(ent, out);
     	addResult(new KeyValueObject<>(index, value));
     }
@@ -64,6 +64,4 @@ public class EventResult implements Serializable {
     public Collection<EventResultValue> allResults() {
         return objectMap.values();
     }
-    
-    
 }

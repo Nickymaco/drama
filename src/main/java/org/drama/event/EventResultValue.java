@@ -8,23 +8,23 @@ import java.io.Serializable;
 public class EventResultValue implements Serializable {
 	private static final long serialVersionUID = -3647983190859217981L;
 	private EventResultEntity value;
-    private boolean isOutput;
+    private boolean output;
     
 	public EventResultValue(EventResultEntity value) {
 		this(value, false);
 	}
 	
-	public EventResultValue(EventResultEntity value, boolean isOutput) {
+	public EventResultValue(EventResultEntity value, boolean output) {
 		this.setValue(value);
-		this.isOutput = isOutput;
+		this.output = output;
 	}
 
-	public boolean isOutput() {
-		return isOutput;
+	public boolean getOutput() {
+		return output;
 	}
 
-	public void setOutput(boolean isOutput) {
-		this.isOutput = isOutput;
+	public void setOutput(boolean output) {
+		this.output = output;
 	}
 
 	public EventResultEntity getValue() {
