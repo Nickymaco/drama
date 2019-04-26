@@ -27,7 +27,7 @@ public abstract class DramaEvent<T> implements Event{
         return eventResult.get();
     }
 
-    public void setEventResult(EventResult eventResult) {
+    protected void setEventResult(EventResult eventResult) {
         this.eventResult.set(eventResult);
     }
 

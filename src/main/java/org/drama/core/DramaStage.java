@@ -110,12 +110,12 @@ public class DramaStage implements Stage {
 			return;
 		}
 
-		DramaEvent<?> abstractEvent = (DramaEvent<?>) event;
-		abstractEvent.setEventResult(new EventResult(abstractEvent));
+		DramaEvent<?> dramaEvent = (DramaEvent<?>) event;
+		dramaEvent.setEventResult(new EventResult(dramaEvent));
 
-		playDealEvent(abstractEvent, lisenter);
+		playDealEvent(dramaEvent, lisenter);
 
-		EventResult eventResult = abstractEvent.getEventResult();
+		EventResult eventResult = dramaEvent.getEventResult();
 		Collection<EventResultValue> resultValues = eventResult.allResults();
 
 		resultValues.stream().filter((r) -> r.getOutput()).forEach((r) -> {
