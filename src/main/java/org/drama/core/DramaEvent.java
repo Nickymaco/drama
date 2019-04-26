@@ -1,4 +1,9 @@
-package org.drama.event;
+package org.drama.core;
+
+import org.drama.event.Event;
+import org.drama.event.EventArgument;
+import org.drama.event.EventContext;
+import org.drama.event.EventResult;
 
 /**
  * 抽象事件，所以事件都应该派生于它

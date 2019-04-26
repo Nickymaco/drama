@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.InheritanceUtils;
 import org.drama.annotation.AliasAnno;
 import org.drama.collections.ImmutableSet;
-import org.drama.event.DramaEvent;
 import org.drama.event.Event;
 import org.drama.event.EventResult;
 import org.drama.event.EventResultEntity;
