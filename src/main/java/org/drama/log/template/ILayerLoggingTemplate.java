@@ -6,7 +6,7 @@ import org.drama.event.Event;
 import org.drama.log.LoggingInteractor;
 
 public interface ILayerLoggingTemplate extends LoggingInteractor {
-	static final String PREFIX="[ LAYER ] ->";
+	String PREFIX="[ LAYER ] ->";
 
 	/**
 	 * 记录传播事件

@@ -11,14 +11,14 @@ public interface LayerDescriptor {
 	 * @author john
 	 *
 	 */
-	static enum Default implements LayerDescriptor {
+	enum Default implements LayerDescriptor {
 		Drama(Layer.DEFAULT_NAME, Layer.DEFAULT_UUID, Layer.DEFAULT_PRIORITY);
 		
 		private String name;
 		private String UUID;
 		private int priority;
 
-		private Default(String name, String UUID, int priority) {
+		Default(String name, String UUID, int priority) {
 			this.name = name;
 			this.UUID = UUID;
 			this.priority = priority;
@@ -43,7 +43,7 @@ public interface LayerDescriptor {
 		public boolean getDisabled() {
 			return false;
 		}
-	};
+	}
 	
 	/**
 	 * 名称

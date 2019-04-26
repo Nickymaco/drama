@@ -7,15 +7,15 @@ import org.drama.event.Event;
  * 逻辑处理层，每一个逻辑处理层负责发起通知
  */
 public interface Layer {
-	static final String DEFAULT_NAME = "Drama";
-	static final String DEFAULT_UUID = "A66A23C6-1A62-4B53-AD80-6DDB58D900D";
-	static final int DEFAULT_PRIORITY = 3290;
+	String DEFAULT_NAME = "Drama";
+	String DEFAULT_UUID = "A66A23C6-1A62-4B53-AD80-6DDB58D900D";
+	int DEFAULT_PRIORITY = 3290;
 	/**
 	 * 占位符,防空指针
 	 * @author john
 	 *
 	 */
-	static final class Null implements Layer {
+	final class Null implements Layer {
 		@Override
 		public ImmutableSet<Element> getElements() {
 			return null;
@@ -40,7 +40,6 @@ public interface Layer {
      * 广播事件
      */
     void broadcast(Event event, BroadcastLisenter broadcasetListener);
-    
     /**
      * 参数配置
      *

@@ -30,8 +30,4 @@ public class BasicLoggingTemplate implements LoggingInteractor {
 	public Logging getLogging() {
 		return this.logging;
 	}
-	
-	@PostConstruct
-	protected void init() {	
-	}
 }

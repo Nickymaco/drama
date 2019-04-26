@@ -6,10 +6,7 @@ public interface PlayLisenter {
 	/**
 	 * 占位符，防止抛空指针异常
 	 */
-	static final PlayLisenter NULL = new PlayLisenter() {
-		@Override
-		public void onCompletedPlay(Event event) {
-		}
+	PlayLisenter NULL = event -> {
 	};
 	/**
 	 * 在stage play 前触发

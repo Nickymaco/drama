@@ -26,7 +26,7 @@ public class DramaLayer implements Layer {
     @Override
     public void broadcast(Event event, BroadcastLisenter broadcasetListener) {
 		if(Objects.isNull(event)) {
-			throw OccurredException.illegalBroadcastEvent(this, event);
+			throw OccurredException.illegalBroadcastEvent(this, null);
 		}
 		
 		// 设置当前逻辑处理层
@@ -41,6 +41,8 @@ public class DramaLayer implements Layer {
 			if(Objects.nonNull(broadcasetListener)) {
 				broadcasetListener.setHandingStatus(e.getHandingStatus());
 			}
+			// 打印完成日志
+			that.getLogging().handingElement(that, e);
 		});
     }
 

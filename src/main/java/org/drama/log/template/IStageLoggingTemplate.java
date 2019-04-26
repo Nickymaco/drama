@@ -29,7 +29,7 @@ public interface IStageLoggingTemplate extends LoggingInteractor {
 	void regeisteredElement(Class<?>[] elements);
 	/**
 	 * 已注册逻辑处理层
-	 * @param layers
+	 * @param layerNames
 	 */
 	void regeisteredLayer(String[] layerNames);
 	/**
