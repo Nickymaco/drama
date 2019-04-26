@@ -55,5 +55,4 @@ public class DramaConfiguration implements Configuration {
 	public void setLoggingFactory(LoggingFactory loggingFactory) {
 		this.loggingFactory = loggingFactory;
 	}
-
 }

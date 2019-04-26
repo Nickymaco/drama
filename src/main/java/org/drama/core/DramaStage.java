@@ -67,8 +67,11 @@ public class DramaStage implements Stage {
 		getLogging().recevieEvent(events);
 
 		Map<String, Object> modelMap = new HashMap<>();
-		BroadcastLisenter broadcastlisenter = configuration.getBroadcastLisenter();
+		
 		PlayLisenter playLisenter = ObjectUtils.defaultIfNull(lisenter, PlayLisenter.NULL);
+		
+		BroadcastLisenter broadcastlisenter = 
+				ObjectUtils.defaultIfNull(configuration.getBroadcastLisenter(), new DramaBroadcastLisenter());
 
 		for (Event event : events) {
 			if(playLisenter.onBeforePlay(event)) {
