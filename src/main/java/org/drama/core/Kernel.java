@@ -23,6 +23,7 @@ public interface Kernel {
 	 * 通知事件句柄
 	 * @param layer
 	 * @param event
+	 * @param onPreHanding 在每一个逻辑处理层开始广播前执行
 	 * @param onCompleted 事件完成回调，如果 {@code true} 则退出当前逻辑层不再往下执行
 	 */
 	void notifyHandler(Layer layer, Event event, Consumer<LayerContainer> onPreHanding, Consumer<Element> onCompleted);
