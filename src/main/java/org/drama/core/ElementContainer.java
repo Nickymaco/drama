@@ -9,7 +9,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.drama.exception.OccurredException;
 
-final class ElementContainer implements InvocationHandler, Comparable<ElementContainer> {
+class ElementContainer implements InvocationHandler, Comparable<ElementContainer> {
 	private int priority;
 	private final Element elem;
 	private final Object invodicator;
@@ -72,7 +72,7 @@ final class ElementContainer implements InvocationHandler, Comparable<ElementCon
 		try {
 			return method.invoke(elem, args);
 		} catch (Exception e) {
-			throw OccurredException.occurredHandingError(e, currentLayer, elem);
+			throw OccurredException.occurredHandingError(e, getCurrentLayer(), elem);
 		}
 	}
 

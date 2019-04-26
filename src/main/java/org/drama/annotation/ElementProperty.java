@@ -18,26 +18,26 @@ import org.drama.event.Event;
 public @interface ElementProperty {
 	/**
 	 * 优先级
-	 * @return
+	 *
 	 */
 	int priority() default 0;
 	/**
 	 * 元素要监听的时间
 	 * 
-	 * @return
+	 *
 	 */
 	Class<? extends Event>[] events();
 
 	/**
 	 * 指定具体逻辑处理层，需要提供一个无参构造函数
 	 * 
-	 * @return
+	 *
 	 */
 	Class<? extends Layer> layer() default Layer.Null.class;
 	
 	/**
 	 * 逻辑处理层描述，如果{@code layer}里找到描述则不会用此属性覆盖
-	 * @return
+	 *
 	 */
 	LayerDescription layerDesc() default @LayerDescription(desc = LayerDescriptor.Default.class, target = Layer.DEFAULT_NAME); 
 }

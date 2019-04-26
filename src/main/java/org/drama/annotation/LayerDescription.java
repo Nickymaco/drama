@@ -12,12 +12,12 @@ import org.drama.core.LayerDescriptor;
 public @interface LayerDescription {
 	/**
 	 * 用枚举表述一个逻辑处理层
-	 * @return
+	 *
 	 */
 	Class<? extends Enum<? extends LayerDescriptor>> desc(); 
 	/**
 	 * 指导{@code desc}选用哪个枚举
-	 * @return
+	 *
 	 */
 	String target();
 }

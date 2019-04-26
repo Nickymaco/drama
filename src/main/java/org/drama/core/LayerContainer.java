@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-final class LayerContainer implements Comparable<LayerContainer> {
+class LayerContainer implements Comparable<LayerContainer> {
 	private final UUID indentity;
 	private final Layer layer;
 	private String name;

@@ -15,7 +15,7 @@ public interface PlayLisenter {
 	 * 在stage play 前触发
 	 * 
 	 * @param event
-	 * @return 返回{@code true}则退出广播
+	 * @return  返回{@code true}则退出广播
 	 */
 	default boolean onBeforePlay(Event event) {
 		return false;

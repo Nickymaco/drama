@@ -10,7 +10,7 @@ public interface LoggingInteractor {
 
     /**
      * 获取log解析器
-     * @return
+     *
      */
     Logging getLogging();
 }

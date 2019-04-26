@@ -7,12 +7,12 @@ import org.drama.log.LoggingFactory;
 public interface Configuration extends Serializable {
 	/**
 	 * 内核
-	 * @return
+	 *
 	 */
 	Kernel getKernel();
 	/**
 	 * 事件传播监听器
-	 * @return
+	 *
 	 */
 	BroadcastLisenter getBroadcastLisenter();
 	/**

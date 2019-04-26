@@ -8,7 +8,7 @@ import org.drama.event.Event;
 public interface Element {
     /**
      * 获取当前元素处理状态
-     * @return
+     *
      */
     default HandingStatus getHandingStatus() {
     	return HandingStatus.Transmit;

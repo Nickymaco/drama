@@ -14,7 +14,7 @@ public class BiParameterValueObject<P1, P2> implements Serializable {
 		setParam1(p1);
 		setParam2(p2);
 	}
-	
+
 	public P1 getParam1() {
 		return param1;
 	}

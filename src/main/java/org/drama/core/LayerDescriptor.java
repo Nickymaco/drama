@@ -47,22 +47,22 @@ public interface LayerDescriptor {
 	
 	/**
 	 * 名称
-	 * @return
+	 *
 	 */
 	String getName();
 	/**
 	 * 优先级
-	 * @return
+	 *
 	 */
 	int getPriority();
 	/**
 	 * 唯一标识
-	 * @return
+	 *
 	 */
 	String getUUID();
 	/**
 	 * 禁用
-	 * @return
+	 *
 	 */
 	boolean getDisabled();
 }

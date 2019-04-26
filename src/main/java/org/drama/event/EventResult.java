@@ -28,8 +28,7 @@ public class EventResult implements Serializable {
     /**
      * 添加事件结果
      *
-     * @param key
-     * @param value
+     * @param param
      */
     public void addResult(KeyValueObject<EventResultIndex, EventResultValue> param) {
         objectMap.put(param.getKey(), param.getValue());
@@ -52,7 +51,7 @@ public class EventResult implements Serializable {
      * 获取事件结果
      *
      * @param key
-     * @return
+     *
      */
     public EventResultValue getResult(EventResultIndex key) {
         return objectMap.get(key);
