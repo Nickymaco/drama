@@ -70,7 +70,7 @@ public class OccurredException extends RuntimeException {
 	}
 	
 	public static OccurredException onlyGlobaleEvent(Class<? extends Element> elem) {
-		String message = String.format(ILLEGAL_EVENT_MSG, elem.getName());
+		String message = String.format(ONLY_GLOBALE_EVENT_MSG, elem.getName());
 		return new OccurredException(message);
 	}
 	
