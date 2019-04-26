@@ -24,28 +24,28 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
 			if(i != 0) {
 				build.append(WHITESPACE);
 			}
-			build.append(events[i].getClass().getSimpleName());
+			build.append(events[i].getClass().getName());
 		}
 		
-		getLogging().info(STAGE_RECEVIE, build);
+		getLogging().info(String.format(STAGE_RECEVIE, build));
 	}
 
 	@Override
 	public void dealEvent(Event event) {
-		getLogging().info(STAGE_DEAL, event.getClass().getSimpleName());
+		getLogging().info(String.format(STAGE_DEAL, event.getClass().getName()));
 	}
 
 	@Override
 	public void broadcast(String layerName, Event event) {
 		String eventName = event.getClass().getSimpleName();
-		getLogging().info(LAYER_BROADCAST, layerName, eventName);
+		getLogging().info(String.format(LAYER_BROADCAST, layerName, eventName));
 	}
 
 	@Override
 	public void handingElement(Layer layer, Element element) {
 		String layerName = layer.getClass().getSimpleName();
 		String elementName = element.getClass().getSimpleName();
-		getLogging().info(LAYER_HANDING, layerName, elementName);
+		getLogging().info(String.format(LAYER_HANDING, layerName, elementName));
 	}
 
 	@Override
@@ -54,7 +54,7 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
 			return;
 		}
 		for(Class<?> event : events) {
-			getLogging().info(REGISTERED_EVENT, event.getName());
+			getLogging().info(String.format(REGISTERED_EVENT, event.getName()));
 		}
 		
 	}
@@ -65,7 +65,7 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
 			return;
 		}
 		for(Class<?> elem : elements) {
-			getLogging().info(REGISTERED_ELEMENT, elem.getName());
+			getLogging().info(String.format(REGISTERED_ELEMENT, elem.getName()));
 		}
 	}
 
@@ -75,12 +75,12 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
 			return;
 		}
 		for(String layerName : layers) {
-			getLogging().info(REGISTERED_LAYER, layerName);
+			getLogging().info(String.format(REGISTERED_LAYER, layerName));
 		}
 	}
 
 	@Override
 	public void setup(Stage stage) {
-		getLogging().info(STAGE_IS_RUNNING, stage.getClass().getName());
+		getLogging().info(String.format(STAGE_IS_RUNNING, stage.getClass().getName()));
 	}
 }

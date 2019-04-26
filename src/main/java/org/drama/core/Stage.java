@@ -2,7 +2,7 @@ package org.drama.core;
 
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
-import org.drama.exception.OccurredException;
+import org.drama.exception.DramaException;
 
 /**
  * 事件舞台
@@ -16,15 +16,15 @@ public interface Stage {
     /**
      * 演出
      */
-    Render play(Event... events) throws OccurredException;
+    Render play(Event... events) throws DramaException;
     /**
      * 演出
      * @param lisenter
      * @param events
      *
-     * @throws OccurredException
+     * @throws DramaException
      */
-    Render play(PlayLisenter lisenter, Event... events) throws OccurredException;
+    Render play(PlayLisenter lisenter, Event... events) throws DramaException;
     /**
      * 参数配置
      *
@@ -33,12 +33,5 @@ public interface Stage {
     /**
      * 启动
      */
-    void setup(Configuration configuration) throws OccurredException;
-    /**
-     * 默认异常输出
-     *
-     */
-    static Render defaultErrorRender() {
-    	return new StageRender(Render.FAILURE, null, Render.ERROR_MSG);
-    }
+    void setup(Configuration configuration) throws DramaException;
 }

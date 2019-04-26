@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.drama.exception.OccurredException;
+import org.drama.exception.DramaException;
 
 class ElementContainer implements InvocationHandler, Comparable<ElementContainer> {
 	private int priority;
@@ -72,7 +72,7 @@ class ElementContainer implements InvocationHandler, Comparable<ElementContainer
 		try {
 			return method.invoke(elem, args);
 		} catch (Exception e) {
-			throw OccurredException.occurredHandingError(e, getCurrentLayer(), elem);
+			throw DramaException.occurredHandingError(e, getCurrentLayer(), elem);
 		}
 	}
 

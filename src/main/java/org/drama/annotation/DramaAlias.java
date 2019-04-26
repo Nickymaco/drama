@@ -12,6 +12,6 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER })
 @Inherited
-public @interface AliasAnno {
+public @interface DramaAlias {
 	String value();
 }

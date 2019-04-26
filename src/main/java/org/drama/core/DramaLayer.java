@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
-import org.drama.exception.OccurredException;
+import org.drama.exception.DramaException;
 import org.drama.log.LoggingFactory;
 import org.drama.log.template.ILayerLoggingTemplate;
 import org.drama.log.template.LoggingTemplateFactory;
@@ -26,7 +26,7 @@ public class DramaLayer implements Layer {
     @Override
     public void broadcast(Event event, BroadcastLisenter broadcasetListener) {
 		if(Objects.isNull(event)) {
-			throw OccurredException.illegalBroadcastEvent(this, null);
+			throw DramaException.illegalBroadcastEvent(this, null);
 		}
 		
 		// 设置当前逻辑处理层
@@ -34,16 +34,22 @@ public class DramaLayer implements Layer {
 		
 		final DramaLayer that = this;
 		
-		kernel.notifyHandler(this, event, (l) -> {
+		kernel.notifyHandler(this, event, l -> {
 			// 打印日志
 			that.getLogging().broadcast(l.getName(), event);
-		},(e) -> {
-			if(Objects.nonNull(broadcasetListener)) {
-				broadcasetListener.setHandingStatus(e.getHandingStatus());
-			}
+		}, e -> {
 			// 打印完成日志
 			that.getLogging().handingElement(that, e);
+
+			if(Objects.nonNull(broadcasetListener)) {
+				broadcasetListener.setHandingStatus(e.getHandingStatus());
+				broadcasetListener.onElementHandingCompleted(e);
+			}
 		});
+
+		if(Objects.nonNull(broadcasetListener)) {
+			broadcasetListener.onLayerBroadcastCompleted(this);
+		}
     }
 
 	protected ILayerLoggingTemplate getLogging() {

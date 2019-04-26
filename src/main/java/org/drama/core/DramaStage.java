@@ -5,13 +5,13 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.InheritanceUtils;
-import org.drama.annotation.AliasAnno;
+import org.drama.annotation.DramaAlias;
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
 import org.drama.event.EventResult;
 import org.drama.event.EventResultEntity;
 import org.drama.event.EventResultValue;
-import org.drama.exception.OccurredException;
+import org.drama.exception.DramaException;
 import org.drama.log.template.IStageLoggingTemplate;
 import org.drama.log.template.LoggingTemplateFactory;
 
@@ -38,18 +38,12 @@ public class DramaStage implements Stage {
 		return layers;
 	}
 	
-	protected void setLayers(ImmutableSet<Layer> layers) {
-		if(!Objects.equals(this.layers, layers)) {
-			this.layers = layers;
-		}
-	}
-	
 	protected IStageLoggingTemplate getLogging() {
 		return logging;
 	}
 	
 	@Override
-	public Render play(PlayLisenter lisenter, Event... events) throws OccurredException {
+	public Render play(PlayLisenter lisenter, Event... events) throws DramaException {
 		currentRender.set(new StageRender());
 
 		if (ArrayUtils.isEmpty(events)) {
@@ -78,7 +72,7 @@ public class DramaStage implements Stage {
 			Class<?> eventClazz = event.getClass();
 			// 检查注册事件类型范围
 			if (!eventClazz.equals(Event.class) && InheritanceUtils.distance(eventClazz, DramaEvent.class) == 0) {
-				throw OccurredException.illegalRegisterEvent(eventClazz);
+				throw DramaException.illegalRegisterEvent(eventClazz);
 			}
 
 			playDeal(event, modelMap, broadcastlisenter);
@@ -97,7 +91,7 @@ public class DramaStage implements Stage {
 	}
 
 	@Override
-	public Render play(Event... events) throws OccurredException {
+	public Render play(Event... events) throws DramaException {
 		return play(null, events);
 	}
 	
@@ -116,9 +110,9 @@ public class DramaStage implements Stage {
 		EventResult eventResult = dramaEvent.getEventResult();
 		Collection<EventResultValue> resultValues = eventResult.allResults();
 
-		resultValues.stream().filter((r) -> r.getOutput()).forEach((r) -> {
+		resultValues.stream().filter(r -> r.getOutput()).forEach(r -> {
 			Class<?> clzR = r.getValue().getClass();
-			AliasAnno aliasName = clzR.getAnnotation(AliasAnno.class);
+			DramaAlias aliasName = clzR.getAnnotation(DramaAlias.class);
 			
 			if (Objects.nonNull(aliasName) && StringUtils.isNotBlank(aliasName.value())) {
 				modelMap.put(aliasName.value(), r.getValue());
@@ -143,7 +137,7 @@ public class DramaStage implements Stage {
 			try {
 				layer.broadcast(event, lisenter);
 			} catch (Throwable e) {
-				throw OccurredException.occurredPlayError(e, event);
+				throw DramaException.occurredPlayError(e, event);
 			}
 
 			if (Objects.equals(lisenter.getHandingStatus(), HandingStatus.Exit)) {
@@ -153,10 +147,12 @@ public class DramaStage implements Stage {
 	}
 
 	@Override
-	public void setup(Configuration configuration) throws OccurredException {
+	public void setup(Configuration configuration) throws DramaException {
 		this.configuration = Objects.requireNonNull(configuration);
 		this.kernel = Objects.requireNonNull(configuration.getKernel());
 
+		// 清空逻辑处理层，以便可以重新获取
+		layers = null;
 		
 		logging = LoggingTemplateFactory.getStageLoggingTemplate(configuration.getLoggingFactory());		
 		logging.setup(this);
@@ -165,13 +161,13 @@ public class DramaStage implements Stage {
 		final RegisterEventFactory registerEventFactory = configuration.getRegisterEventFactory();
 		
 		if(Objects.isNull(registerEventFactory)) {
-			throw OccurredException.emptyRegisterEvents();
+			throw DramaException.emptyRegisterEvents();
 		}
 		// 获取注册元素工厂
 		final RegisterElementFactory registerElementFactory = configuration.getRegisterElementFactory();
 		
 		if(Objects.isNull(registerElementFactory)) {
-			throw OccurredException.emptyRegisterElements();
+			throw DramaException.emptyRegisterElements();
 		}
 		// 自定义逻辑处理层构建工厂
 		final LayerFactory layerFacotry = configuration.getLayerFactory();
@@ -182,21 +178,16 @@ public class DramaStage implements Stage {
 		if(Objects.isNull(kernel.getLayerGenerator())) {
 			addLayerGenerator(layerFacotry, layerDescList);
 		}
-
-		// 清空逻辑处理层，以便可以重新获取
-		setLayers(null);
 		
 		if(!registerEvent(registerEventFactory.events())) {
-			throw OccurredException.errorRegisterEvents();
+			throw DramaException.errorRegisterEvents();
 		}
 		
 		if(!registerElement(registerElementFactory.elements())) {
-			throw OccurredException.emptyRegisterElements();
+			throw DramaException.emptyRegisterElements();
 		}
-		// 输出日志
-		layerDescList.forEach((desc) -> {
-			getLogging().regeisteredLayer(new String[] { desc.getName() });
-		});
+		// 打印注册了哪些逻辑处理层
+		layerDescList.forEach(desc -> getLogging().regeisteredLayer(new String[] { desc.getName() }));
 	}
 
 	protected void addLayerGenerator(final LayerFactory layerFacotry, final List<LayerDescriptor> layerDescList) {
@@ -248,7 +239,7 @@ public class DramaStage implements Stage {
 		
 		kernel.regeisterEvent(events);
 		
-		getLogging().registeredEvent(events.toArray(new Class<?>[events.size()]));
+		getLogging().registeredEvent(events.toArray(new Class<?>[]{}));
 		
 		return true;
 	}

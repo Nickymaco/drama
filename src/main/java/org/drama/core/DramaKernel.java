@@ -7,7 +7,7 @@ import org.drama.annotation.LayerDescription;
 import org.drama.annotation.LayerProperty;
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
-import org.drama.exception.OccurredException;
+import org.drama.exception.DramaException;
 import org.drama.vo.BiParameterValueObject;
 import org.drama.vo.KeyValueObject;
 
@@ -47,28 +47,19 @@ class DramaKernel implements Kernel {
 	private void bindElementHandler(Element element, ElementProperty prop, Set<ElementContainer> elemSet) {
 		ElementContainer elemCon = new ElementContainer(element);
 		elemCon.setPriority(prop.priority());
-
-		if (!elemSet.contains(elemCon)) {
-			elemSet.add(elemCon);
-		}
+		elemSet.add(elemCon);
 	}
 
-	protected Set<ElementContainer> getElemSet(Class<? extends Event> clazz, LayerContainer LayerContainer) {
+	private Set<ElementContainer> getElemSet(Class<? extends Event> clazz, LayerContainer LayerContainer) {
 		KeyValueObject<Class<? extends Event>, LayerContainer> idx = new KeyValueObject<>(clazz, LayerContainer);
-		Set<ElementContainer> elemSet = HANDING_POOL.get(idx);
-
-		if (elemSet == null) {
-			elemSet = new TreeSet<>();
-			HANDING_POOL.put(idx, elemSet);
-		}
-		return elemSet;
+		return HANDING_POOL.computeIfAbsent(idx, i -> new TreeSet<>());
 	}
 
-	protected LayerContainer getLayerContainer(Class<? extends Layer> layerClazz) {
+	private LayerContainer getLayerContainer(Class<? extends Layer> layerClazz) {
 		LayerProperty prop = layerClazz.getAnnotation(LayerProperty.class);
 		
 		if(Objects.isNull(prop)) {
-			throw OccurredException.noSpecialLayerProp(layerClazz);
+			throw DramaException.noSpecialLayerProp(layerClazz);
 		}
 		
 		LayerDescriptor layerDesc = getLayerDescriptor(prop.uuid(), prop.name(), prop.priority(), prop.disabled());
@@ -94,9 +85,7 @@ class DramaKernel implements Kernel {
 			Layer layer = func(layerGenerator, new BiParameterValueObject<>(clz, desc));
 
 			if (Objects.nonNull(layer)) {
-				layerContainer = new LayerContainer(layer, identity);
-				layerContainer.setName(desc.getName());
-				layerContainer.setPriority(desc.getPriority());
+				layerContainer = new LayerContainer(layer, identity, desc.getName(), desc.getPriority());
 				layerContainer.setDisable(desc.getDisabled());
 			}
 		}
@@ -104,13 +93,13 @@ class DramaKernel implements Kernel {
 		return layerContainer;
 	}
 
-	protected LayerContainer getLayerContainer(ElementProperty elemProp) {
+	private LayerContainer getLayerContainer(ElementProperty elemProp) {
 		LayerContainer layerContainer = null;
 		
 		Class<? extends Layer> layerClazz = elemProp.layer();
 
 		// 如果指定的 layer 有描述注解，则按描述注解进行查找和分配
-		if (Objects.nonNull(layerClazz) && !Objects.equals(layerClazz, Layer.Null.class)) {
+		if (!Objects.equals(layerClazz, Layer.Null.class)) {
 			layerContainer = getLayerContainer(layerClazz);
 		} else {
 			// 根据指定的 layer 没有找到，则通过 ElementProperty 提供给的 layerDesc 进行分配
@@ -120,16 +109,18 @@ class DramaKernel implements Kernel {
 			
 			Optional<LayerDescriptor> optDesc = 
 					Arrays.stream(layerDesc.desc().getEnumConstants())
-						.map((e) -> (LayerDescriptor)e)
-						.filter((e) -> Objects.equals(e.getName(), enumTargetName))
+						.map(e -> (LayerDescriptor)e)
+						.filter(e -> Objects.equals(e.getName(), enumTargetName))
 						.findFirst();
 			
 			if(optDesc.isPresent()) {
 				layerContainer = getLayerContainer(layerClazz, optDesc.get());
+			} else {
+				throw DramaException.illegalLayerDesc(layerDesc);
 			}
 		}
 
-		if (Objects.nonNull(layerContainer) && !LAYER_CONTAINERS.contains(layerContainer)) {
+		if (Objects.nonNull(layerContainer)) {
 			LAYER_CONTAINERS.add(layerContainer);
 		}
 
@@ -163,15 +154,15 @@ class DramaKernel implements Kernel {
 	@Override
 	public final ImmutableSet<Layer> getlayers() {
 		return ImmutableSet
-				.newInstance(LAYER_CONTAINERS.stream().map((c) -> c.getLayer()).collect(Collectors.toSet()));
+				.newInstance(LAYER_CONTAINERS.stream().map(c -> c.getLayer()).collect(Collectors.toSet()));
 	}
 
 	@Override
 	public void notifyHandler(final Layer layer, final Event event, final Consumer<LayerContainer> onPreHanding, final Consumer<Element> onCompleted) {
 		final Class<?> eventClass = event.getClass();
 
-		HANDING_POOL.keySet().stream().filter((k) -> Objects.equals(k.getValue().getLayer(), layer)
-				&& !k.getValue().getDisabled() && Objects.equals(k.getKey(), eventClass)).forEach((k) -> {
+		HANDING_POOL.keySet().stream().filter(k -> Objects.equals(k.getValue().getLayer(), layer)
+				&& !k.getValue().getDisabled() && Objects.equals(k.getKey(), eventClass)).forEach(k -> {
 
 					Set<ElementContainer> elemSet = HANDING_POOL.get(k);
 
@@ -216,7 +207,7 @@ class DramaKernel implements Kernel {
 	@Override
 	public Layer registerElement(Element element) {
 		if (CollectionUtils.isEmpty(REGISTERED_EVENTS)) {
-			throw OccurredException.emptyRegisterEvents();
+			throw DramaException.emptyRegisterEvents();
 		}
 
 		ElementProperty prop = Objects.requireNonNull(element.getClass().getAnnotation(ElementProperty.class));
@@ -226,16 +217,16 @@ class DramaKernel implements Kernel {
 		// 注册全局元素
 		if (ArrayUtils.contains(events, Event.class)) {
 			if(events.length != 1) {
-				throw OccurredException.onlyGlobaleEvent(element.getClass());
+				throw DramaException.onlyGlobaleEvent(element.getClass());
 			}
-			REGISTERED_EVENTS.forEach((clazz) -> {
+			REGISTERED_EVENTS.forEach(clazz -> {
 				Set<ElementContainer> elemSet = getElemSet(clazz, LayerContainer);
 				bindElementHandler(element, prop, elemSet);
 			});
 		} else {
 			// 注册非全局元素
 			for (Class<? extends Event> clazz : events) {
-				REGISTERED_EVENTS.forEach((registeredEvent) -> {
+				REGISTERED_EVENTS.forEach(registeredEvent -> {
 					if (Objects.equals(clazz, registeredEvent)) {
 						Set<ElementContainer> elemSet = getElemSet(clazz, LayerContainer);
 						bindElementHandler(element, prop, elemSet);

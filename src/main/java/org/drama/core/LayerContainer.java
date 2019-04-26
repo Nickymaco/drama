@@ -11,10 +11,6 @@ class LayerContainer implements Comparable<LayerContainer> {
 	private String name;
 	private int priority;
 	private boolean disabled = false;
-	
-	protected LayerContainer(Layer layer, UUID identity) {
-		this(layer, identity, "", 0);
-	}
 
 	protected LayerContainer(Layer layer, UUID indentity, String name, int priority) {
 		this.indentity = indentity;

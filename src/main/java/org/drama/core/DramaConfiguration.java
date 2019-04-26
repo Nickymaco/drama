@@ -3,6 +3,8 @@ package org.drama.core;
 import org.apache.commons.lang3.ObjectUtils;
 import org.drama.log.LoggingFactory;
 
+import java.util.Objects;
+
 public class DramaConfiguration implements Configuration {
 	private static final long serialVersionUID = -5226125623860649004L;
 	private LoggingFactory loggingFactory;
@@ -10,13 +12,18 @@ public class DramaConfiguration implements Configuration {
 	private RegisterElementFactory registerElementFactory;
 	private RegisterEventFactory registerEventFactory;
 
+	private LayerFactory layerFactory;
+
 	@Override
 	public Kernel getKernel() {
 		return kernel;
 	}
 
 	public void setKernel(Kernel kernel) {
-		this.kernel = kernel;
+		if(Objects.equals(this.kernel, kernel)) {
+			return;
+		}
+		this.kernel = Objects.requireNonNull(kernel);
 	}
 
 	@Override
@@ -26,7 +33,11 @@ public class DramaConfiguration implements Configuration {
 
 	@Override
 	public LayerFactory getLayerFactory() {
-		return null;
+		return layerFactory;
+	}
+
+	public void setLayerFactory(LayerFactory layerFactory) {
+		this.layerFactory = layerFactory;
 	}
 
 	@Override
@@ -54,5 +65,10 @@ public class DramaConfiguration implements Configuration {
 
 	public void setLoggingFactory(LoggingFactory loggingFactory) {
 		this.loggingFactory = loggingFactory;
+	}
+
+	@Override
+	public Render defaultErrorRender() {
+		return new StageRender(Render.FAILURE, null, Render.ERROR_MSG);
 	}
 }
