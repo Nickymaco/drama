@@ -12,6 +12,7 @@ import org.drama.vo.BiParameterValueObject;
 import org.drama.vo.KeyValueObject;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -26,9 +27,15 @@ import static org.drama.delegate.Delegator.func;
  *
  */
 class DramaKernel implements Kernel {
-	private static final Set<Class<? extends Event>> REGISTERED_EVENTS = new HashSet<>();
-	private static final Map<KeyValueObject<Class<? extends Event>, LayerContainer>, Set<ElementContainer>> HANDING_POOL = new HashMap<>();
-	private static final Set<LayerContainer> LAYER_CONTAINERS = new TreeSet<>();
+	private static final Set<Class<? extends Event>> REGISTERED_EVENTS;
+	private static final Map<KeyValueObject<Class<? extends Event>, LayerContainer>, Set<ElementContainer>> HANDING_POOL;
+	private static final Set<LayerContainer> LAYER_CONTAINERS;
+
+	static {
+		REGISTERED_EVENTS = new HashSet<>();
+		HANDING_POOL = new ConcurrentHashMap<>();
+		LAYER_CONTAINERS = new TreeSet<>();
+	}
 
 	private Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> layerGenerator;
 
