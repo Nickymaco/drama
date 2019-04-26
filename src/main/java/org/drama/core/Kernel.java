@@ -1,13 +1,12 @@
 package org.drama.core;
 
+import org.drama.collections.ImmutableSet;
+import org.drama.event.Event;
+import org.drama.vo.BiParameterValueObject;
+
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.drama.collections.ImmutableSet;
-import org.drama.event.Event;
-import org.drama.exception.OccurredException;
-import org.drama.vo.BiParameterValueObject;
 
 public interface Kernel {
 	/**
@@ -18,7 +17,6 @@ public interface Kernel {
 	/**
 	 * 注册元素
 	 * @param element
-	 * @throws OccurredException 
 	 */
 	Layer registerElement(Element element);	
 	/**
@@ -34,8 +32,12 @@ public interface Kernel {
 	 */
 	ImmutableSet<Layer> getlayers();
 	/**
-	 * Layer 生成器
+	 * Layer 构造工厂
 	 * @param generator
 	 */
-	void addLayerGenerator(Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> generator);
+	void setLayerGenerator(Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> generator);
+	/**
+	 * Layer 构造工厂
+	 */
+	Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> getLayerGenerator();
 }

@@ -1,21 +1,5 @@
 package org.drama.core;
 
-import static org.drama.delegate.Delegator.action;
-import static org.drama.delegate.Delegator.func;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.drama.annotation.ElementProperty;
@@ -26,6 +10,14 @@ import org.drama.event.Event;
 import org.drama.exception.OccurredException;
 import org.drama.vo.BiParameterValueObject;
 import org.drama.vo.KeyValueObject;
+
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static org.drama.delegate.Delegator.action;
+import static org.drama.delegate.Delegator.func;
 
 /**
  * Stage 和 layer 的运转内核
@@ -41,10 +33,15 @@ class DramaKernel implements Kernel {
 	private Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> layerGenerator;
 
 	@Override
-	public void addLayerGenerator(
+	public void setLayerGenerator(
 			Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> generator) {
 
 		layerGenerator = generator;
+	}
+
+	@Override
+	public Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> getLayerGenerator() {
+		return layerGenerator;
 	}
 
 	private void bindElementHandler(Element element, ElementProperty prop, Set<ElementContainer> elemSet) {

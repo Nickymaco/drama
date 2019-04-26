@@ -1,15 +1,5 @@
 package org.drama.core;
 
-import static org.joor.Reflect.on;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -25,6 +15,10 @@ import org.drama.exception.OccurredException;
 import org.drama.log.template.IStageLoggingTemplate;
 import org.drama.log.template.LoggingTemplateFactory;
 
+import java.util.*;
+
+import static org.joor.Reflect.on;
+
 /**
  * 默认舞台，执行逻辑处理层时按照线性关系依次执行
  */
@@ -34,11 +28,12 @@ public class DramaStage implements Stage {
 	private IStageLoggingTemplate logging;
 	private ImmutableSet<Layer> layers;
 	private Configuration configuration;
+	private Kernel kernel;
 	
 	@Override
 	public ImmutableSet<Layer> getLayers() {
 		if(Objects.isNull(layers)) {
-			layers = configuration.getKernel().getlayers();
+			layers = kernel.getlayers();
 		}
 		return layers;
 	}
@@ -160,6 +155,8 @@ public class DramaStage implements Stage {
 	@Override
 	public void setup(Configuration configuration) throws OccurredException {
 		this.configuration = Objects.requireNonNull(configuration);
+		this.kernel = Objects.requireNonNull(configuration.getKernel());
+
 		
 		logging = LoggingTemplateFactory.getStageLoggingTemplate(configuration.getLoggingFactory());		
 		logging.setup(this);
@@ -181,28 +178,11 @@ public class DramaStage implements Stage {
 		
 		// 注册逻辑处理层
 		final List<LayerDescriptor> layerDescList = new ArrayList<>();
-		
-		configuration.getKernel().addLayerGenerator((p) -> {	
-			Layer layer = null;
-			
-			if(Objects.equals(Layer.Null.class, p.getParam1())) {
-				layer = on(DEFAULT_LAYER_CLASS, this.getClass().getClassLoader()).create().get();
-			}else if(Objects.isNull(layerFacotry)) {
-				return null;
-			} else {
-				layer = layerFacotry.getLayer(p.getParam1());
-				
-				if(Objects.isNull(layer)) {
-					layer = layerFacotry.getLayer(p.getParam2());
-				}
-			}
-			
-			if(Objects.nonNull(layer) && !layerDescList.contains(p.getParam2())) {
-				layerDescList.add(p.getParam2());
-			}
-			return layer;
-		});
-		
+
+		if(Objects.isNull(kernel.getLayerGenerator())) {
+			addLayerGenerator(layerFacotry, layerDescList);
+		}
+
 		// 清空逻辑处理层，以便可以重新获取
 		setLayers(null);
 		
@@ -218,13 +198,34 @@ public class DramaStage implements Stage {
 			getLogging().regeisteredLayer(new String[] { desc.getName() });
 		});
 	}
-	
+
+	protected void addLayerGenerator(final LayerFactory layerFacotry, final List<LayerDescriptor> layerDescList) {
+		kernel.setLayerGenerator((p) -> {
+			Layer layer;
+
+			if(Objects.equals(Layer.Null.class, p.getParam1())) {
+				layer = on(DEFAULT_LAYER_CLASS, this.getClass().getClassLoader()).create().get();
+			}else if(Objects.isNull(layerFacotry)) {
+				return null;
+			} else {
+				layer = layerFacotry.getLayer(p.getParam1());
+
+				if(Objects.isNull(layer)) {
+					layer = layerFacotry.getLayer(p.getParam2());
+				}
+			}
+
+			if(Objects.nonNull(layer) && !layerDescList.contains(p.getParam2())) {
+				layerDescList.add(p.getParam2());
+			}
+			return layer;
+		});
+	}
+
 	protected boolean registerElement(Set<Element> elements) {
 		if (CollectionUtils.isEmpty(elements)) {
 			return false;
 		}
-		
-		Kernel kernel = Objects.requireNonNull(configuration.getKernel());
 		
 		for (Element element : elements) {
 			Layer layer = kernel.registerElement(element);
@@ -245,7 +246,6 @@ public class DramaStage implements Stage {
 			return false;
 		}
 		
-		Kernel kernel = Objects.requireNonNull(configuration.getKernel());
 		kernel.regeisterEvent(events);
 		
 		getLogging().registeredEvent(events.toArray(new Class<?>[events.size()]));
