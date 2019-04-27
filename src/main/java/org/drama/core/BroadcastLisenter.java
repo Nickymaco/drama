@@ -1,9 +1,23 @@
 package org.drama.core;
 
 public interface BroadcastLisenter {
-    HandingStatus getHandingStatus();
+    BroadcastLisenter Default = new BroadcastLisenter() {
+        private BroadcastStatus broadcastStatus;
 
-    void setHandingStatus(HandingStatus broadcastStatus);
+        @Override
+        public BroadcastStatus getBroadcastStatus() {
+            return broadcastStatus;
+        }
+
+        @Override
+        public void setBroadcastStatus(BroadcastStatus broadcastStatus) {
+            this.broadcastStatus = broadcastStatus;
+        }
+    };
+
+    BroadcastStatus getBroadcastStatus();
+
+    void setBroadcastStatus(BroadcastStatus broadcastStatus);
 
     default void onElementHandingCompleted(Element element) {
     }

@@ -1,7 +1,7 @@
 package org.drama.domain;
 
 import org.drama.core.Element;
-import org.drama.core.HandingStatus;
+import org.drama.core.BroadcastStatus;
 import org.drama.event.Event;
 import org.drama.event.EventArgument;
 import org.drama.vo.BiParameterValueObject;
@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 import static org.drama.delegate.Delegator.action;
 
 public abstract class QueryElement implements Element {
-    private HandingStatus handingStatus = HandingStatus.Transmit;
+    private BroadcastStatus broadcastStatus = BroadcastStatus.Transmit;
     private QueryFactory queryFactory;
     private Consumer<BiParameterValueObject<Event, Object>> resultRenderHandler;
 
@@ -74,11 +74,11 @@ public abstract class QueryElement implements Element {
     }
 
     @Override
-    public HandingStatus getHandingStatus() {
-        return handingStatus;
+    public BroadcastStatus getBroadcastStatus() {
+        return broadcastStatus;
     }
 
-    public void setHandingStatus(HandingStatus handingStatus) {
-        this.handingStatus = handingStatus;
+    public void setBroadcastStatus(BroadcastStatus broadcastStatus) {
+        this.broadcastStatus = broadcastStatus;
     }
 }

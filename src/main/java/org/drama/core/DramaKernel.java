@@ -219,7 +219,7 @@ class DramaKernel implements Kernel {
 
                 elemCon.setCurrentLayer(null);
 
-                if (!Objects.equals(elem.getHandingStatus(), HandingStatus.Transmit)) {
+                if (!Objects.equals(elem.getBroadcastStatus(), BroadcastStatus.Transmit)) {
                     break;
                 }
             }

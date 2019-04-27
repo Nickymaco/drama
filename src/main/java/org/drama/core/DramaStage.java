@@ -24,7 +24,9 @@ import static org.joor.Reflect.on;
  */
 public class DramaStage implements Stage {
     protected static final String DEFAULT_LAYER_CLASS = "org.drama.core.DramaLayer";
-    private final ThreadLocal<Render> currentRender = new ThreadLocal<>();
+    private final ThreadLocal<Render> renderThreadLocal = new ThreadLocal<>();
+    private final ThreadLocal<BroadcastLisenter> broadcastLisenterThreadLocal = new ThreadLocal<>();
+    private final ThreadLocal<PlayLisenter> playLisenterThreadLocal = new ThreadLocal<>();
     private IStageLoggingTemplate logging;
     private ImmutableSet<Layer> layers;
     private Configuration configuration;
@@ -38,47 +40,40 @@ public class DramaStage implements Stage {
         return layers;
     }
 
-    protected IStageLoggingTemplate getLogging() {
-        return logging;
-    }
-
     @Override
     public Render play(Event[] events) throws DramaException {
-        return play(null, events);
+        return play(events, null, null);
     }
 
     @Override
-    public Render play(PlayLisenter lisenter, Event[] events) throws DramaException {
-        play(null, lisenter, events);
-        return currentRender.get();
+    public Render play(Event[] events, PlayLisenter pLisenter, BroadcastLisenter bLisenter) throws DramaException {
+        play(null, events, pLisenter, bLisenter);
+
+        return getRender();
     }
 
     @Override
-    public void play(Render render, PlayLisenter lisenter, Event[] events) throws DramaException {
-        currentRender.set(ObjectUtils.defaultIfNull(render, new DramaRender()));
-
+    public void play(Render render, Event[] events, PlayLisenter pLisenter, BroadcastLisenter bLisenter) throws DramaException {
         if (ArrayUtils.isEmpty(events)) {
-            currentRender.get().setCode(Render.FAILURE);
-            currentRender.get().setMessage(Render.UNFOUND_EVENT_MSG);
-            currentRender.get().setModel(null);
-            return;
+            throw DramaException.emptyRegisterEvents();
         }
+
+        setRender(render);
+        setPlayLisenter(pLisenter);
+        setBroadcastLisenter(bLisenter);
 
         getLogging().recevieEvent(events);
 
-        Map<String, Object> modelMap = new HashMap<>();
-
-        PlayLisenter playLisenter = ObjectUtils.defaultIfNull(lisenter, PlayLisenter.NULL);
-
-        BroadcastLisenter broadcastlisenter =
-                ObjectUtils.defaultIfNull(configuration.getBroadcastLisenter(), new DramaBroadcastLisenter());
+        final PlayLisenter playLisenter = getPlayLisenter();
+        final BroadcastLisenter broadcastlisenter = getBroadcasetLisenter();
+        final Map<String, Object> modelMap = new HashMap<>();
 
         for (Event event : events) {
             if (playLisenter.onBeforePlay(event)) {
                 break;
             }
 
-            broadcastlisenter.setHandingStatus(HandingStatus.Transmit);
+            broadcastlisenter.setBroadcastStatus(BroadcastStatus.Transmit);
 
             Class<?> eventClazz = event.getClass();
             // 检查注册事件类型范围
@@ -87,23 +82,23 @@ public class DramaStage implements Stage {
             }
 
             playDeal(event, modelMap, broadcastlisenter);
-            // 触发事件
+
             playLisenter.onCompletedPlay(event);
 
-            if (Objects.equals(broadcastlisenter.getHandingStatus(), HandingStatus.Exit)) {
+            if (Objects.equals(broadcastlisenter.getBroadcastStatus(), BroadcastStatus.Exit)) {
                 break;
             }
         }
 
-        currentRender.get().setCode(Render.SUCCESS);
-        currentRender.get().setModel(modelMap);
+        getRender().setCode(Render.SUCCESS);
+        getRender().setModel(modelMap);
     }
 
-    protected void playDeal(Event event, Map<String, Object> modelMap, BroadcastLisenter lisenter) {
+    protected void playDeal(Event event, final Map<String, Object> modelMap, BroadcastLisenter lisenter) {
         getLogging().dealEvent(event);
 
         if (!(event instanceof DramaEvent)) {
-            return;
+            throw DramaException.illegalRegisterEvent(event.getClass());
         }
 
         DramaEvent<?> dramaEvent = (DramaEvent<?>) event;
@@ -114,7 +109,11 @@ public class DramaStage implements Stage {
         EventResult eventResult = dramaEvent.getEventResult();
         Collection<EventResultValue> resultValues = eventResult.allResults();
 
-        resultValues.stream().filter(r -> r.getOutput()).forEach(r -> {
+        resultValues.forEach(r -> {
+            if(!r.getOutput()) {
+                return;
+            }
+
             Class<?> clzR = r.getValue().getClass();
             DramaAlias aliasName = clzR.getAnnotation(DramaAlias.class);
 
@@ -144,7 +143,7 @@ public class DramaStage implements Stage {
                 throw DramaException.occurredPlayError(e, event);
             }
 
-            if (Objects.equals(lisenter.getHandingStatus(), HandingStatus.Exit)) {
+            if (Objects.equals(lisenter.getBroadcastStatus(), BroadcastStatus.Exit)) {
                 break;
             }
         }
@@ -257,5 +256,33 @@ public class DramaStage implements Stage {
     @Override
     public Configuration getConfiguration() {
         return configuration;
+    }
+
+    protected PlayLisenter getPlayLisenter() {
+        return playLisenterThreadLocal.get();
+    }
+
+    protected void setPlayLisenter(PlayLisenter lisenter) {
+        playLisenterThreadLocal.set(ObjectUtils.defaultIfNull(lisenter, PlayLisenter.NULL));
+    }
+
+    protected BroadcastLisenter getBroadcasetLisenter() {
+        return broadcastLisenterThreadLocal.get();
+    }
+
+    protected void setBroadcastLisenter(BroadcastLisenter lisenter) {
+        broadcastLisenterThreadLocal.set(ObjectUtils.defaultIfNull(lisenter, BroadcastLisenter.Default));
+    }
+
+    protected Render getRender() {
+        return renderThreadLocal.get();
+    }
+
+    protected void setRender(Render render) {
+        renderThreadLocal.set(ObjectUtils.defaultIfNull(render, new DramaRender()));
+    }
+
+    protected IStageLoggingTemplate getLogging() {
+        return logging;
     }
 }

@@ -98,7 +98,7 @@ final class ElementContainer implements InvocationHandler, Comparable<ElementCon
         return simpleName;
     }
 
-    public HandingStatus getHandingStatus() {
-        return getInvocator().getHandingStatus();
+    public BroadcastStatus getHandingStatus() {
+        return getInvocator().getBroadcastStatus();
     }
 }

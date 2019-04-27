@@ -1,6 +1,6 @@
 package org.drama.core;
 
-public enum HandingStatus {
+public enum BroadcastStatus {
     /**
      * 持续广播
      */

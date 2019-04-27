@@ -45,7 +45,7 @@ public class DramaLayer implements Layer {
             getLogging().handingElement(e.getSimpleName());
 
             if (Objects.nonNull(broadcasetListener)) {
-                broadcasetListener.setHandingStatus(e.getHandingStatus());
+                broadcasetListener.setBroadcastStatus(e.getHandingStatus());
                 broadcasetListener.onElementHandingCompleted(e.getInvocator());
             }
         });

@@ -9,8 +9,8 @@ public interface Element {
     /**
      * 获取当前元素处理状态
      */
-    default HandingStatus getHandingStatus() {
-        return HandingStatus.Transmit;
+    default BroadcastStatus getBroadcastStatus() {
+        return BroadcastStatus.Transmit;
     }
 
     /**

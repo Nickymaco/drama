@@ -18,11 +18,6 @@ public class DramaConfiguration implements Configuration, Signature {
     private Serializable signer = this;
 
     @Override
-    public BroadcastLisenter getBroadcastLisenter() {
-        return new DramaBroadcastLisenter();
-    }
-
-    @Override
     public LayerFactory getLayerFactory() {
         return layerFactory;
     }
@@ -56,11 +51,6 @@ public class DramaConfiguration implements Configuration, Signature {
 
     public void setLoggingFactory(LoggingFactory loggingFactory) {
         this.loggingFactory = loggingFactory;
-    }
-
-    @Override
-    public Render defaultErrorRender() {
-        return new DramaRender(Render.FAILURE, null, Render.ERROR_MSG);
     }
 
     @Override
