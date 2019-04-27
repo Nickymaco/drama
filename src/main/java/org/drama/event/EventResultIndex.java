@@ -8,8 +8,6 @@ import java.util.UUID;
 
 /**
  * 事件结果索引，对事件结果做一个逻辑上的业务元数据描述
- *
- * @author john
  */
 public class EventResultIndex implements Serializable {
     private static final long serialVersionUID = -7453443690549858336L;

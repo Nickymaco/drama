@@ -4,14 +4,10 @@ import org.drama.event.Event;
 
 /**
  * 逻辑处理层描述符
- *
- * @author john
  */
 public interface LayerDescriptor {
     /**
      * 占位符，默认描述
-     *
-     * @author john
      */
     enum Default implements LayerDescriptor {
         Drama(Layer.DEFAULT_NAME, Layer.DEFAULT_UUID, Layer.DEFAULT_PRIORITY);

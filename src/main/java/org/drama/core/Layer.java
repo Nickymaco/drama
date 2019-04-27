@@ -13,8 +13,6 @@ public interface Layer {
 
     /**
      * 占位符,防空指针
-     *
-     * @author john
      */
     final class Null implements Layer {
         @Override

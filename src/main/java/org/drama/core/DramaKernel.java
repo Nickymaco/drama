@@ -21,8 +21,6 @@ import static org.drama.delegate.Delegator.func;
 
 /**
  * Stage 和 layer 的运转内核
- *
- * @author john
  */
 class DramaKernel implements Kernel {
     private static final Map<Signature, DramaKernel> INSTANCE_MAP;

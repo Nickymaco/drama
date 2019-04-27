@@ -2,8 +2,6 @@ package org.drama.core;
 
 /**
  * 逻辑处理层工厂
- *
- * @author john
  */
 public interface LayerFactory {
     /**

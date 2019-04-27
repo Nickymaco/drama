@@ -3,8 +3,6 @@ package org.drama.log;
 public abstract class LoggingFactory {
     /**
      * 占位符
-     *
-     * @author john
      */
     static final class Null extends LoggingFactory {
         @Override

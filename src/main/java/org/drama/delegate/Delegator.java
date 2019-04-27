@@ -5,8 +5,6 @@ import java.util.function.Function;
 
 /**
  * 委托传递器
- *
- * @author john
  */
 public final class Delegator {
     public static void action(Runnable delegate) {
