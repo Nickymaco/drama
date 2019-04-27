@@ -5,5 +5,6 @@ package org.drama.domain;
  */
 public interface Pagination {
     int getPageSize();
+
     int getPageIndex();
 }

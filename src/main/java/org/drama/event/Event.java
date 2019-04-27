@@ -6,20 +6,16 @@ package org.drama.event;
 public interface Event {
     /**
      * 获取事件参数
-     *
-     *
      */
     EventArgument<?> getArgument();
 
     /**
      * 获取事件结果
-     *
      */
     EventResult getEventResult();
-    
+
     /**
      * 事件上下文
-     *
      */
     EventContext getContext();
 }

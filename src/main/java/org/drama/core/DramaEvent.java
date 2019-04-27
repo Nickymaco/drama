@@ -8,19 +8,19 @@ import org.drama.event.EventResult;
 /**
  * 抽象事件，所以事件都应该派生于它
  */
-public abstract class DramaEvent<T> implements Event{
-	private ThreadLocal<EventArgument<T>> argument = new ThreadLocal<>();
+public abstract class DramaEvent<T> implements Event {
+    private ThreadLocal<EventArgument<T>> argument = new ThreadLocal<>();
     private ThreadLocal<EventResult> eventResult = new ThreadLocal<>();
     private ThreadLocal<EventContext> contextLocal = new ThreadLocal<>();
-    
+
     public DramaEvent() {
-    	contextLocal.set(new EventContext(this));
+        contextLocal.set(new EventContext(this));
     }
-    
+
     @Override
-	public EventContext getContext() {
-		return contextLocal.get();
-	}
+    public EventContext getContext() {
+        return contextLocal.get();
+    }
 
     @Override
     public EventResult getEventResult() {

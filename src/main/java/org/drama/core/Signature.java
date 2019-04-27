@@ -1,5 +1,6 @@
 package org.drama.core;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -10,8 +11,9 @@ public interface Signature {
      * 唯一标示
      */
     UUID getIdentity();
+
     /**
      * 签署对象
      */
-    Object getSigner();
+    Serializable getSigner();
 }

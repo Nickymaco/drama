@@ -9,7 +9,7 @@ public enum OperateMode {
 
     private int code;
 
-    private OperateMode(int code) {
+    OperateMode(int code) {
         setCode(code);
     }
 

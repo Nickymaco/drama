@@ -1,86 +1,104 @@
 package org.drama.core;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.drama.exception.DramaException;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Objects;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.drama.exception.DramaException;
-
 final class ElementContainer implements InvocationHandler, Comparable<ElementContainer> {
-	private int priority;
-	private final Element elem;
-	private final Object invodicator;
-	private Layer currentLayer;
+    private int priority;
+    private final Element elem;
+    private final Object invodicator;
+    private Layer currentLayer;
+    private final String name;
+    private final String simpleName;
 
-	public ElementContainer(Element element) {
-		elem = Objects.requireNonNull(element);
+    public ElementContainer(Element element) {
+        elem = Objects.requireNonNull(element);
 
-		Class<?> clazz = element.getClass();
-		Class<?>[] interfaces = clazz.getInterfaces();
+        Class<?> clazz = element.getClass();
+        name = clazz.getName();
+        simpleName = clazz.getSimpleName();
 
-		if (!ArrayUtils.contains(interfaces, Element.class)) {
-			interfaces = ArrayUtils.add(interfaces, Element.class);
-		}
 
-		invodicator = Proxy.newProxyInstance(clazz.getClassLoader(), interfaces, this);
-	}
+        Class<?>[] interfaces = clazz.getInterfaces();
 
-	public int getPriority() {
-		return priority;
-	}
+        if (!ArrayUtils.contains(interfaces, Element.class)) {
+            interfaces = ArrayUtils.add(interfaces, Element.class);
+        }
 
-	public void setPriority(int priority) {
-		this.priority = priority;
-	}
+        invodicator = Proxy.newProxyInstance(clazz.getClassLoader(), interfaces, this);
+    }
 
-	public Element getInvocator() {
-		return (Element) invodicator;
-	}
+    public int getPriority() {
+        return priority;
+    }
 
-	@Override
-	public int hashCode() {
-		HashCodeBuilder hcb = new HashCodeBuilder();
-		hcb.append(elem);
-		return hcb.toHashCode();
-	}
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (Objects.isNull(obj) || !Objects.equals(getClass(), obj.getClass())) {
-			return false;
-		}
+    public Element getInvocator() {
+        return (Element) invodicator;
+    }
 
-		ElementContainer that = (ElementContainer) obj;
+    @Override
+    public int hashCode() {
+        HashCodeBuilder hcb = new HashCodeBuilder();
+        hcb.append(elem);
+        return hcb.toHashCode();
+    }
 
-		return Objects.equals(elem, that.elem);
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (Objects.isNull(obj) || !Objects.equals(getClass(), obj.getClass())) {
+            return false;
+        }
 
-	@Override
-	public int compareTo(ElementContainer o) {
-		if (Objects.isNull(o)) {
-			return 1;
-		} else {
-			return Integer.compare(getPriority(), o.getPriority());
-		}
-	}
+        ElementContainer that = (ElementContainer) obj;
 
-	@Override
-	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		try {
-			return method.invoke(elem, args);
-		} catch (Exception e) {
-			throw DramaException.occurredHandingError(e, getCurrentLayer(), elem);
-		}
-	}
+        return Objects.equals(elem, that.elem);
+    }
 
-	public Layer getCurrentLayer() {
-		return currentLayer;
-	}
+    @Override
+    public int compareTo(ElementContainer o) {
+        if (Objects.isNull(o)) {
+            return 1;
+        } else {
+            return Integer.compare(getPriority(), o.getPriority());
+        }
+    }
 
-	public void setCurrentLayer(Layer currentLayer) {
-		this.currentLayer = currentLayer;
-	}
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        try {
+            return method.invoke(elem, args);
+        } catch (Exception e) {
+            throw DramaException.occurredHandingError(e, getCurrentLayer(), elem);
+        }
+    }
+
+    public Layer getCurrentLayer() {
+        return currentLayer;
+    }
+
+    public void setCurrentLayer(Layer currentLayer) {
+        this.currentLayer = currentLayer;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSimpleName() {
+        return simpleName;
+    }
+
+    public HandingStatus getHandingStatus() {
+        return getInvocator().getHandingStatus();
+    }
 }

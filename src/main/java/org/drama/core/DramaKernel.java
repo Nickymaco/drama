@@ -15,243 +15,265 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static org.drama.delegate.Delegator.action;
 import static org.drama.delegate.Delegator.func;
 
 /**
  * Stage 和 layer 的运转内核
- * 
- * @author john
  *
+ * @author john
  */
 class DramaKernel implements Kernel {
-	private static final Map<Signature, DramaKernel> INSTANCE_MAP;
+    private static final Map<Signature, DramaKernel> INSTANCE_MAP;
 
-	static {
-		INSTANCE_MAP = new ConcurrentHashMap<>();
-	}
+    static {
+        INSTANCE_MAP = new ConcurrentHashMap<>();
+    }
 
-	private final Set<Class<? extends Event>> REGISTERED_EVENTS;
-	private final Map<KeyValueObject<Class<? extends Event>, LayerContainer>, Set<ElementContainer>> HANDING_POOL;
-	private final Set<LayerContainer> LAYER_CONTAINERS;
-	private Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> layerGenerator;
+    private final Set<Class<? extends Event>> registeredEventSet;
+    private final Map<KeyValueObject<Class<? extends Event>, LayerContainer>, Set<ElementContainer>> handingMap;
+    private final Set<LayerContainer> layerContainerSet;
+    private final Map<Layer, Set<Element>> elementMap;
+    private Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> layerGenerator;
 
-	private DramaKernel() {
-		REGISTERED_EVENTS = new HashSet<>();
-		HANDING_POOL = new ConcurrentHashMap<>();
-		LAYER_CONTAINERS = new TreeSet<>();
-	}
+    private DramaKernel() {
+        registeredEventSet = new HashSet<>();
+        handingMap = new ConcurrentHashMap<>();
+        elementMap = new ConcurrentHashMap<>();
+        layerContainerSet = new TreeSet<>();
+    }
 
-	public static Kernel getInstance(Configuration configuration) {
-		return INSTANCE_MAP.computeIfAbsent(Objects.requireNonNull(configuration.getSignature()), s -> new DramaKernel());
-	}
+    public static Kernel getInstance(Signature signature) {
+        return INSTANCE_MAP.computeIfAbsent(Objects.requireNonNull(signature), s -> new DramaKernel());
+    }
 
-	@Override
-	public void setLayerGenerator(
-			Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> generator) {
+    @Override
+    public void setLayerGenerator(
+            Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> generator) {
 
-		layerGenerator = generator;
-	}
+        layerGenerator = generator;
+    }
 
-	@Override
-	public Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> getLayerGenerator() {
-		return layerGenerator;
-	}
+    @Override
+    public Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> getLayerGenerator() {
+        return layerGenerator;
+    }
 
-	private void bindElementHandler(Element element, ElementProperty prop, Set<ElementContainer> elemSet) {
-		ElementContainer elemCon = new ElementContainer(element);
-		elemCon.setPriority(prop.priority());
-		elemSet.add(elemCon);
-	}
+    @Override
+    public boolean reset() {
+        registeredEventSet.clear();
+        handingMap.clear();
+        layerContainerSet.clear();
+        return true;
+    }
 
-	private Set<ElementContainer> getElemSet(Class<? extends Event> clazz, LayerContainer LayerContainer) {
-		KeyValueObject<Class<? extends Event>, LayerContainer> idx = new KeyValueObject<>(clazz, LayerContainer);
-		return HANDING_POOL.computeIfAbsent(idx, i -> new TreeSet<>());
-	}
+    private void bindElementHandler(Element element, ElementProperty prop, Set<ElementContainer> elemSet) {
+        ElementContainer elemCon = new ElementContainer(element);
+        elemCon.setPriority(prop.priority());
+        elemSet.add(elemCon);
+    }
 
-	private LayerContainer getLayerContainer(Class<? extends Layer> layerClazz) {
-		LayerProperty prop = layerClazz.getAnnotation(LayerProperty.class);
-		
-		if(Objects.isNull(prop)) {
-			throw DramaException.noSpecialLayerProp(layerClazz);
-		}
-		
-		LayerDescriptor layerDesc = getLayerDescriptor(prop.uuid(), prop.name(), prop.priority(), prop.disabled());
-		
-		return getLayerContainer(layerClazz, layerDesc);		
-	}
+    private Set<ElementContainer> getElemSet(Class<? extends Event> clazz, LayerContainer LayerContainer) {
+        KeyValueObject<Class<? extends Event>, LayerContainer> idx = new KeyValueObject<>(clazz, LayerContainer);
+        return handingMap.computeIfAbsent(idx, i -> new TreeSet<>());
+    }
 
-	private LayerContainer getLayerContainer(final Class<? extends Layer> clz, LayerDescriptor desc) {
-		final UUID identity = UUID.fromString(desc.getUUID());
-		
-		LayerContainer layerContainer = null;
+    private LayerContainer getLayerContainer(Class<? extends Layer> layerClazz) {
+        LayerProperty prop = layerClazz.getAnnotation(LayerProperty.class);
 
-		for(LayerContainer layerCon : LAYER_CONTAINERS) {
-			if(Objects.equals(layerCon.getIdentity(), identity)) {
-				layerContainer = layerCon;
-				break;
-			}
-		}
+        if (Objects.isNull(prop)) {
+            throw DramaException.noSpecialLayerProp(layerClazz);
+        }
 
-		if (Objects.nonNull(layerContainer)) {
-			return layerContainer;
-		} else {
-			Layer layer = func(layerGenerator, new BiParameterValueObject<>(clz, desc));
+        LayerDescriptor layerDesc = getLayerDescriptor(prop.uuid(), prop.name(), prop.priority(), prop.disabled());
 
-			if (Objects.nonNull(layer)) {
-				layerContainer = new LayerContainer(layer, identity, desc.getName(), desc.getPriority());
-				layerContainer.setDisable(desc.getDisabled());
-			}
-		}
+        return getLayerContainer(layerClazz, layerDesc);
+    }
 
-		return layerContainer;
-	}
+    private LayerContainer getLayerContainer(final Class<? extends Layer> clz, LayerDescriptor desc) {
+        final UUID identity = UUID.fromString(desc.getUUID());
 
-	private LayerContainer getLayerContainer(ElementProperty elemProp) {
-		LayerContainer layerContainer;
-		
-		Class<? extends Layer> layerClazz = elemProp.layer();
+        LayerContainer layerContainer = null;
 
-		// 如果指定的 layer 有描述注解，则按描述注解进行查找和分配
-		if (!Objects.equals(layerClazz, Layer.Null.class)) {
-			layerContainer = getLayerContainer(layerClazz);
-		} else {
-			// 根据指定的 layer 没有找到，则通过 ElementProperty 提供给的 layerDesc 进行分配
-			LayerDescription layerDesc = Objects.requireNonNull(elemProp.layerDesc());
+        for (LayerContainer layerCon : layerContainerSet) {
+            if (Objects.equals(layerCon.getIdentity(), identity)) {
+                layerContainer = layerCon;
+                break;
+            }
+        }
 
-			final String enumTargetName = layerDesc.target();
-			
-			Optional<LayerDescriptor> optDesc = 
-					Arrays.stream(layerDesc.desc().getEnumConstants())
-						.map(e -> (LayerDescriptor)e)
-						.filter(e -> Objects.equals(e.getName(), enumTargetName))
-						.findFirst();
-			
-			if(optDesc.isPresent()) {
-				layerContainer = getLayerContainer(layerClazz, optDesc.get());
-			} else {
-				throw DramaException.illegalLayerDesc(layerDesc);
-			}
-		}
+        if (Objects.nonNull(layerContainer)) {
+            return layerContainer;
+        } else {
+            Layer layer = func(layerGenerator, new BiParameterValueObject<>(clz, desc));
 
-		if (Objects.nonNull(layerContainer)) {
-			LAYER_CONTAINERS.add(layerContainer);
-		}
+            if (Objects.nonNull(layer)) {
+                layerContainer = new LayerContainer(layer, identity, desc.getName(), desc.getPriority());
+                layerContainer.setDisable(desc.getDisabled());
+            }
+        }
 
-		return layerContainer;
-	}
+        return layerContainer;
+    }
 
-	private LayerDescriptor getLayerDescriptor(
-			final String uuid, final String name, final int priority, final boolean disabled) {
+    private LayerContainer getLayerContainer(ElementProperty elemProp) {
+        LayerContainer layerContainer;
 
-		return new LayerDescriptor() {
-			@Override
-			public boolean getDisabled() {
-				return disabled;
-			}
+        Class<? extends Layer> layerClazz = elemProp.layer();
 
-			@Override
-			public String getName() {
-				return name;
-			}
+        // 如果指定的 layer 有描述注解，则按描述注解进行查找和分配
+        if (!Objects.equals(layerClazz, Layer.Null.class)) {
+            layerContainer = getLayerContainer(layerClazz);
+        } else {
+            // 根据指定的 layer 没有找到，则通过 ElementProperty 提供给的 layerDesc 进行分配
+            LayerDescription layerDesc = Objects.requireNonNull(elemProp.layerDesc());
 
-			@Override
-			public int getPriority() {
-				return priority;
-			}
+            final String enumTargetName = layerDesc.target();
 
-			@Override
-			public String getUUID() {
-				return uuid;
-			}
-		};
-	}
+            Optional<LayerDescriptor> optDesc =
+                    Arrays.stream(layerDesc.desc().getEnumConstants())
+                            .map(e -> (LayerDescriptor) e)
+                            .filter(e -> Objects.equals(e.getName(), enumTargetName))
+                            .findFirst();
 
-	@Override
-	public final ImmutableSet<Layer> getlayers() {
-		return ImmutableSet
-				.newInstance(LAYER_CONTAINERS.stream().map(c -> c.getLayer()).collect(Collectors.toSet()));
-	}
+            if (optDesc.isPresent()) {
+                layerContainer = getLayerContainer(layerClazz, optDesc.get());
+            } else {
+                throw DramaException.illegalLayerDesc(layerDesc);
+            }
+        }
 
-	@Override
-	public void notifyHandler(final Layer layer, final Event event, final Consumer<LayerContainer> onPreHanding, final Consumer<Element> onCompleted) {
-		final Class<?> eventClass = event.getClass();
+        if (Objects.nonNull(layerContainer)) {
+            layerContainerSet.add(layerContainer);
+        }
 
-		HANDING_POOL.keySet().stream().filter(k -> Objects.equals(k.getValue().getLayer(), layer)
-				&& !k.getValue().getDisabled() && Objects.equals(k.getKey(), eventClass)).forEach(k -> {
+        return layerContainer;
+    }
 
-					Set<ElementContainer> elemSet = HANDING_POOL.get(k);
+    private LayerDescriptor getLayerDescriptor(
+            final String uuid, final String name, final int priority, final boolean disabled) {
 
-					if (CollectionUtils.isEmpty(elemSet)) {
-						return;
-					}
-					
-					action(onPreHanding, k.getValue());
+        return new LayerDescriptor() {
+            @Override
+            public boolean getDisabled() {
+                return disabled;
+            }
 
-					for (ElementContainer elemCon : elemSet) {
-						elemCon.setCurrentLayer(layer);
-						
-						Element elem = elemCon.getInvocator();
+            @Override
+            public String getName() {
+                return name;
+            }
 
-						elem.handing(event);
+            @Override
+            public int getPriority() {
+                return priority;
+            }
 
-						action(onCompleted, elem);
-						
-						elemCon.setCurrentLayer(null);
+            @Override
+            public String getUUID() {
+                return uuid;
+            }
+        };
+    }
 
-						if (!Objects.equals(elem.getHandingStatus(), HandingStatus.Transmit)) {
-							break;
-						}
-					}
-				});
-	}
+    @Override
+    public final ImmutableSet<Layer> getlayers() {
+        Set<Layer> layers = new LinkedHashSet<>();
 
-	@Override
-	public boolean regeisterEvent(Set<Class<? extends Event>> eventClzs) {
-		if (CollectionUtils.isEmpty(eventClzs)) {
-			return false;
-		}
+        layerContainerSet.forEach(l -> layers.add(l.getLayer()));
 
-		eventClzs.forEach((eClz) -> {
-			if (!REGISTERED_EVENTS.contains(eClz) && !eClz.equals(Event.class)) {
-				REGISTERED_EVENTS.add(eClz);
-			}
-		});
-		return true;
-	}
+        return ImmutableSet.newInstance(layers);
+    }
 
-	@Override
-	public Layer registerElement(Element element) {
-		if (CollectionUtils.isEmpty(REGISTERED_EVENTS)) {
-			throw DramaException.emptyRegisterEvents();
-		}
+    @Override
+    public ImmutableSet<Element> getElements(Layer layer) {
+        return ImmutableSet.newInstance(elementMap.getOrDefault(layer, new HashSet<>()));
+    }
 
-		ElementProperty prop = Objects.requireNonNull(element.getClass().getAnnotation(ElementProperty.class));
-		LayerContainer LayerContainer = Objects.requireNonNull(getLayerContainer(prop));
-		Class<? extends Event>[] events = Objects.requireNonNull(prop.events());
+    @Override
+    public void notifyHandler(
+            final Layer layer, final Event event, final Consumer<LayerContainer> onPreHanding, final Consumer<ElementContainer> onCompleted) {
 
-		// 注册全局元素
-		if (ArrayUtils.contains(events, Event.class)) {
-			if(events.length != 1) {
-				throw DramaException.onlyGlobaleEvent(element.getClass());
-			}
-			REGISTERED_EVENTS.forEach(clazz -> {
-				Set<ElementContainer> elemSet = getElemSet(clazz, LayerContainer);
-				bindElementHandler(element, prop, elemSet);
-			});
-		} else {
-			// 注册非全局元素
-			for (Class<? extends Event> clazz : events) {
-				REGISTERED_EVENTS.forEach(registeredEvent -> {
-					if (Objects.equals(clazz, registeredEvent)) {
-						Set<ElementContainer> elemSet = getElemSet(clazz, LayerContainer);
-						bindElementHandler(element, prop, elemSet);
-					}
-				});
-			}
-		}
-		return LayerContainer.getLayer();
-	}
+        final Class<?> eventClass = event.getClass();
+
+        handingMap.keySet().stream().filter(k -> Objects.equals(k.getValue().getLayer(), layer)
+                && !k.getValue().getDisabled() && Objects.equals(k.getKey(), eventClass)).forEach(k -> {
+
+            Set<ElementContainer> elemSet = handingMap.get(k);
+
+            if (CollectionUtils.isEmpty(elemSet)) {
+                return;
+            }
+
+            action(onPreHanding, k.getValue());
+
+            for (ElementContainer elemCon : elemSet) {
+                elemCon.setCurrentLayer(layer);
+
+                Element elem = elemCon.getInvocator();
+
+                elem.handing(event);
+
+                action(onCompleted, elemCon);
+
+                elemCon.setCurrentLayer(null);
+
+                if (!Objects.equals(elem.getHandingStatus(), HandingStatus.Transmit)) {
+                    break;
+                }
+            }
+        });
+    }
+
+    @Override
+    public boolean regeisterEvent(Set<Class<? extends Event>> classSet) {
+        if (CollectionUtils.isEmpty(classSet)) {
+            return false;
+        }
+
+        classSet.forEach((eClz) -> {
+            if (!registeredEventSet.contains(eClz) && !eClz.equals(Event.class)) {
+                registeredEventSet.add(eClz);
+            }
+        });
+        return true;
+    }
+
+    @Override
+    public Layer registerElement(Element element) {
+        if (CollectionUtils.isEmpty(registeredEventSet)) {
+            throw DramaException.emptyRegisterEvents();
+        }
+
+        ElementProperty prop = Objects.requireNonNull(element.getClass().getAnnotation(ElementProperty.class));
+        LayerContainer LayerContainer = Objects.requireNonNull(getLayerContainer(prop));
+        Class<? extends Event>[] events = Objects.requireNonNull(prop.events());
+
+        // 注册全局元素
+        if (ArrayUtils.contains(events, Event.class)) {
+            if (events.length != 1) {
+                throw DramaException.onlyGlobaleEvent(element.getClass());
+            }
+            registeredEventSet.forEach(clazz -> {
+                Set<ElementContainer> elemSet = getElemSet(clazz, LayerContainer);
+                bindElementHandler(element, prop, elemSet);
+            });
+        } else {
+            // 注册非全局元素
+            for (Class<? extends Event> clazz : events) {
+                registeredEventSet.forEach(registeredEvent -> {
+                    if (Objects.equals(clazz, registeredEvent)) {
+                        Set<ElementContainer> elemSet = getElemSet(clazz, LayerContainer);
+                        bindElementHandler(element, prop, elemSet);
+                    }
+                });
+            }
+        }
+
+        Layer layer = LayerContainer.getLayer();
+        Set<Element> elementSet = elementMap.computeIfAbsent(layer, l -> new HashSet<>());
+        elementSet.add(element);
+        return layer;
+    }
 }

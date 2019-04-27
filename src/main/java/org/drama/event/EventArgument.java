@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 /**
  * 事件参数对象
+ *
  * @param <T>
  */
 public class EventArgument<T> implements Serializable {

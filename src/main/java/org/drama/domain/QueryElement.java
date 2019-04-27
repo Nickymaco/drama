@@ -1,17 +1,17 @@
 package org.drama.domain;
 
-import static org.drama.delegate.Delegator.action;
-
-import java.util.function.Consumer;
-
 import org.drama.core.Element;
 import org.drama.core.HandingStatus;
 import org.drama.event.Event;
 import org.drama.event.EventArgument;
 import org.drama.vo.BiParameterValueObject;
 
+import java.util.function.Consumer;
+
+import static org.drama.delegate.Delegator.action;
+
 public abstract class QueryElement implements Element {
-	private HandingStatus handingStatus = HandingStatus.Transmit;
+    private HandingStatus handingStatus = HandingStatus.Transmit;
     private QueryFactory queryFactory;
     private Consumer<BiParameterValueObject<Event, Object>> resultRenderHandler;
 
@@ -26,24 +26,24 @@ public abstract class QueryElement implements Element {
         action(getResultRenderHandler(), new BiParameterValueObject<>(event, queryResult));
     }
 
-	protected Object doQuery(Event event) {
-		EventArgument<?> argument = event.getArgument();
+    protected Object doQuery(Event event) {
+        EventArgument<?> argument = event.getArgument();
         Object object = argument.getArgument();
 
-        if(!(object instanceof Operate)) {
-           return null;
+        if (!(object instanceof Operate)) {
+            return null;
         }
 
-        Class<?> objectClass= object.getClass();
+        Class<?> objectClass = object.getClass();
         Queriable<Object> queriable = queryFactory.getQuerier(objectClass);
 
-        if(queriable == null) {
+        if (queriable == null) {
             return null;
         }
 
         Object queryResult = null;
-        Operate operate = (Operate)object;
-        
+        Operate operate = (Operate) object;
+
         switch (operate.operate()) {
             case Create:
                 queryResult = queriable.create(object);
@@ -61,24 +61,24 @@ public abstract class QueryElement implements Element {
                 queryResult = queriable.retrieveList(object);
                 break;
         }
-        
-		return queryResult;
-	}
 
-	public Consumer<BiParameterValueObject<Event, Object>> getResultRenderHandler() {
-		return resultRenderHandler;
-	}
+        return queryResult;
+    }
 
-	protected void setResultRenderHandler(Consumer<BiParameterValueObject<Event, Object>> resultRenderHandler) {
-		this.resultRenderHandler = resultRenderHandler;
-	}
+    public Consumer<BiParameterValueObject<Event, Object>> getResultRenderHandler() {
+        return resultRenderHandler;
+    }
 
-	@Override
-	public HandingStatus getHandingStatus() {
-		return handingStatus;
-	}
+    protected void setResultRenderHandler(Consumer<BiParameterValueObject<Event, Object>> resultRenderHandler) {
+        this.resultRenderHandler = resultRenderHandler;
+    }
 
-	public void setHandingStatus(HandingStatus handingStatus) {
-		this.handingStatus = handingStatus;
-	}
+    @Override
+    public HandingStatus getHandingStatus() {
+        return handingStatus;
+    }
+
+    public void setHandingStatus(HandingStatus handingStatus) {
+        this.handingStatus = handingStatus;
+    }
 }
