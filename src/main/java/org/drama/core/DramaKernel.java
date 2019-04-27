@@ -199,43 +199,48 @@ class DramaKernel implements Kernel {
     public void notifyHandler(final Layer layer, final Event event, final Consumer<LayerContainer> onPreHanding,
                               final Consumer<ElementContainer> onCompleted) {
 
-        final Class<?> eventClass = event.getClass();
+        Class<? extends Event> eventClass = event.getClass();
 
-        handingMap.keySet().stream().filter(k -> {
-                    LayerContainer con = k.getValue();
-                    Class<? extends Event> clazz = k.getKey();
+        Optional<LayerContainer> opt = layerContainerSet.stream().filter(l -> Objects.equals(l.getLayer(), layer)).findFirst();
 
-                    return Objects.equals(con.getLayer(), layer)
-                            && !con.getDisabled()
-                            && Objects.equals(clazz, eventClass)
-                            && (Objects.nonNull(con.getExcludeEvent())
-                                && !ArrayUtils.contains(con.getExcludeEvent(), eventClass));
-                }).forEach(k -> {
+        if(!opt.isPresent()) {
+            return;
+        }
 
-            Set<ElementContainer> elemSet = handingMap.get(k);
+        LayerContainer layerCon = opt.get();
 
-            if (CollectionUtils.isEmpty(elemSet)) {
-                return;
+        if(layerCon.getDisabled()) {
+            return;
+        }
+
+        if(Objects.nonNull(layerCon.getExcludeEvent()) && ArrayUtils.contains(layerCon.getExcludeEvent(), eventClass)) {
+            return;
+        }
+
+        KeyValueObject<Class<? extends Event>, LayerContainer> key = new KeyValueObject<>(eventClass, layerCon);
+        Set<ElementContainer> elemSet = handingMap.get(key);
+
+        if (CollectionUtils.isEmpty(elemSet)) {
+            return;
+        }
+
+        action(onPreHanding, key.getValue());
+
+        for (ElementContainer elemCon : elemSet) {
+            elemCon.setCurrentLayer(layer);
+
+            Element elem = elemCon.getInvocator();
+
+            elem.handing(event);
+
+            action(onCompleted, elemCon);
+
+            elemCon.setCurrentLayer(null);
+
+            if (!Objects.equals(elem.getBroadcastStatus(), BroadcastStatus.Transmit)) {
+                break;
             }
-
-            action(onPreHanding, k.getValue());
-
-            for (ElementContainer elemCon : elemSet) {
-                elemCon.setCurrentLayer(layer);
-
-                Element elem = elemCon.getInvocator();
-
-                elem.handing(event);
-
-                action(onCompleted, elemCon);
-
-                elemCon.setCurrentLayer(null);
-
-                if (!Objects.equals(elem.getBroadcastStatus(), BroadcastStatus.Transmit)) {
-                    break;
-                }
-            }
-        });
+        }
     }
 
     @Override
