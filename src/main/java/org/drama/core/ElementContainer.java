@@ -9,7 +9,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.drama.exception.DramaException;
 
-class ElementContainer implements InvocationHandler, Comparable<ElementContainer> {
+final class ElementContainer implements InvocationHandler, Comparable<ElementContainer> {
 	private int priority;
 	private final Element elem;
 	private final Object invodicator;
@@ -49,13 +49,13 @@ class ElementContainer implements InvocationHandler, Comparable<ElementContainer
 
 	@Override
 	public boolean equals(Object obj) {
-		if (Objects.isNull(obj) || !(obj instanceof ElementContainer)) {
+		if (Objects.isNull(obj) || !Objects.equals(getClass(), obj.getClass())) {
 			return false;
 		}
 
-		ElementContainer elemCon = (ElementContainer) obj;
+		ElementContainer that = (ElementContainer) obj;
 
-		return Objects.equals(elem, elemCon.getInvocator());
+		return Objects.equals(elem, that.elem);
 	}
 
 	@Override

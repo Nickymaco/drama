@@ -5,15 +5,15 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-class LayerContainer implements Comparable<LayerContainer> {
-	private final UUID indentity;
+final class LayerContainer implements Comparable<LayerContainer> {
+	private final UUID identity;
 	private final Layer layer;
 	private String name;
 	private int priority;
 	private boolean disabled = false;
 
-	protected LayerContainer(Layer layer, UUID indentity, String name, int priority) {
-		this.indentity = indentity;
+	protected LayerContainer(Layer layer, UUID identity, String name, int priority) {
+		this.identity = identity;
 		this.layer = layer;
 		setName(name);
 		setPriority(priority);
@@ -40,8 +40,8 @@ class LayerContainer implements Comparable<LayerContainer> {
 		this.priority = priority;
 	}
 
-	public UUID getIndentity() {
-		return indentity;
+	public UUID getIdentity() {
+		return identity;
 	}
 
 	public Layer getLayer() {
@@ -62,19 +62,19 @@ class LayerContainer implements Comparable<LayerContainer> {
 	@Override
 	public int hashCode() {
 		HashCodeBuilder hcb = new HashCodeBuilder();
-		hcb.append(this.indentity);
+		hcb.append(identity);
 		return hcb.toHashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if(Objects.isNull(obj) || !(obj instanceof LayerContainer)) {
+		if(Objects.isNull(obj) || !Objects.equals(obj.getClass(), getClass())) {
 			return false;
 		}
 		
-		LayerContainer container = (LayerContainer)obj;
+		LayerContainer that = (LayerContainer)obj;
 		
-		return Objects.equals(getIndentity(), container.getIndentity());
+		return Objects.equals(identity, that.identity);
 	}
 
 }

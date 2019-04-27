@@ -27,17 +27,26 @@ import static org.drama.delegate.Delegator.func;
  *
  */
 class DramaKernel implements Kernel {
-	private static final Set<Class<? extends Event>> REGISTERED_EVENTS;
-	private static final Map<KeyValueObject<Class<? extends Event>, LayerContainer>, Set<ElementContainer>> HANDING_POOL;
-	private static final Set<LayerContainer> LAYER_CONTAINERS;
+	private static final Map<Signature, DramaKernel> INSTANCE_MAP;
 
 	static {
+		INSTANCE_MAP = new ConcurrentHashMap<>();
+	}
+
+	private final Set<Class<? extends Event>> REGISTERED_EVENTS;
+	private final Map<KeyValueObject<Class<? extends Event>, LayerContainer>, Set<ElementContainer>> HANDING_POOL;
+	private final Set<LayerContainer> LAYER_CONTAINERS;
+	private Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> layerGenerator;
+
+	private DramaKernel() {
 		REGISTERED_EVENTS = new HashSet<>();
 		HANDING_POOL = new ConcurrentHashMap<>();
 		LAYER_CONTAINERS = new TreeSet<>();
 	}
 
-	private Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> layerGenerator;
+	public static Kernel getInstance(Configuration configuration) {
+		return INSTANCE_MAP.computeIfAbsent(Objects.requireNonNull(configuration.getSignature()), s -> new DramaKernel());
+	}
 
 	@Override
 	public void setLayerGenerator(
@@ -80,7 +89,7 @@ class DramaKernel implements Kernel {
 		LayerContainer layerContainer = null;
 
 		for(LayerContainer layerCon : LAYER_CONTAINERS) {
-			if(Objects.equals(layerCon.getIndentity(), identity)) {
+			if(Objects.equals(layerCon.getIdentity(), identity)) {
 				layerContainer = layerCon;
 				break;
 			}
@@ -101,7 +110,7 @@ class DramaKernel implements Kernel {
 	}
 
 	private LayerContainer getLayerContainer(ElementProperty elemProp) {
-		LayerContainer layerContainer = null;
+		LayerContainer layerContainer;
 		
 		Class<? extends Layer> layerClazz = elemProp.layer();
 
@@ -134,7 +143,9 @@ class DramaKernel implements Kernel {
 		return layerContainer;
 	}
 
-	private LayerDescriptor getLayerDescriptor(String uuid, String name, int priority, boolean disabled) {
+	private LayerDescriptor getLayerDescriptor(
+			final String uuid, final String name, final int priority, final boolean disabled) {
+
 		return new LayerDescriptor() {
 			@Override
 			public boolean getDisabled() {

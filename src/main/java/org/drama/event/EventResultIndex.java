@@ -48,19 +48,18 @@ public class EventResultIndex implements Serializable {
 	public int hashCode() {
 		HashCodeBuilder hcb = new HashCodeBuilder();
 		hcb.append(artifactId);
-		hcb.append(super.hashCode());
 		return hcb.toHashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (Objects.isNull(obj) || !(obj instanceof EventResultIndex)) {
+		if (Objects.isNull(obj) || !Objects.equals(getClass(), obj.getClass())) {
 			return false;
 		}
 		
-		EventResultIndex idx = (EventResultIndex)obj;
+		EventResultIndex that = (EventResultIndex)obj;
 		
-		return Objects.equals(idx.artifactId, artifactId);
+		return Objects.equals(that.artifactId, artifactId);
 	}
 
 	@Override

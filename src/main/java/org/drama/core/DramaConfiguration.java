@@ -1,29 +1,24 @@
 package org.drama.core;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.drama.log.LoggingFactory;
 
 import java.util.Objects;
+import java.util.UUID;
 
-public class DramaConfiguration implements Configuration {
+public class DramaConfiguration implements Configuration, Signature {
 	private static final long serialVersionUID = -5226125623860649004L;
 	private LoggingFactory loggingFactory;
-	private Kernel kernel = new DramaKernel();
 	private RegisterElementFactory registerElementFactory;
 	private RegisterEventFactory registerEventFactory;
-
 	private LayerFactory layerFactory;
+	private UUID identity = UUID.randomUUID();
+	private Object signer = this;
 
 	@Override
 	public Kernel getKernel() {
-		return kernel;
-	}
-
-	public void setKernel(Kernel kernel) {
-		if(Objects.equals(this.kernel, kernel)) {
-			return;
-		}
-		this.kernel = Objects.requireNonNull(kernel);
+		return DramaKernel.getInstance(this);
 	}
 
 	@Override
@@ -70,5 +65,46 @@ public class DramaConfiguration implements Configuration {
 	@Override
 	public Render defaultErrorRender() {
 		return new StageRender(Render.FAILURE, null, Render.ERROR_MSG);
+	}
+
+	@Override
+	public Signature getSignature() {
+		return this;
+	}
+
+	@Override
+	public UUID getIdentity() {
+		return identity;
+	}
+
+	public void setIdentity(UUID identity) {
+		this.identity = Objects.requireNonNull(identity);
+	}
+
+	@Override
+	public Object getSigner() {
+		return signer;
+	}
+
+	public void setSigner(Object signer) {
+		this.signer = Objects.requireNonNull(signer);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if(Objects.isNull(o) || !Objects.equals(getClass(), o.getClass())) {
+			return false;
+		}
+
+		DramaConfiguration that = (DramaConfiguration) o;
+
+		return Objects.equals(identity, that.identity);
+	}
+
+	@Override
+	public int hashCode() {
+		HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
+		hashCodeBuilder.append(identity);
+		return hashCodeBuilder.toHashCode();
 	}
 }
