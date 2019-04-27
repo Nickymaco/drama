@@ -1,5 +1,7 @@
 package org.drama.core;
 
+import org.drama.event.Event;
+
 /**
  * 逻辑处理层描述符
  *
@@ -43,6 +45,11 @@ public interface LayerDescriptor {
         public boolean getDisabled() {
             return false;
         }
+
+        @Override
+        public Class<? extends Event>[] getExculdeEvent() {
+            return null;
+        }
     }
 
     /**
@@ -64,4 +71,10 @@ public interface LayerDescriptor {
      * 禁用
      */
     boolean getDisabled();
+
+    /**
+     * 排除广播事件
+     * @return
+     */
+    Class<? extends Event>[] getExculdeEvent();
 }

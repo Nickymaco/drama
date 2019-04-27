@@ -1,6 +1,7 @@
 package org.drama.annotation;
 
 import org.drama.core.Layer;
+import org.drama.event.Event;
 
 import java.lang.annotation.*;
 
@@ -30,4 +31,9 @@ public @interface LayerProperty {
      * 是否禁用
      */
     boolean disabled() default false;
+
+    /**
+     * 排除广播事件
+     */
+    Class<? extends Event>[] excludeEvent() default {};
 }

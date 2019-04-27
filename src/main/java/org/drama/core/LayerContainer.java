@@ -1,6 +1,7 @@
 package org.drama.core;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.drama.event.Event;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -11,10 +12,12 @@ final class LayerContainer implements Comparable<LayerContainer> {
     private String name;
     private int priority;
     private boolean disabled = false;
+    private Class<? extends Event>[] excludeEvent;
 
-    protected LayerContainer(Layer layer, UUID identity, String name, int priority) {
+    protected LayerContainer(Layer layer, UUID identity, String name, int priority, Class<? extends Event>... events) {
         this.identity = identity;
         this.layer = layer;
+        this.excludeEvent = events;
         setName(name);
         setPriority(priority);
     }
@@ -57,6 +60,14 @@ final class LayerContainer implements Comparable<LayerContainer> {
             return;
         }
         this.disabled = disabled;
+    }
+
+    public Class<? extends Event>[] getExcludeEvent() {
+        return excludeEvent;
+    }
+
+    public void setExcludeEvent(Class<? extends Event>[] excludeEvent) {
+        this.excludeEvent = excludeEvent;
     }
 
     @Override

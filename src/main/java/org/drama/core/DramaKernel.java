@@ -86,7 +86,7 @@ class DramaKernel implements Kernel {
             throw DramaException.noSpecialLayerProp(layerClazz);
         }
 
-        LayerDescriptor layerDesc = getLayerDescriptor(prop.uuid(), prop.name(), prop.priority(), prop.disabled());
+        LayerDescriptor layerDesc = getLayerDescriptor(prop.uuid(), prop.name(), prop.priority(), prop.disabled(), prop.excludeEvent());
 
         return getLayerContainer(layerClazz, layerDesc);
     }
@@ -111,6 +111,7 @@ class DramaKernel implements Kernel {
             if (Objects.nonNull(layer)) {
                 layerContainer = new LayerContainer(layer, identity, desc.getName(), desc.getPriority());
                 layerContainer.setDisable(desc.getDisabled());
+                layerContainer.setExcludeEvent(desc.getExculdeEvent());
             }
         }
 
@@ -152,12 +153,17 @@ class DramaKernel implements Kernel {
     }
 
     private LayerDescriptor getLayerDescriptor(
-            final String uuid, final String name, final int priority, final boolean disabled) {
+            String uuid, String name, int priority, boolean disabled, Class<? extends Event>[] event) {
 
         return new LayerDescriptor() {
             @Override
             public boolean getDisabled() {
                 return disabled;
+            }
+
+            @Override
+            public Class<? extends Event>[] getExculdeEvent() {
+                return event;
             }
 
             @Override
@@ -192,13 +198,21 @@ class DramaKernel implements Kernel {
     }
 
     @Override
-    public void notifyHandler(
-            final Layer layer, final Event event, final Consumer<LayerContainer> onPreHanding, final Consumer<ElementContainer> onCompleted) {
+    public void notifyHandler(final Layer layer, final Event event, final Consumer<LayerContainer> onPreHanding,
+                              final Consumer<ElementContainer> onCompleted) {
 
         final Class<?> eventClass = event.getClass();
 
-        handingMap.keySet().stream().filter(k -> Objects.equals(k.getValue().getLayer(), layer)
-                && !k.getValue().getDisabled() && Objects.equals(k.getKey(), eventClass)).forEach(k -> {
+        handingMap.keySet().stream().filter(k -> {
+                    LayerContainer con = k.getValue();
+                    Class<? extends Event> clazz = k.getKey();
+
+                    return Objects.equals(con.getLayer(), layer)
+                            && !con.getDisabled()
+                            && Objects.equals(clazz, eventClass)
+                            && (Objects.nonNull(con.getExcludeEvent())
+                                && !ArrayUtils.contains(con.getExcludeEvent(), eventClass));
+                }).forEach(k -> {
 
             Set<ElementContainer> elemSet = handingMap.get(k);
 
