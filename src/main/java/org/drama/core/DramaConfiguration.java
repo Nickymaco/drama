@@ -60,7 +60,7 @@ public class DramaConfiguration implements Configuration, Signature {
 
     @Override
     public Render defaultErrorRender() {
-        return new StageRender(Render.FAILURE, null, Render.ERROR_MSG);
+        return new DramaRender(Render.FAILURE, null, Render.ERROR_MSG);
     }
 
     @Override

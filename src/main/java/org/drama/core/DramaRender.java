@@ -1,20 +1,20 @@
 package org.drama.core;
 
-class StageRender implements Render {
+public class DramaRender implements Render {
     private static final long serialVersionUID = 4805058851279820776L;
     private int code;
     private Object model;
     private String message;
 
-    public StageRender() {
+    public DramaRender() {
         this(Render.SUCCESS, null);
     }
 
-    public StageRender(int code, Object model) {
+    public DramaRender(int code, Object model) {
         this(code, model, "");
     }
 
-    public StageRender(int code, Object model, String message) {
+    public DramaRender(int code, Object model, String message) {
         this.code = code;
         this.model = model;
         this.message = message;
@@ -35,14 +35,17 @@ class StageRender implements Render {
         return message;
     }
 
+    @Override
     public void setCode(int code) {
         this.code = code;
     }
 
+    @Override
     public void setModel(Object model) {
         this.model = model;
     }
 
+    @Override
     public void setMessage(String message) {
         this.message = message;
     }

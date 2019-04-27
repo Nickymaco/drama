@@ -15,17 +15,27 @@ public interface Stage {
 
     /**
      * 演出
+     * @param events 事件
      */
-    Render play(Event... events) throws DramaException;
+    Render play(Event[] events) throws DramaException;
 
     /**
      * 演出
      *
-     * @param lisenter
-     * @param events
+     * @param lisenter 演出监听器
+     * @param events 事件
      * @throws DramaException
      */
-    Render play(PlayLisenter lisenter, Event... events) throws DramaException;
+    Render play(PlayLisenter lisenter, Event[] events) throws DramaException;
+
+    /**
+     * 演出（自定义提供 Render）
+     * @param render 演出渲染
+     * @param lisenter 演出监听器
+     * @param events 事件
+     * @throws DramaException
+     */
+    void play(Render render, PlayLisenter lisenter, Event[] events) throws DramaException;
 
     /**
      * 参数配置

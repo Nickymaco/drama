@@ -24,7 +24,7 @@ import static org.joor.Reflect.on;
  */
 public class DramaStage implements Stage {
     protected static final String DEFAULT_LAYER_CLASS = "org.drama.core.DramaLayer";
-    private final ThreadLocal<StageRender> currentRender = new ThreadLocal<>();
+    private final ThreadLocal<Render> currentRender = new ThreadLocal<>();
     private IStageLoggingTemplate logging;
     private ImmutableSet<Layer> layers;
     private Configuration configuration;
@@ -43,14 +43,25 @@ public class DramaStage implements Stage {
     }
 
     @Override
-    public Render play(PlayLisenter lisenter, Event... events) throws DramaException {
-        currentRender.set(new StageRender());
+    public Render play(Event[] events) throws DramaException {
+        return play(null, events);
+    }
+
+    @Override
+    public Render play(PlayLisenter lisenter, Event[] events) throws DramaException {
+        play(null, lisenter, events);
+        return currentRender.get();
+    }
+
+    @Override
+    public void play(Render render, PlayLisenter lisenter, Event[] events) throws DramaException {
+        currentRender.set(ObjectUtils.defaultIfNull(render, new DramaRender()));
 
         if (ArrayUtils.isEmpty(events)) {
             currentRender.get().setCode(Render.FAILURE);
             currentRender.get().setMessage(Render.UNFOUND_EVENT_MSG);
             currentRender.get().setModel(null);
-            return currentRender.get();
+            return;
         }
 
         getLogging().recevieEvent(events);
@@ -86,13 +97,6 @@ public class DramaStage implements Stage {
 
         currentRender.get().setCode(Render.SUCCESS);
         currentRender.get().setModel(modelMap);
-
-        return currentRender.get();
-    }
-
-    @Override
-    public Render play(Event... events) throws DramaException {
-        return play(null, events);
     }
 
     protected void playDeal(Event event, Map<String, Object> modelMap, BroadcastLisenter lisenter) {
