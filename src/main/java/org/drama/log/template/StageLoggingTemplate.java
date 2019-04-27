@@ -5,6 +5,8 @@ import org.drama.core.Stage;
 import org.drama.event.Event;
 import org.drama.log.Logging;
 
+import static org.drama.delegate.Delegator.forEach;
+
 class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLoggingTemplate, ILayerLoggingTemplate {
     public StageLoggingTemplate(Logging logging) {
         super(logging);
@@ -16,14 +18,15 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
             return;
         }
 
-        StringBuilder build = new StringBuilder();
+        final StringBuilder build = new StringBuilder();
 
-        for (int i = 0; i < events.length; i++) {
+        forEach(events, (e, i) -> {
             if (i != 0) {
                 build.append(WHITESPACE);
             }
-            build.append(events[i].getClass().getName());
-        }
+            build.append(e.getClass().getName());
+            return false;
+        });
 
         getLogging().info(String.format(STAGE_RECEVIE, build));
     }

@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static org.drama.delegate.Delegator.*;
 import static org.drama.delegate.Delegator.action;
 import static org.drama.delegate.Delegator.func;
 
@@ -64,12 +65,6 @@ class DramaKernel implements Kernel {
         handingMap.clear();
         layerContainerSet.clear();
         return true;
-    }
-
-    private void bindElementHandler(Element element, ElementProperty prop, Set<ElementContainer> elemSet) {
-        ElementContainer elemCon = new ElementContainer(element);
-        elemCon.setPriority(prop.priority());
-        elemSet.add(elemCon);
     }
 
     private Set<ElementContainer> getElemSet(Class<? extends Event> clazz, LayerContainer LayerContainer) {
@@ -226,7 +221,7 @@ class DramaKernel implements Kernel {
 
         action(onPreHanding, key.getValue());
 
-        for (ElementContainer elemCon : elemSet) {
+        forEach(elemSet, (elemCon, index) -> {
             elemCon.setCurrentLayer(layer);
 
             Element elem = elemCon.getInvocator();
@@ -237,10 +232,8 @@ class DramaKernel implements Kernel {
 
             elemCon.setCurrentLayer(null);
 
-            if (!Objects.equals(elem.getBroadcastStatus(), BroadcastStatus.Transmit)) {
-                break;
-            }
-        }
+            return !Objects.equals(elem.getBroadcastStatus(), BroadcastStatus.Transmit);
+        });
     }
 
     @Override
@@ -292,5 +285,11 @@ class DramaKernel implements Kernel {
         Set<Element> elementSet = elementMap.computeIfAbsent(layer, l -> new HashSet<>());
         elementSet.add(element);
         return layer;
+    }
+
+    private void bindElementHandler(Element element, ElementProperty prop, Set<ElementContainer> elemSet) {
+        ElementContainer elemCon = new ElementContainer(element);
+        elemCon.setPriority(prop.priority());
+        elemSet.add(elemCon);
     }
 }
