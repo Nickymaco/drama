@@ -1,7 +1,7 @@
 package org.drama.domain;
 
-import org.drama.core.Element;
 import org.drama.core.BroadcastStatus;
+import org.drama.core.Element;
 import org.drama.event.Event;
 import org.drama.event.EventArgument;
 import org.drama.vo.BiParameterValueObject;

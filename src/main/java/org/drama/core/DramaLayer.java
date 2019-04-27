@@ -22,7 +22,7 @@ public class DramaLayer implements Layer {
 
     @Override
     public ImmutableSet<Element> getElements() {
-        if(CollectionUtils.isEmpty(elementSet)) {
+        if (CollectionUtils.isEmpty(elementSet)) {
             elementSet = kernel.getElements(this);
         }
         return elementSet;

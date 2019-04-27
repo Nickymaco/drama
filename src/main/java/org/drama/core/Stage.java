@@ -15,6 +15,7 @@ public interface Stage {
 
     /**
      * 演出
+     *
      * @param events 事件
      * @return 渲染
      * @throws DramaException
@@ -23,8 +24,9 @@ public interface Stage {
 
     /**
      * 演出
-     * @param events 事件
-     * @param playLisenter Stage play 监听器
+     *
+     * @param events            事件
+     * @param playLisenter      Stage play 监听器
      * @param broadcastLisenter 逻辑处理层广播监听器
      * @return 渲染
      */
@@ -32,9 +34,10 @@ public interface Stage {
 
     /**
      * 演出（自定义提供 Render）
-     * @param render 自定义演出渲染
-     * @param events 事件
-     * @param playLisenter Stag play 监听器
+     *
+     * @param render            自定义演出渲染
+     * @param events            事件
+     * @param playLisenter      Stag play 监听器
      * @param broadcastLisenter 逻辑处理层广播监听器
      * @throws DramaException
      */

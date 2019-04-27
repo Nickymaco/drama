@@ -17,6 +17,7 @@ public interface Render extends Serializable {
 
     /**
      * 设置响应码
+     *
      * @param code 响应码
      */
     void setCode(int code);
@@ -28,6 +29,7 @@ public interface Render extends Serializable {
 
     /**
      * 设置响应模型
+     *
      * @param model 响应模型
      */
     void setModel(Object model);
@@ -39,6 +41,7 @@ public interface Render extends Serializable {
 
     /**
      * 设置响应消息
+     *
      * @param message 响应消息
      */
     void setMessage(String message);

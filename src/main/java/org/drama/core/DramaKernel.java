@@ -203,17 +203,17 @@ class DramaKernel implements Kernel {
 
         Optional<LayerContainer> opt = layerContainerSet.stream().filter(l -> Objects.equals(l.getLayer(), layer)).findFirst();
 
-        if(!opt.isPresent()) {
+        if (!opt.isPresent()) {
             return;
         }
 
         LayerContainer layerCon = opt.get();
 
-        if(layerCon.getDisabled()) {
+        if (layerCon.getDisabled()) {
             return;
         }
 
-        if(Objects.nonNull(layerCon.getExcludeEvent()) && ArrayUtils.contains(layerCon.getExcludeEvent(), eventClass)) {
+        if (Objects.nonNull(layerCon.getExcludeEvent()) && ArrayUtils.contains(layerCon.getExcludeEvent(), eventClass)) {
             return;
         }
 

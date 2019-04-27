@@ -70,6 +70,7 @@ public interface LayerDescriptor {
 
     /**
      * 排除广播事件
+     *
      * @return
      */
     Class<? extends Event>[] getExculdeEvent();

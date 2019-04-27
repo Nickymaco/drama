@@ -40,6 +40,7 @@ interface Kernel {
 
     /**
      * 获取逻辑处理层注册的元素
+     *
      * @param layer 逻辑处理层
      * @return 已注册元素
      */

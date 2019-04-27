@@ -110,7 +110,7 @@ public class DramaStage implements Stage {
         Collection<EventResultValue> resultValues = eventResult.allResults();
 
         resultValues.forEach(r -> {
-            if(!r.getOutput()) {
+            if (!r.getOutput()) {
                 return;
             }
 

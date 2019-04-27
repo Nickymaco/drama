@@ -6,7 +6,8 @@ public interface PlayLisenter {
     /**
      * 占位符，防止抛空指针异常
      */
-    PlayLisenter NULL = event -> {};
+    PlayLisenter NULL = event -> {
+    };
 
     /**
      * 在 Stage play 前触发
