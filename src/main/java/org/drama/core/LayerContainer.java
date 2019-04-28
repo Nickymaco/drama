@@ -14,6 +14,7 @@ final class LayerContainer implements Comparable<LayerContainer> {
     private boolean disabled = false;
     private Class<? extends Event>[] excludeEvent;
 
+    @SafeVarargs
     protected LayerContainer(Layer layer, UUID identity, String name, int priority, Class<? extends Event>... events) {
         this.identity = identity;
         this.layer = layer;
