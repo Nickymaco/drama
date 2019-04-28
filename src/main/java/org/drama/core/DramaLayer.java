@@ -20,8 +20,7 @@ public class DramaLayer implements Layer {
     private ImmutableSet<Element> elementSet;
     private Kernel kernel;
 
-    @Override
-    public ImmutableSet<Element> getElements() {
+    protected ImmutableSet<Element> getElements() {
         if (CollectionUtils.isEmpty(elementSet)) {
             elementSet = kernel.getElements(this);
         }

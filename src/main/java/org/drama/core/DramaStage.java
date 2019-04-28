@@ -16,7 +16,9 @@ import org.drama.log.template.IStageLoggingTemplate;
 import org.drama.log.template.LoggingTemplateFactory;
 
 import java.util.*;
+import java.util.function.Consumer;
 
+import static org.drama.delegate.Delegator.action;
 import static org.joor.Reflect.on;
 
 /**
@@ -178,10 +180,10 @@ public class DramaStage implements Stage {
         final LayerFactory layerFacotry = configuration.getLayerFactory();
 
         // 注册逻辑处理层
-        final List<LayerDescriptor> layerDescList = new ArrayList<>();
+        final Set<LayerDescriptor> layerDescList = new HashSet<>();
 
         if (Objects.isNull(kernel.getLayerGenerator())) {
-            addLayerGenerator(layerFacotry, layerDescList);
+            addLayerGenerator(layerFacotry, l -> layerDescList.add(l));
         }
 
         if (!registerEvent(registerEventFactory.events())) {
@@ -195,7 +197,7 @@ public class DramaStage implements Stage {
         layerDescList.forEach(desc -> getLogging().regeisteredLayer(new String[]{desc.getName()}));
     }
 
-    protected void addLayerGenerator(final LayerFactory layerFacotry, final List<LayerDescriptor> layerDescList) {
+    protected void addLayerGenerator(final LayerFactory layerFacotry, final Consumer<LayerDescriptor> onCreated) {
         kernel.setLayerGenerator((p) -> {
             Layer layer;
 
@@ -213,10 +215,10 @@ public class DramaStage implements Stage {
 
             if (Objects.nonNull(layer)) {
                 layer.setConfiguration(configuration);
+            }
 
-                if (!layerDescList.contains(p.getParam2())) {
-                    layerDescList.add(p.getParam2());
-                }
+            if(Objects.nonNull(layer)) {
+                action(onCreated, p.getParam2());
             }
             return layer;
         });

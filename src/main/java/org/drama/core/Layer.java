@@ -16,11 +16,6 @@ public interface Layer {
      */
     final class Null implements Layer {
         @Override
-        public ImmutableSet<Element> getElements() {
-            return null;
-        }
-
-        @Override
         public void broadcast(Event event, BroadcastLisenter broadcasetListener) {
         }
 
@@ -33,11 +28,6 @@ public interface Layer {
         public void setConfiguration(Configuration configuration) {
         }
     }
-
-    /**
-     * 当前逻辑处理层有哪些注册元素
-     */
-    ImmutableSet<Element> getElements();
 
     /**
      * 广播事件
