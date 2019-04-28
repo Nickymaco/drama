@@ -5,7 +5,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.InheritanceUtils;
-import org.drama.annotation.Alias;
+import org.drama.annotation.ResultEntityAlias;
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
 import org.drama.event.EventResult;
@@ -115,16 +115,15 @@ public class DramaStage implements Stage {
                 return;
             }
 
-            Class<?> clzR = r.getValue().getClass();
-            Alias aliasName = clzR.getAnnotation(Alias.class);
+            EventResultEntity entity = r.getValue();
+            Class<?> entityClass = entity.getClass();
+
+            ResultEntityAlias aliasName = entityClass.getAnnotation(ResultEntityAlias.class);
 
             if (Objects.nonNull(aliasName) && StringUtils.isNotBlank(aliasName.value())) {
                 modelMap.put(aliasName.value(), r.getValue());
             } else {
-                EventResultEntity entity = r.getValue();
-                Class<?> clzEntity = entity.getClass();
-                String simpleName = clzEntity.getSimpleName();
-                modelMap.put(simpleName, entity);
+                modelMap.put(entityClass.getSimpleName(), entity);
             }
         });
     }
