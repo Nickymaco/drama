@@ -17,9 +17,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static org.drama.delegate.Delegator.*;
-import static org.drama.delegate.Delegator.action;
-import static org.drama.delegate.Delegator.func;
-
 /**
  * Stage 和 layer 的运转内核
  */

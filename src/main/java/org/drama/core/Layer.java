@@ -1,6 +1,5 @@
 package org.drama.core;
 
-import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
 
 /**
