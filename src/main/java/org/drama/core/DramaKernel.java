@@ -87,27 +87,21 @@ class DramaKernel implements Kernel {
     private LayerContainer getLayerContainer(final Class<? extends Layer> clz, LayerDescriptor desc) {
         final UUID identity = UUID.fromString(desc.getUUID());
 
-        LayerContainer layerContainer = null;
+        Optional<LayerContainer> opt = layerContainerSet.stream().filter(l -> Objects.equals(l.getIdentity(), identity)).findFirst();
 
-        for (LayerContainer layerCon : layerContainerSet) {
-            if (Objects.equals(layerCon.getIdentity(), identity)) {
-                layerContainer = layerCon;
-                break;
-            }
+        if(opt.isPresent()) {
+            return opt.get();
         }
 
-        if (Objects.nonNull(layerContainer)) {
-            return layerContainer;
-        } else {
-            Layer layer = func(layerGenerator, new BiParameterValueObject<>(clz, desc));
+        Layer layer = func(layerGenerator, new BiParameterValueObject<>(clz, desc));
 
-            if (Objects.nonNull(layer)) {
-                layerContainer = new LayerContainer(layer, identity, desc.getName(), desc.getPriority());
-                layerContainer.setDisable(desc.getDisabled());
-                layerContainer.setExcludeEvent(desc.getExculdeEvent());
-            }
+        if (Objects.isNull(layer)) {
+            throw DramaException.illegalLayerDesc(desc);
         }
 
+        LayerContainer layerContainer = new LayerContainer(layer, identity, desc.getName(), desc.getPriority());
+        layerContainer.setDisable(desc.getDisabled());
+        layerContainer.setExcludeEvent(desc.getExculdeEvent());
         return layerContainer;
     }
 

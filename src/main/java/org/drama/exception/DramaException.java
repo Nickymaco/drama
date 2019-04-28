@@ -3,6 +3,7 @@ package org.drama.exception;
 import org.drama.annotation.LayerDescription;
 import org.drama.core.Element;
 import org.drama.core.Layer;
+import org.drama.core.LayerDescriptor;
 import org.drama.event.Event;
 
 import java.util.Objects;
@@ -19,8 +20,10 @@ public class DramaException extends RuntimeException {
     static final String ONLY_GLOBALE_EVENT_MSG = "Element<%s> register more event, Global Event only. don't need any other event";
     static final String NO_SPECIAL_LAYER_PROP_MSG = "Layer<%s> must special a LayerProperty annotaioin";
     static final String ILLEGAL_LAYER_DESC = "Illegal layer special target [%s] to enum [%s] in LayerDescription annotation";
+    static final String ILLEGAL_LAYER_DESCRIPTOR = "Illegal layer descripter[%s] with name [%s] not found";
 
     private static final long serialVersionUID = -7337990653787626209L;
+
 
     protected DramaException(String message) {
         super(message);
@@ -82,5 +85,10 @@ public class DramaException extends RuntimeException {
 
     public static DramaException illegalLayerDesc(LayerDescription layerDesc) {
         return new DramaException(String.format(ILLEGAL_LAYER_DESC, layerDesc.desc().getName(), layerDesc.target()));
+    }
+
+    public static DramaException illegalLayerDesc(LayerDescriptor desc) {
+        String msg = String.format(ILLEGAL_LAYER_DESCRIPTOR, desc.getUUID(), desc.getName());
+        return new DramaException(msg);
     }
 }

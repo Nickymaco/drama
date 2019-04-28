@@ -4,7 +4,7 @@ import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
 
 /**
- * 逻辑处理层，每一个逻辑处理层负责发起通知
+ * 逻辑处理层，负责发起事件广播，每个逻辑处理层必须保证有一个无参数构造函数
  */
 public interface Layer {
     String DEFAULT_NAME = "Drama";
