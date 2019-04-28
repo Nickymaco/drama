@@ -204,7 +204,7 @@ public class DramaStage implements Stage {
             if (Objects.equals(Layer.Null.class, p.getParam1())) {
                 layer = on(DramaLayer.class).create().get();
             } else if (Objects.isNull(layerFacotry)) {
-                return on(p.getParam1()).create().get();
+                layer = on(p.getParam1()).create().get();
             } else {
                 layer = layerFacotry.getLayer(p.getParam1());
 
@@ -215,9 +215,7 @@ public class DramaStage implements Stage {
 
             if (Objects.nonNull(layer)) {
                 layer.setConfiguration(configuration);
-            }
 
-            if(Objects.nonNull(layer)) {
                 action(onCreated, p.getParam2());
             }
             return layer;
