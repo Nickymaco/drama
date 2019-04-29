@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 /**
  * 事件，可以作为全局事件注册，注册全局事件后其他自定义事件不需要重复注册，为互斥
+ * @param <T> 限定事件参数类型
  */
 public interface Event<T> extends Serializable {
     /**
