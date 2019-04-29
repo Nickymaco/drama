@@ -8,6 +8,7 @@ import org.drama.annotation.LayerProperty;
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
 import org.drama.exception.DramaException;
+import org.drama.security.Signature;
 import org.drama.vo.BiParameterValueObject;
 import org.drama.vo.KeyValueObject;
 

@@ -1,6 +1,7 @@
 package org.drama.core;
 
 import org.drama.log.LoggingFactory;
+import org.drama.security.Signature;
 
 import java.io.Serializable;
 

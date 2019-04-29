@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * 事件参数对象
  *
- * @param <T>
+ * @param <T> 参数值类型
  */
 public class EventArgument<T> implements Serializable {
     private static final long serialVersionUID = -2894669687322825883L;

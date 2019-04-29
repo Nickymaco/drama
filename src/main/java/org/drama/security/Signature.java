@@ -1,4 +1,4 @@
-package org.drama.core;
+package org.drama.security;
 
 import java.io.Serializable;
 import java.util.UUID;

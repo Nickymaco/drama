@@ -1,6 +1,7 @@
 package org.drama.event;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.drama.security.Signature;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -11,42 +12,30 @@ import java.util.UUID;
  */
 public class EventResultIndex implements Serializable {
     private static final long serialVersionUID = -7453443690549858336L;
-    private Class<? extends Event> eventMeta;
-    private Class<?> sourceMeta;
-    private UUID artifactId;
+    private final Signature signature;
 
-    public EventResultIndex(UUID artifact, Class<? extends Event> eventMeta, Class<?> sourceMeta) {
-        setArtifactId(artifact);
+    public EventResultIndex(final String uuid, final Event<?> event) {
+        this.signature = new Signature() {
+            @Override
+            public UUID getIdentity() {
+                return UUID.fromString(uuid);
+            }
+
+            @Override
+            public Serializable getSigner() {
+                return event;
+            }
+        };
     }
 
-    public Class<? extends Event> getEventMeta() {
-        return eventMeta;
-    }
-
-    public void setEventMeta(Class<? extends Event> eventMeta) {
-        this.eventMeta = eventMeta;
-    }
-
-    public Class<?> getSourceMeta() {
-        return sourceMeta;
-    }
-
-    public void setSourceMeta(Class<?> sourceMeta) {
-        this.sourceMeta = sourceMeta;
-    }
-
-    public UUID getArtifactId() {
-        return artifactId;
-    }
-
-    public void setArtifactId(UUID artifact) {
-        this.artifactId = Objects.requireNonNull(artifact);
+    public Signature getSignature() {
+        return signature;
     }
 
     @Override
     public int hashCode() {
         HashCodeBuilder hcb = new HashCodeBuilder();
-        hcb.append(artifactId);
+        hcb.append(signature.getIdentity());
         return hcb.toHashCode();
     }
 
@@ -58,11 +47,11 @@ public class EventResultIndex implements Serializable {
 
         EventResultIndex that = (EventResultIndex) obj;
 
-        return Objects.equals(that.artifactId, artifactId);
+        return Objects.nonNull(that.signature) && Objects.equals(that.signature.getIdentity(), signature.getIdentity());
     }
 
     @Override
     public String toString() {
-        return String.format("%s[%s]::$s", eventMeta.getSimpleName(), artifactId, sourceMeta.getSimpleName());
+        return String.format("EventResultIndex[%s]", signature.getIdentity());
     }
 }

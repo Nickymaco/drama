@@ -1,5 +1,7 @@
 package org.drama.core;
 
+import org.drama.security.Signature;
+
 final class KernelFactory {
     private static KernelFactory ourInstance = new KernelFactory();
 

@@ -1,42 +1,40 @@
 package org.drama.core;
 
-import org.drama.event.Event;
-import org.drama.event.EventArgument;
-import org.drama.event.EventContext;
-import org.drama.event.EventResult;
+import org.drama.event.*;
+
+import javax.annotation.PreDestroy;
 
 /**
- * 抽象事件，所以事件都应该派生于它
+ * 抽象事件，事件都应派生于它
  */
-public abstract class DramaEvent<T> implements Event {
-    private ThreadLocal<EventArgument<T>> argument = new ThreadLocal<>();
-    private ThreadLocal<EventResult> eventResult = new ThreadLocal<>();
-    private ThreadLocal<EventContext> contextLocal = new ThreadLocal<>();
-
-    public DramaEvent() {
-        contextLocal.set(new EventContext(this));
-    }
+public abstract class DramaEvent<T> implements Event<T> {
+    private EventArgument<T> argument;
+    private DramaEventResult eventResult = new DramaEventResult();
+    private DramaEventContext context = new DramaEventContext();
 
     @Override
     public EventContext getContext() {
-        return contextLocal.get();
+        return context;
     }
 
     @Override
     public EventResult getEventResult() {
-        return eventResult.get();
-    }
-
-    protected void setEventResult(EventResult eventResult) {
-        this.eventResult.set(eventResult);
+        return eventResult;
     }
 
     @Override
     public EventArgument<T> getArgument() {
-        return argument.get();
+        return argument;
     }
 
+    @Override
     public void setArgument(EventArgument<T> argument) {
-        this.argument.set(argument);
+        this.argument = argument;
+    }
+
+    @PreDestroy
+    private void destory() {
+        eventResult.destroy();
+        context.destroy();
     }
 }

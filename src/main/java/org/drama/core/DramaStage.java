@@ -6,10 +6,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.InheritanceUtils;
 import org.drama.collections.ImmutableSet;
-import org.drama.event.Event;
-import org.drama.event.EventResult;
-import org.drama.event.EventResultEntity;
-import org.drama.event.EventResultValue;
+import org.drama.event.*;
 import org.drama.exception.DramaException;
 import org.drama.log.template.IStageLoggingTemplate;
 import org.drama.log.template.LoggingTemplateFactory;
@@ -97,19 +94,11 @@ public class DramaStage implements Stage {
     protected void playDeal(Event event, final Map<String, Object> modelMap, BroadcastLisenter lisenter) {
         getLogging().dealEvent(event);
 
-        if (!(event instanceof DramaEvent)) {
-            throw DramaException.illegalRegisterEvent(event.getClass());
-        }
+        playDealEvent(event, lisenter);
 
-        DramaEvent<?> dramaEvent = (DramaEvent<?>) event;
-        dramaEvent.setEventResult(new EventResult(dramaEvent));
+        EventResult result = Objects.requireNonNull(event.getEventResult());
 
-        playDealEvent(dramaEvent, lisenter);
-
-        EventResult eventResult = dramaEvent.getEventResult();
-        Collection<EventResultValue> resultValues = eventResult.allResults();
-
-        resultValues.forEach(r -> {
+        result.allResults().forEach(r -> {
             if (!r.getOutput()) {
                 return;
             }

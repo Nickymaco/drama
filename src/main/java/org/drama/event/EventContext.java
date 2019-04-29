@@ -3,45 +3,32 @@ package org.drama.event;
 import org.drama.core.Layer;
 
 import java.io.Serializable;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class EventContext implements Serializable {
-    private static final long serialVersionUID = 7285410254463046346L;
-    private Map<Object, Object> context = new ConcurrentHashMap<>();
-    private Layer currentLayer;
-    private Event currentEvent;
+public interface EventContext extends Serializable {
+    /**
+     * 事件上下文添加参数
+     * @param key
+     * @param value
+     */
+    void addParameter(String key, Object value);
 
-    public EventContext() {
-    }
+    /**
+     * 获取事件向下文参数
+     * @param key
+     * @return 返回参数值
+     * @throws Exception
+     */
+    Object getParameter(String key);
 
-    public EventContext(Event event) {
-        setCurrentEvent(event);
-    }
+    /**
+     * 当前逻辑处理层
+     * @return 逻辑层处理层
+     */
+    Layer getCurrentLayer();
 
-    public void addParameter(Object key, Object value) {
-        context.put(key, value);
-    }
-
-    public Object getParameter(Object key) throws Exception {
-        Object value = this.context.get(key);
-
-        return value;
-    }
-
-    public Layer getCurrentLayer() {
-        return currentLayer;
-    }
-
-    public void setCurrentLayer(Layer currentLayer) {
-        this.currentLayer = currentLayer;
-    }
-
-    public Event getCurrentEvent() {
-        return currentEvent;
-    }
-
-    public void setCurrentEvent(Event currentEvent) {
-        this.currentEvent = currentEvent;
-    }
+    /**
+     * 设置当前逻辑处理层
+     * @param currentLayer 逻辑处理层
+     */
+    void setCurrentLayer(Layer currentLayer);
 }

@@ -1,10 +1,8 @@
 package org.drama.event;
 
-import org.drama.core.DramaEvent;
-
 import static org.joor.Reflect.on;
 
-public class EventBuilder<T extends DramaEvent<TT>, TT> {
+public class EventBuilder<T extends Event<TT>, TT> {
     private Class<T> clazz;
     private EventArgument<TT> argument;
 
