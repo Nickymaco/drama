@@ -1,6 +1,9 @@
 package org.drama.core;
 
-import org.drama.event.*;
+import org.drama.event.Event;
+import org.drama.event.EventArgument;
+import org.drama.event.EventContext;
+import org.drama.event.EventResult;
 
 import javax.annotation.PreDestroy;
 

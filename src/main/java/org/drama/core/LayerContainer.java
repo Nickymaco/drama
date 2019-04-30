@@ -1,10 +1,18 @@
 package org.drama.core;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
 
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+
+import static org.drama.delegate.Delegator.action;
+import static org.drama.delegate.Delegator.forEach;
 
 final class LayerContainer implements Comparable<LayerContainer> {
     private final UUID identity;
@@ -13,12 +21,18 @@ final class LayerContainer implements Comparable<LayerContainer> {
     private int priority;
     private boolean disabled = false;
     private Class<? extends Event>[] excludeEvent;
+    private final Set<ElementContainer> elementContainers;
+    private final Map<Class<? extends Event>, Runnable> handingMap;
+    private Set<Element> elements;
 
     @SafeVarargs
+    @SuppressWarnings("unchecked")
     protected LayerContainer(Layer layer, UUID identity, String name, int priority, Class<? extends Event>... events) {
         this.identity = identity;
         this.layer = layer;
-        this.excludeEvent = events;
+        this.excludeEvent = ObjectUtils.defaultIfNull(events, (Class<? extends Event>[])new Class<?>[]{});
+        this.handingMap = new ConcurrentHashMap<>();
+        this.elementContainers = new TreeSet<>();
         setName(name);
         setPriority(priority);
     }
@@ -71,6 +85,18 @@ final class LayerContainer implements Comparable<LayerContainer> {
         this.excludeEvent = excludeEvent;
     }
 
+    public ImmutableSet<Class<? extends Event>> getRegeisteredEvents() {
+        return ImmutableSet.newInstance(handingMap.keySet());
+    }
+
+    public ImmutableSet<Element> getElements() {
+        if(Objects.isNull(elements)) {
+            elements = new LinkedHashSet<>();
+            elementContainers.forEach(elemCon -> elements.add(elemCon.getInvocator()));
+        }
+        return ImmutableSet.newInstance(elements);
+    }
+
     @Override
     public int hashCode() {
         HashCodeBuilder hcb = new HashCodeBuilder();
@@ -87,5 +113,66 @@ final class LayerContainer implements Comparable<LayerContainer> {
         LayerContainer that = (LayerContainer) obj;
 
         return Objects.equals(identity, that.identity);
+    }
+
+    public void addElement(ElementContainer element) {
+        elementContainers.add(element);
+    }
+
+    public void handingEevnt(Event event, final Consumer<LayerContainer> onPreHanding, final Consumer<ElementContainer> onCompleted) {
+        if(disabled) {
+            return;
+        }
+
+        final Class<? extends Event> eventClass = event.getClass();
+
+        if(ArrayUtils.contains(excludeEvent, eventClass)) {
+            return;
+        }
+
+        Runnable handing = handingMap.get(eventClass);
+
+        if(Objects.nonNull(handing)) {
+            action(handing);
+            return;
+        }
+
+        final Set<ElementContainer> handingSet = new TreeSet<>();
+
+        elementContainers.stream().filter(elem -> {
+            Class<? extends Event>[] events = elem.getRegisterEvents();
+
+           if(ArrayUtils.isEmpty(events)) {
+               return false;
+           }
+
+           return ArrayUtils.contains(events, eventClass) || elem.getGlobal();
+        }).forEach(handingSet::add);
+
+        final LayerContainer that = this;
+
+        handingMap.put(eventClass, handing = () -> {
+            if(CollectionUtils.isEmpty(handingSet)) {
+                return;
+            }
+
+            action(onPreHanding, that);
+
+            forEach(handingSet, (elemCon, i) -> {
+                elemCon.setCurrentLayer(that.layer);
+
+                Element elem = elemCon.getInvocator();
+
+                elem.handing(event);
+
+                action(onCompleted, elemCon);
+
+                elemCon.setCurrentLayer(null);
+
+                return !Objects.equals(elem.getBroadcastStatus(), BroadcastStatus.Transmit);
+            });
+        });
+
+        action(handing);
     }
 }

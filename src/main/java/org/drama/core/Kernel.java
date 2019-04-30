@@ -4,18 +4,10 @@ import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
 import org.drama.vo.BiParameterValueObject;
 
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 interface Kernel {
-    /**
-     * 注册事件元数据
-     *
-     * @param classSet 需要被注册的事件
-     */
-    boolean regeisterEvent(Set<Class<? extends Event>> classSet);
-
     /**
      * 注册元素
      *

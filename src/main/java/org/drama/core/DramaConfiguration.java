@@ -13,7 +13,6 @@ public class DramaConfiguration implements Configuration, Signature {
     private static final long serialVersionUID = -5226125623860649004L;
     private LoggingFactory loggingFactory;
     private RegisterElementFactory registerElementFactory;
-    private RegisterEventFactory registerEventFactory;
     private LayerFactory layerFactory;
     private UUID identity = UUID.randomUUID();
     private Serializable signer = this;
@@ -34,15 +33,6 @@ public class DramaConfiguration implements Configuration, Signature {
 
     public void setRegisterElementFactory(RegisterElementFactory registerElementFactory) {
         this.registerElementFactory = registerElementFactory;
-    }
-
-    @Override
-    public RegisterEventFactory getRegisterEventFactory() {
-        return registerEventFactory;
-    }
-
-    public void setRegisterEventFactory(RegisterEventFactory registerEventFactory) {
-        this.registerEventFactory = registerEventFactory;
     }
 
     @Override

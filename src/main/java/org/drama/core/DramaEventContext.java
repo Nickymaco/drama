@@ -1,7 +1,6 @@
 package org.drama.core;
 
 import org.apache.commons.lang3.StringUtils;
-import org.drama.core.Layer;
 import org.drama.delegate.Delegator;
 import org.drama.event.EventContext;
 

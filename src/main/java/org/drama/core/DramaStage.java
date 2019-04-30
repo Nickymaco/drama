@@ -6,7 +6,9 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.InheritanceUtils;
 import org.drama.collections.ImmutableSet;
-import org.drama.event.*;
+import org.drama.event.Event;
+import org.drama.event.EventResult;
+import org.drama.event.EventResultEntity;
 import org.drama.exception.DramaException;
 import org.drama.log.template.IStageLoggingTemplate;
 import org.drama.log.template.LoggingTemplateFactory;
@@ -148,12 +150,6 @@ public class DramaStage implements Stage {
 
         kernel.reset();
 
-        // 获取注册事件工厂
-        final RegisterEventFactory registerEventFactory = configuration.getRegisterEventFactory();
-
-        if (Objects.isNull(registerEventFactory)) {
-            throw DramaException.emptyRegisterEvents();
-        }
         // 获取注册元素工厂
         final RegisterElementFactory registerElementFactory = configuration.getRegisterElementFactory();
 
@@ -167,11 +163,7 @@ public class DramaStage implements Stage {
         final Set<LayerDescriptor> layerDescList = new HashSet<>();
 
         if (Objects.isNull(kernel.getLayerGenerator())) {
-            addLayerGenerator(layerFacotry, l -> layerDescList.add(l));
-        }
-
-        if (!registerEvent(registerEventFactory.events())) {
-            throw DramaException.errorRegisterEvents();
+            addLayerGenerator(layerFacotry, layerDescList::add);
         }
 
         if (!registerElement(registerElementFactory.elements())) {
@@ -221,18 +213,6 @@ public class DramaStage implements Stage {
 
             getLogging().regeisteredElement(new Class<?>[]{element.getClass()});
         }
-        return true;
-    }
-
-    protected boolean registerEvent(Set<Class<? extends Event>> events) {
-        if (CollectionUtils.isEmpty(events)) {
-            return false;
-        }
-
-        kernel.regeisterEvent(events);
-
-        getLogging().registeredEvent(events.toArray(new Class<?>[]{}));
-
         return true;
     }
 

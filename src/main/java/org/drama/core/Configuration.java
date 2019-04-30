@@ -17,11 +17,6 @@ public interface Configuration extends Serializable {
     RegisterElementFactory getRegisterElementFactory();
 
     /**
-     * 注册事件
-     */
-    RegisterEventFactory getRegisterEventFactory();
-
-    /**
      * 添加日志
      */
     LoggingFactory getLoggingFactory();

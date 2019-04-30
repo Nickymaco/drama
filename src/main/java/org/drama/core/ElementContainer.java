@@ -2,6 +2,7 @@ package org.drama.core;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.drama.event.Event;
 import org.drama.exception.DramaException;
 
 import java.lang.reflect.InvocationHandler;
@@ -16,14 +17,15 @@ final class ElementContainer implements InvocationHandler, Comparable<ElementCon
     private Layer currentLayer;
     private final String name;
     private final String simpleName;
+    private boolean global;
+    private Class<? extends Event>[] registerEvents;
 
-    public ElementContainer(Element element) {
+    ElementContainer(Element element) {
         elem = Objects.requireNonNull(element);
 
         Class<?> clazz = element.getClass();
         name = clazz.getName();
         simpleName = clazz.getSimpleName();
-
 
         Class<?>[] interfaces = clazz.getInterfaces();
 
@@ -100,5 +102,22 @@ final class ElementContainer implements InvocationHandler, Comparable<ElementCon
 
     public BroadcastStatus getHandingStatus() {
         return getInvocator().getBroadcastStatus();
+    }
+
+    public boolean getGlobal() {
+        return global;
+    }
+
+    private void setGlobal(boolean global) {
+        this.global = global;
+    }
+
+    public Class<? extends Event>[] getRegisterEvents() {
+        return registerEvents;
+    }
+
+    public void setRegisterEvents(Class<? extends Event>[] registerEvents) {
+        this.registerEvents = registerEvents;
+        setGlobal(ArrayUtils.contains(registerEvents, Event.class) && registerEvents.length == 1);
     }
 }
