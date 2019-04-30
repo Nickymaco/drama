@@ -11,8 +11,6 @@ import java.util.Objects;
 public class DramaException extends RuntimeException {
     static final String EMPTY_EVENT_MSG = "Without any event registered";
     static final String EMPTY_ELEMENS_MSG = "Without any elemen registered";
-    static final String ERROR_REGISTER_EVENT_MSG = "Event registered occurred error";
-    static final String ERROR_REGISTER_ELEMENS_MSG = "Elemen registered  occurred error";
     static final String PLAYE_RROR_MSG = "Occurred errer on play";
     static final String ILLEGAL_EVENT_MSG = "Illegal event<%s>. It should be inherited DramaEvent";
     static final String ILLEGAL_BROADCAST_MSG = "Illegal broadcast event on layer<%s>";
@@ -23,7 +21,6 @@ public class DramaException extends RuntimeException {
     static final String ILLEGAL_LAYER_DESCRIPTOR = "Illegal layer descripter[%s] with name [%s] not found";
 
     private static final long serialVersionUID = -7337990653787626209L;
-
 
     protected DramaException(String message) {
         super(message);
@@ -40,14 +37,6 @@ public class DramaException extends RuntimeException {
 
     public static DramaException emptyRegisterElements() {
         return new DramaException(EMPTY_ELEMENS_MSG);
-    }
-
-    public static DramaException errorRegisterEvents() {
-        return new DramaException(ERROR_REGISTER_EVENT_MSG);
-    }
-
-    public static DramaException errorRegisterElements() {
-        return new DramaException(ERROR_REGISTER_ELEMENS_MSG);
     }
 
     public static DramaException occurredPlayError(Throwable e, Event event) {

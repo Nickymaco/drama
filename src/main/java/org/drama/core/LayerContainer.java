@@ -87,7 +87,8 @@ final class LayerContainer implements Comparable<LayerContainer> {
     }
 
     public ImmutableSet<Class<? extends Event>> getRegeisteredEvents() {
-        return ImmutableSet.newInstance(handingMap.keySet().stream().map(k -> k.getKey()).collect(Collectors.toSet()));
+        return ImmutableSet.newInstance(
+                handingMap.keySet().stream().map(KeyValueObject::getKey).collect(Collectors.toSet()));
     }
 
     public ImmutableSet<Element> getElements() {
