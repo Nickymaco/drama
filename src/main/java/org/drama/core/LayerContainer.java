@@ -1,7 +1,6 @@
 package org.drama.core;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -30,7 +29,7 @@ final class LayerContainer implements Comparable<LayerContainer> {
 
     @SafeVarargs
     @SuppressWarnings("unchecked")
-    protected LayerContainer(Layer layer, UUID identity, String name, int priority, Class<? extends Event>... events) {
+    LayerContainer(Layer layer, UUID identity, String name, int priority, Class<? extends Event>... events) {
         this.identity = identity;
         this.layer = layer;
         this.excludeEvent = ObjectUtils.defaultIfNull(events, (Class<? extends Event>[])new Class<?>[]{});
