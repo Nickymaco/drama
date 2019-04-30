@@ -12,6 +12,7 @@ import java.util.UUID;
  */
 public class EventResultIndex implements Serializable {
     private static final long serialVersionUID = -7453443690549858336L;
+    private static final String RESULT_INDEX = "EventResultIndex-%s[%s]";
     private final Signature signature;
 
     public EventResultIndex(final String uuid, final Event<?> event) {
@@ -52,6 +53,6 @@ public class EventResultIndex implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("EventResultIndex[%s]", signature.getIdentity());
+        return String.format(RESULT_INDEX, signature.getSigner().getClass().getSimpleName(), signature.getIdentity());
     }
 }

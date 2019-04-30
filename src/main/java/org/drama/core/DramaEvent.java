@@ -10,8 +10,17 @@ import javax.annotation.PreDestroy;
  */
 public abstract class DramaEvent<T> implements Event<T> {
     private EventArgument<T> argument;
-    private DramaEventResult eventResult = new DramaEventResult();
-    private DramaEventContext context = new DramaEventContext();
+    private final DramaEventResult eventResult;
+    private final DramaEventContext context;
+
+    public DramaEvent(){
+        this(new DramaEventResult(), new DramaEventContext());
+    }
+
+    public DramaEvent(DramaEventResult eventResult, DramaEventContext context) {
+        this.eventResult = eventResult;
+        this.context = context;
+    }
 
     @Override
     public EventContext getContext() {

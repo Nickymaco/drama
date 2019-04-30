@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DramaEventResult implements EventResult {
     private static final long serialVersionUID = 4555755009367480736L;
+    private static final String INDEX_KEY = "KEY[%s-%s]";
     private final static Map<String, EventResultValue> RESULT_MAP = new ConcurrentHashMap<>();
     private final String identity = UUID.randomUUID().toString().toUpperCase();
 
@@ -69,6 +70,6 @@ public class DramaEventResult implements EventResult {
     }
 
     private String getKey(EventResultIndex index) {
-        return String.format("Index[%s-%s]", identity, index);
+        return String.format(INDEX_KEY, identity, index);
     }
 }

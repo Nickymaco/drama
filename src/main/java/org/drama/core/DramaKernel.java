@@ -59,9 +59,9 @@ class DramaKernel implements Kernel {
 
     @Override
     public boolean reset() {
-        registeredEventSet.clear();
         handingMap.clear();
         layerContainerSet.clear();
+        registeredEventSet.clear();
         return true;
     }
 

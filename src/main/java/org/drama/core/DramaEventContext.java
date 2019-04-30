@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DramaEventContext implements EventContext {
     private static final long serialVersionUID = 7285410254463046346L;
     private static final Map<String, Object> CONTEXT = new ConcurrentHashMap<>();
+    private static final String KEY_FORMAT = "%s:%s";
     private final String identity = UUID.randomUUID().toString();
     private Layer currentLayer;
 
@@ -37,7 +38,7 @@ public class DramaEventContext implements EventContext {
     }
 
     private String getKey(Object key) {
-        return String.format("%s:%s", identity, key);
+        return String.format(KEY_FORMAT, identity, key);
     }
 
     @PreDestroy
