@@ -1,20 +1,24 @@
 package org.drama.core;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.KeyValue;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
+import org.drama.vo.KeyValueObject;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static org.drama.delegate.Delegator.action;
 import static org.drama.delegate.Delegator.forEach;
 
 final class LayerContainer implements Comparable<LayerContainer> {
+    private final static Map<KeyValueObject<Class<? extends Event>, LayerContainer>, Runnable> handingMap = new ConcurrentHashMap<>();
     private final UUID identity;
     private final Layer layer;
     private String name;
@@ -22,7 +26,6 @@ final class LayerContainer implements Comparable<LayerContainer> {
     private boolean disabled = false;
     private Class<? extends Event>[] excludeEvent;
     private final Set<ElementContainer> elementContainers;
-    private final Map<Class<? extends Event>, Runnable> handingMap;
     private Set<Element> elements;
 
     @SafeVarargs
@@ -31,7 +34,6 @@ final class LayerContainer implements Comparable<LayerContainer> {
         this.identity = identity;
         this.layer = layer;
         this.excludeEvent = ObjectUtils.defaultIfNull(events, (Class<? extends Event>[])new Class<?>[]{});
-        this.handingMap = new ConcurrentHashMap<>();
         this.elementContainers = new TreeSet<>();
         setName(name);
         setPriority(priority);
@@ -86,7 +88,7 @@ final class LayerContainer implements Comparable<LayerContainer> {
     }
 
     public ImmutableSet<Class<? extends Event>> getRegeisteredEvents() {
-        return ImmutableSet.newInstance(handingMap.keySet());
+        return ImmutableSet.newInstance(handingMap.keySet().stream().map(k -> k.getKey()).collect(Collectors.toSet()));
     }
 
     public ImmutableSet<Element> getElements() {
@@ -130,7 +132,9 @@ final class LayerContainer implements Comparable<LayerContainer> {
             return;
         }
 
-        Runnable handing = handingMap.get(eventClass);
+        KeyValueObject<Class<? extends Event>, LayerContainer> handingKey = new KeyValueObject<>(eventClass, this);
+
+        Runnable handing = handingMap.get(handingKey);
 
         if(Objects.nonNull(handing)) {
             action(handing);
@@ -151,7 +155,7 @@ final class LayerContainer implements Comparable<LayerContainer> {
 
         final LayerContainer that = this;
 
-        handingMap.put(eventClass, handing = () -> {
+        handingMap.put(handingKey, handing = () -> {
             if(CollectionUtils.isEmpty(handingSet)) {
                 return;
             }
