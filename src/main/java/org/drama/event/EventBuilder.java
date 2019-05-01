@@ -1,25 +1,65 @@
 package org.drama.event;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.drama.vo.KeyValueObject;
+import org.joor.Reflect;
+
+import static org.drama.delegate.Delegator.forEach;
 import static org.joor.Reflect.on;
 
-public class EventBuilder<T extends Event<TT>, TT> {
-    private Class<T> clazz;
-    private EventArgument<TT> argument;
+public class EventBuilder {
+    private Class<? extends Event> clazz;
+    private EventArgument<?> argument;
+    private Object[] parameters;
+    private KeyValueObject<String, Object>[] properties;
 
-    public EventBuilder(Class<T> clazz) {
+    public EventBuilder setType(Class<? extends Event> clazz) {
         this.clazz = clazz;
+        return this;
     }
 
-    public EventBuilder<T, TT> setArgument(TT value) {
-        EventArgument<TT> argument = new EventArgument<>();
+    public <T> EventBuilder setArgument(T value) {
+        EventArgument<T> argument = new EventArgument<>();
         argument.setArgument(value);
         this.argument = argument;
         return this;
     }
 
-    public T build(Object... paramters) throws Throwable {
-        T tEvent;
-        tEvent = on(clazz).create(paramters).get();
+//    @SuppressWarnings("unchecked")
+//    public <T> EventBuilder setArgumentObject(Object value) {
+//        EventArgument<T> argument = new EventArgument<>();
+//        argument.setArgument((T)value);
+//        this.argument = argument;
+//        return this;
+//    }
+
+    public EventBuilder setParameters(Object... parameters) {
+        this.parameters = parameters;
+        return this;
+    }
+
+    public EventBuilder setProperties(KeyValueObject<String, Object>... properties) {
+        this.properties = properties;
+        return this;
+    }
+
+    public Event build() {
+        final Reflect reflect;
+
+        if(!ArrayUtils.isEmpty(parameters)) {
+            reflect = on(clazz).create(parameters);
+        } else {
+            reflect = on(clazz).create();
+        }
+
+        if(ArrayUtils.isNotEmpty(properties)) {
+            forEach(properties, (property, i) -> {
+               reflect.set(property.getKey(), property.getValue());
+               return false;
+            });
+        }
+
+        Event tEvent = reflect.get();
         tEvent.setArgument(this.argument);
         return tEvent;
     }

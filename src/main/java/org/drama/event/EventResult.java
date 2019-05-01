@@ -19,7 +19,7 @@ public interface EventResult extends Serializable {
      * @param event 关联事件
      * @param out 是否输出
      */
-    void addResult(String uuid, Event<?> event, EventResultEntity entity, boolean out);
+    void addResult(String uuid, Event event, EventResultEntity entity, boolean out);
 
     /**
      * 获取结果值

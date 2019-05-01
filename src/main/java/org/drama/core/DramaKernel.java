@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.drama.delegate.Delegator.forEach;
-import static org.drama.delegate.Delegator.func;
+import static org.drama.delegate.Delegator.*;
+
 /**
  * Stage 和 layer 的运转内核
  */
@@ -25,7 +25,7 @@ class DramaKernel implements Kernel {
     private final Set<LayerContainer> layerContainerSet = new TreeSet<>();
     private Function<BiParameterValueObject<Class<? extends Layer>, LayerDescriptor>, Layer> layerGenerator;
 
-    public static Kernel getInstance(Signature signature) {
+    static Kernel getInstance(Signature signature) {
         return INSTANCE_MAP.computeIfAbsent(Objects.requireNonNull(signature), s -> new DramaKernel());
     }
 
@@ -64,7 +64,7 @@ class DramaKernel implements Kernel {
 
         Optional<LayerContainer> opt = layerContainerSet.stream().filter(l -> Objects.equals(l.getIdentity(), identity)).findFirst();
 
-        if(opt.isPresent()) {
+        if (opt.isPresent()) {
             return opt.get();
         }
 
@@ -174,7 +174,12 @@ class DramaKernel implements Kernel {
     }
 
     @Override
-    public Layer registerElement(final Element element) {
+    public Layer registerElement(Element element) {
+        return registerElement(element, null);
+    }
+
+    @Override
+    public Layer registerElement(final Element element, Consumer<Class<? extends Event>[]> onRegistered) {
         final ElementProperty prop = Objects.requireNonNull(element.getClass().getAnnotation(ElementProperty.class));
         final LayerContainer layerContainer = Objects.requireNonNull(getLayerContainer(prop));
         Class<? extends Event>[] events = Objects.requireNonNull(prop.events());
@@ -191,6 +196,8 @@ class DramaKernel implements Kernel {
             layerContainer.addElement(elemCon);
             return false;
         });
+
+        action(onRegistered, events);
 
         return layerContainer.getLayer();
     }

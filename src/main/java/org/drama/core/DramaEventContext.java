@@ -41,9 +41,9 @@ public class DramaEventContext implements EventContext {
     }
 
     @PreDestroy
-    protected void destroy(){
+    protected void destroy() {
         Delegator.forEach(CONTEXT.keySet(), (key, i) -> {
-            if(StringUtils.contains(key, identity)) {
+            if (StringUtils.contains(key, identity)) {
                 CONTEXT.remove(getKey(key));
             }
             return false;

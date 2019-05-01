@@ -35,7 +35,7 @@ public class DramaEventResult implements EventResult {
      * @param out    是否输出
      */
     @Override
-    public void addResult(String uuid, Event<?> event, EventResultEntity entity, boolean out) {
+    public void addResult(String uuid, Event event, EventResultEntity entity, boolean out) {
         EventResultIndex index = new EventResultIndex(uuid, event);
         EventResultValue value = new EventResultValue(entity, out);
         addResult(index, value);

@@ -12,7 +12,7 @@ public class DramaException extends RuntimeException {
     static final String EMPTY_EVENT_MSG = "Without any event registered";
     static final String EMPTY_ELEMENS_MSG = "Without any elemen registered";
     static final String PLAYE_RROR_MSG = "Occurred errer on play";
-    static final String ILLEGAL_EVENT_MSG = "Illegal event<%s>. It should be inherited DramaEvent";
+    static final String ILLEGAL_EVENT_MSG = "Illegal event<%s>. It should be inherited DramaEvent or implements Event interface";
     static final String ILLEGAL_BROADCAST_MSG = "Illegal broadcast event on layer<%s>";
     static final String ELEM_HANDING_ERROR = "Element occurring error on handing. Layer<%s>-element<%s>";
     static final String ONLY_GLOBALE_EVENT_MSG = "Element<%s> register more event, Global Event only. don't need any other event";
@@ -22,11 +22,11 @@ public class DramaException extends RuntimeException {
 
     private static final long serialVersionUID = -7337990653787626209L;
 
-    protected DramaException(String message) {
+    public DramaException(String message) {
         super(message);
     }
 
-    protected DramaException(String message, Throwable e) {
+    public DramaException(Throwable e, String message) {
         super(message, e);
     }
 
@@ -40,7 +40,7 @@ public class DramaException extends RuntimeException {
     }
 
     public static DramaException occurredPlayError(Throwable e, Event event) {
-        return new DramaException(PLAYE_RROR_MSG, e);
+        return new DramaException(e, PLAYE_RROR_MSG);
     }
 
     public static DramaException illegalRegisterEvent(Class<?> event) {
@@ -53,14 +53,14 @@ public class DramaException extends RuntimeException {
         String layerName = layer.getClass().getSimpleName();
         String msg = String.format(ILLEGAL_BROADCAST_MSG, layerName);
 
-        return Objects.isNull(event) ? new DramaException(msg, new NullPointerException()) : new DramaException(msg);
+        return Objects.isNull(event) ? new DramaException(new NullPointerException(), msg) : new DramaException(msg);
     }
 
     public static DramaException occurredHandingError(Throwable e, Layer layer, Element elem) {
         String layerName = layer.getClass().getSimpleName();
         String elemName = elem.getClass().getSimpleName();
         String msg = String.format(ELEM_HANDING_ERROR, layerName, elemName);
-        return new DramaException(msg, e);
+        return new DramaException(e, msg);
     }
 
     public static DramaException onlyGlobaleEvent(Class<? extends Element> elem) {

@@ -9,14 +9,15 @@ import javax.annotation.PreDestroy;
 
 /**
  * 抽象事件，事件都应派生于它
+ *
  * @param <T> 限定事件参数类型
  */
-public abstract class DramaEvent<T> implements Event<T> {
+public abstract class DramaEvent<T> implements Event {
     private EventArgument<T> argument;
     private final DramaEventResult eventResult;
     private final DramaEventContext context;
 
-    public DramaEvent(){
+    public DramaEvent() {
         this(new DramaEventResult(), new DramaEventContext());
     }
 
@@ -41,8 +42,9 @@ public abstract class DramaEvent<T> implements Event<T> {
     }
 
     @Override
-    public void setArgument(EventArgument<T> argument) {
-        this.argument = argument;
+    @SuppressWarnings("unchecked")
+    public void setArgument(EventArgument<?> argument) {
+        this.argument = (EventArgument<T>) argument;
     }
 
     @PreDestroy

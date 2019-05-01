@@ -32,7 +32,7 @@ final class LayerContainer implements Comparable<LayerContainer> {
     LayerContainer(Layer layer, UUID identity, String name, int priority, Class<? extends Event>... events) {
         this.identity = identity;
         this.layer = layer;
-        this.excludeEvent = ObjectUtils.defaultIfNull(events, (Class<? extends Event>[])new Class<?>[]{});
+        this.excludeEvent = ObjectUtils.defaultIfNull(events, (Class<? extends Event>[]) new Class<?>[]{});
         this.elementContainers = new TreeSet<>();
         setName(name);
         setPriority(priority);
@@ -92,7 +92,7 @@ final class LayerContainer implements Comparable<LayerContainer> {
     }
 
     public ImmutableSet<Element> getElements() {
-        if(Objects.isNull(elements)) {
+        if (Objects.isNull(elements)) {
             elements = new LinkedHashSet<>();
             elementContainers.forEach(elemCon -> elements.add(elemCon.getInvocator()));
         }
@@ -122,13 +122,13 @@ final class LayerContainer implements Comparable<LayerContainer> {
     }
 
     public void handingEevnt(Event event, final Consumer<LayerContainer> onPreHanding, final Consumer<ElementContainer> onCompleted) {
-        if(disabled) {
+        if (disabled) {
             return;
         }
 
         final Class<? extends Event> eventClass = event.getClass();
 
-        if(ArrayUtils.contains(excludeEvent, eventClass)) {
+        if (ArrayUtils.contains(excludeEvent, eventClass)) {
             return;
         }
 
@@ -136,7 +136,7 @@ final class LayerContainer implements Comparable<LayerContainer> {
 
         Runnable handing = handingMap.get(handingKey);
 
-        if(Objects.nonNull(handing)) {
+        if (Objects.nonNull(handing)) {
             action(handing);
             return;
         }
@@ -146,17 +146,17 @@ final class LayerContainer implements Comparable<LayerContainer> {
         elementContainers.stream().filter(elem -> {
             Class<? extends Event>[] events = elem.getRegisterEvents();
 
-           if(ArrayUtils.isEmpty(events)) {
-               return false;
-           }
+            if (ArrayUtils.isEmpty(events)) {
+                return false;
+            }
 
-           return ArrayUtils.contains(events, eventClass) || elem.getGlobal();
+            return ArrayUtils.contains(events, eventClass) || elem.getGlobal();
         }).forEach(handingSet::add);
 
         final LayerContainer that = this;
 
         handingMap.put(handingKey, handing = () -> {
-            if(CollectionUtils.isEmpty(handingSet)) {
+            if (CollectionUtils.isEmpty(handingSet)) {
                 return;
             }
 

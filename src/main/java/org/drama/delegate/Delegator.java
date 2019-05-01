@@ -2,11 +2,13 @@ package org.drama.delegate;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.drama.vo.BiParameterValueObject;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -46,6 +48,20 @@ public final class Delegator {
             if(handler.apply(arr[i], i)) {
                 return;
             }
+        }
+    }
+
+    public static <T> void forEach(T[] arr, Consumer<BiParameterValueObject<T, Integer>> handler) {
+        if(ArrayUtils.isEmpty(arr) || Objects.isNull(handler)) {
+            return;
+        }
+
+        BiParameterValueObject<T, Integer> consumer = new BiParameterValueObject<>();
+
+        for(int i=0,j=arr.length; i<j; i++) {
+            consumer.setParam1(arr[i]);
+            consumer.setParam2(i);
+            action(handler, consumer);
         }
     }
 

@@ -1,5 +1,6 @@
 package org.drama.core;
 
+import com.sun.istack.internal.NotNull;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -7,16 +8,21 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.InheritanceUtils;
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
+import org.drama.event.EventBuilder;
 import org.drama.event.EventResult;
 import org.drama.event.EventResultEntity;
 import org.drama.exception.DramaException;
 import org.drama.log.template.IStageLoggingTemplate;
 import org.drama.log.template.LoggingTemplateFactory;
+import org.drama.vo.BiParameterValueObject;
+import org.drama.vo.KeyValueObject;
+import org.drama.vo.TriParameterValueObject;
 
 import java.util.*;
 import java.util.function.Consumer;
 
 import static org.drama.delegate.Delegator.action;
+import static org.drama.delegate.Delegator.forEach;
 import static org.joor.Reflect.on;
 
 /**
@@ -30,6 +36,7 @@ public class DramaStage implements Stage {
     private ImmutableSet<Layer> layers;
     private Configuration configuration;
     private Kernel kernel;
+    private Map<Integer, Class<? extends Event>> registeredEvent = new HashMap<>();
 
     @Override
     public ImmutableSet<Layer> getLayers() {
@@ -40,19 +47,32 @@ public class DramaStage implements Stage {
     }
 
     @Override
-    public Render play(Event[] events) throws DramaException {
+    public Render play(TriParameterValueObject<String, ?, BiParameterValueObject<Object[], KeyValueObject<String, Object>[]>>[] objects, PlayLisenter playLisenter, BroadcastLisenter broadcastLisenter) {
+        Event[] events = buildEvents(objects);
+        return play(events, playLisenter, broadcastLisenter);
+    }
+
+    @Override
+    public void play(Render render, TriParameterValueObject<String, ?, BiParameterValueObject<Object[], KeyValueObject<String, Object>[]>>[] objects, PlayLisenter playLisenter, BroadcastLisenter broadcastLisenter) {
+        Event[] events = buildEvents(objects);
+        play(render, events, playLisenter, broadcastLisenter);
+    }
+
+
+    @Override
+    public Render play(@NotNull Event[] events) throws DramaException {
         return play(events, null, null);
     }
 
     @Override
-    public Render play(Event[] events, PlayLisenter pLisenter, BroadcastLisenter bLisenter) throws DramaException {
-        play(null, events, pLisenter, bLisenter);
+    public Render play(@NotNull Event[] events, PlayLisenter pLisenter, BroadcastLisenter bLisenter) throws DramaException {
+        play(new DramaRender(), events, pLisenter, bLisenter);
 
         return getRender();
     }
 
     @Override
-    public void play(Render render, Event[] events, PlayLisenter pLisenter, BroadcastLisenter bLisenter) throws DramaException {
+    public void play(@NotNull Render render, Event[] events, PlayLisenter pLisenter, BroadcastLisenter bLisenter) throws DramaException {
         if (ArrayUtils.isEmpty(events)) {
             throw DramaException.emptyRegisterEvents();
         }
@@ -204,7 +224,16 @@ public class DramaStage implements Stage {
         }
 
         for (Element element : elements) {
-            Layer layer = kernel.registerElement(element);
+            Layer layer = kernel.registerElement(element, (events) -> {
+                forEach(events, (event, i) -> {
+                    if (Objects.equals(event, Event.class)) {
+                        return false;
+                    }
+                    int hashCode = event.hashCode();
+                    registeredEvent.put(hashCode, event);
+                    return false;
+                });
+            });
 
             if (Objects.isNull(layer)) {
                 return false;
@@ -241,11 +270,40 @@ public class DramaStage implements Stage {
         return renderThreadLocal.get();
     }
 
-    protected void setRender(Render render) {
-        renderThreadLocal.set(ObjectUtils.defaultIfNull(render, new DramaRender()));
+    protected void setRender(@NotNull Render render) {
+        renderThreadLocal.set(render);
     }
 
     protected IStageLoggingTemplate getLogging() {
         return logging;
+    }
+
+    private Event[] buildEvents(TriParameterValueObject<String, ?, BiParameterValueObject<Object[], KeyValueObject<String, Object>[]>>[] objects) {
+
+        if (ArrayUtils.isEmpty(objects)) {
+            throw DramaException.emptyRegisterEvents();
+        }
+
+        final Event[] events = new Event[objects.length];
+        final EventBuilder builder = new EventBuilder();
+
+        forEach(objects, (p) -> {
+            TriParameterValueObject<String, ?, BiParameterValueObject<Object[], KeyValueObject<String, Object>[]>> item = p.getParam1();
+            Class<? extends Event> event = registeredEvent.get(item.getParam1().hashCode());
+
+            if (Objects.isNull(event)) {
+                throw DramaException.emptyRegisterEvents();
+            }
+
+            int index = p.getParam2();
+
+            events[index] = builder.setType(event)
+                    .setArgument(item.getParam2())
+                    .setParameters(item.getParam3().getParam1())
+                    .setProperties(item.getParam3().getParam2())
+                    .build();
+
+        });
+        return events;
     }
 }
