@@ -1,16 +1,15 @@
 package org.drama.delegate;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.drama.vo.BiParameterValueObject;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.drama.vo.BiParameterValueObject;
 
 /**
  * 委托传递器

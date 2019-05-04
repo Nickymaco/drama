@@ -1,7 +1,5 @@
 package org.drama.event;
 
-import org.drama.vo.KeyValueObject;
-
 import java.io.Serializable;
 import java.util.Collection;
 

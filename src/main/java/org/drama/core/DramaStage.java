@@ -1,6 +1,5 @@
 package org.drama.core;
 
-import com.sun.istack.internal.NotNull;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -60,19 +59,19 @@ public class DramaStage implements Stage {
 
 
     @Override
-    public Render play(@NotNull Event[] events) throws DramaException {
+    public Render play(Event[] events) throws DramaException {
         return play(events, null, null);
     }
 
     @Override
-    public Render play(@NotNull Event[] events, PlayLisenter pLisenter, BroadcastLisenter bLisenter) throws DramaException {
+    public Render play(Event[] events, PlayLisenter pLisenter, BroadcastLisenter bLisenter) throws DramaException {
         play(new DramaRender(), events, pLisenter, bLisenter);
 
         return getRender();
     }
 
     @Override
-    public void play(@NotNull Render render, Event[] events, PlayLisenter pLisenter, BroadcastLisenter bLisenter) throws DramaException {
+    public void play(Render render, Event[] events, PlayLisenter pLisenter, BroadcastLisenter bLisenter) throws DramaException {
         if (ArrayUtils.isEmpty(events)) {
             throw DramaException.emptyRegisterEvents();
         }
@@ -270,7 +269,7 @@ public class DramaStage implements Stage {
         return renderThreadLocal.get();
     }
 
-    protected void setRender(@NotNull Render render) {
+    protected void setRender(Render render) {
         renderThreadLocal.set(render);
     }
 
