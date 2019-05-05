@@ -89,7 +89,7 @@ class DramaClassloader extends ClassLoader {
     }
 
     private void scanJarFile(final String packagePath, String url, Consumer<Class<?>> onFound) throws IOException {
-        final JarFile jarFile = new JarFile(url);
+        try(final JarFile jarFile = new JarFile(url)) {
 
         jarFile.stream().filter(e -> {
             String name = e.getName();
@@ -123,6 +123,9 @@ class DramaClassloader extends ClassLoader {
                 ex.printStackTrace();
             }
         });
+        } catch(Exception ex) {
+        	ex.printStackTrace();
+        }
     }
 
     private void scanClassFile(final String packageName, final URL url, Consumer<Class<?>> onFound) {

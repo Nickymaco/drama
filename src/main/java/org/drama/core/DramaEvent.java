@@ -11,7 +11,8 @@ import javax.annotation.PreDestroy;
  * 默认事件对象，自定义事件可以应派生于它
  */
 public class DramaEvent implements Event {
-    private EventArgument<?> argument;
+	private static final long serialVersionUID = 4016926097748852570L;
+	private EventArgument<?> argument;
     private final DramaEventResult eventResult;
     private final DramaEventContext context;
     private String name;
