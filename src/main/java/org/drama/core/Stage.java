@@ -25,21 +25,21 @@ public interface Stage {
      * 演出
      *
      * @param events            事件
-     * @param playLisenter      Stage play 监听器 (Option)
-     * @param broadcastLisenter 逻辑处理层广播监听器 (Option)
+     * @param playListener      Stage play 监听器 (Option)
+     * @param broadcastListener 逻辑处理层广播监听器 (Option)
      * @return 渲染
      */
-    Render play(Event[] events, PlayLisenter playLisenter, BroadcastLisenter broadcastLisenter) throws DramaException;
+    Render play(Event[] events, PlayLisenter playListener, BroadcastListener broadcastListener) throws DramaException;
 
     /**
      * 演出（提供自定义 Render）
      *
      * @param render            自定义演出渲染
      * @param events            事件
-     * @param playLisenter      Stag play 监听器 (Option)
-     * @param broadcastLisenter 逻辑处理层广播监听器 (Option)
+     * @param playListener      Stag play 监听器 (Option)
+     * @param broadcastListener 逻辑处理层广播监听器 (Option)
      */
-    void play(Render render, Event[] events, PlayLisenter playLisenter, BroadcastLisenter broadcastLisenter) throws DramaException;
+    void play(Render render, Event[] events, PlayLisenter playListener, BroadcastListener broadcastListener) throws DramaException;
 
     /**
      * 参数配置
@@ -53,6 +53,7 @@ public interface Stage {
 
     /**
      * 演出向导，提供一个参数向导执行演出（推荐）
+     *
      * @return 演出向导
      */
     PlayWizard wizard();

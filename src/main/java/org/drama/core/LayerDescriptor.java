@@ -1,7 +1,5 @@
 package org.drama.core;
 
-import org.drama.event.Event;
-
 /**
  * 逻辑处理层描述符
  */
@@ -43,8 +41,8 @@ public interface LayerDescriptor {
         }
 
         @Override
-        public Class<? extends Event>[] getExculdeEvent() {
-            return null;
+        public String[] getExculdeEvent() {
+            return new String[]{};
         }
     }
 
@@ -73,5 +71,5 @@ public interface LayerDescriptor {
      *
      * @return
      */
-    Class<? extends Event>[] getExculdeEvent();
+    String[] getExculdeEvent();
 }

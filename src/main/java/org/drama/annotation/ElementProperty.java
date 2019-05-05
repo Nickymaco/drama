@@ -2,7 +2,6 @@ package org.drama.annotation;
 
 import org.drama.core.Layer;
 import org.drama.core.LayerDescriptor;
-import org.drama.event.Event;
 
 import java.lang.annotation.*;
 
@@ -17,9 +16,16 @@ public @interface ElementProperty {
     int priority() default 0;
 
     /**
-     * 元素要监听的时间
+     * 监听所有事件，当设置为{@code true}时，events则不生效
+     *
+     * @return {@code true} listen any event or {@code false} only in events property
      */
-    Class<? extends Event>[] events();
+    boolean any() default false;
+
+    /**
+     * 元素要监听的事件
+     */
+    String[] events() default {};
 
     /**
      * 指定具体逻辑处理层，需要提供一个无参构造函数

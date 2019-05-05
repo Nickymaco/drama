@@ -14,7 +14,7 @@ public class DramaException extends RuntimeException {
     static final String PLAYE_RROR_MSG = "Occurred errer on play";
     static final String ILLEGAL_EVENT_MSG = "Illegal event<%s>. It should be inherited DramaEvent or implements Event interface";
     static final String ILLEGAL_BROADCAST_MSG = "Illegal broadcast event on layer<%s>";
-    static final String ELEM_HANDING_ERROR = "Element occurring error on handing. Layer<%s>-element<%s>";
+    static final String ELEM_HANDING_ERROR = "Element<%s> occurring error on handing.";
     static final String ONLY_GLOBALE_EVENT_MSG = "Element<%s> register more event, Global Event only. don't need any other event";
     static final String NO_SPECIAL_LAYER_PROP_MSG = "Layer<%s> must special a LayerProperty annotaioin";
     static final String ILLEGAL_LAYER_DESC = "Illegal layer special target [%s] to enum [%s] in LayerDescription annotation";
@@ -56,10 +56,9 @@ public class DramaException extends RuntimeException {
         return Objects.isNull(event) ? new DramaException(new NullPointerException(), msg) : new DramaException(msg);
     }
 
-    public static DramaException occurredHandingError(Throwable e, Layer layer, Element elem) {
-        String layerName = layer.getClass().getSimpleName();
+    public static DramaException occurredHandingError(Throwable e, Element elem) {
         String elemName = elem.getClass().getSimpleName();
-        String msg = String.format(ELEM_HANDING_ERROR, layerName, elemName);
+        String msg = String.format(ELEM_HANDING_ERROR, elemName);
         return new DramaException(e, msg);
     }
 

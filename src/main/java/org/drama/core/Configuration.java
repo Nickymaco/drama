@@ -28,6 +28,7 @@ public interface Configuration extends Serializable {
 
     /**
      * 要注册的事件的类包路径
+     *
      * @return 类包路径数组
      */
     String[] regeisterEventPackage();

@@ -7,6 +7,7 @@ import java.io.Serializable;
 public interface EventContext extends Serializable {
     /**
      * 事件上下文添加参数
+     *
      * @param key
      * @param value
      */
@@ -14,6 +15,7 @@ public interface EventContext extends Serializable {
 
     /**
      * 获取事件向下文参数
+     *
      * @param key
      * @return 返回参数值
      * @throws Exception
@@ -22,12 +24,14 @@ public interface EventContext extends Serializable {
 
     /**
      * 当前逻辑处理层
+     *
      * @return 逻辑层处理层
      */
     Layer getCurrentLayer();
 
     /**
      * 设置当前逻辑处理层
+     *
      * @param currentLayer 逻辑处理层
      */
     void setCurrentLayer(Layer currentLayer);

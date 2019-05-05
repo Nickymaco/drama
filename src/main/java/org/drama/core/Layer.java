@@ -15,7 +15,7 @@ public interface Layer {
      */
     final class Null implements Layer {
         @Override
-        public void broadcast(Event event, BroadcastLisenter broadcasetListener) {
+        public void broadcast(Event event, BroadcastListener broadcasetListener) {
         }
 
         @Override
@@ -31,7 +31,7 @@ public interface Layer {
     /**
      * 广播事件
      */
-    void broadcast(Event event, BroadcastLisenter broadcasetListener);
+    void broadcast(Event event, BroadcastListener broadcasetListener);
 
     /**
      * 参数配置

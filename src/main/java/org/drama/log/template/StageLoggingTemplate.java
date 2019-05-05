@@ -20,12 +20,11 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
 
         final StringBuilder build = new StringBuilder();
 
-        forEach(events, (e, i) -> {
-            if (i != 0) {
+        forEach(events, p -> {
+            if (p.getParam2() != 0) {
                 build.append(WHITESPACE);
             }
-            build.append(e.getClass().getName());
-            return false;
+            build.append(p.getParam1().getName());
         });
 
         getLogging().info(String.format(STAGE_RECEVIE, build));

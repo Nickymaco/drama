@@ -2,7 +2,6 @@ package org.drama.core;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
@@ -17,22 +16,20 @@ import static org.drama.delegate.Delegator.action;
 import static org.drama.delegate.Delegator.forEach;
 
 final class LayerContainer implements Comparable<LayerContainer> {
-    private final static Map<KeyValueObject<Class<? extends Event>, LayerContainer>, Runnable> handingMap = new ConcurrentHashMap<>();
+    private final static Map<KeyValueObject<String, LayerContainer>, Runnable> handingMap = new ConcurrentHashMap<>();
     private final UUID identity;
     private final Layer layer;
     private String name;
     private int priority;
     private boolean disabled = false;
-    private Class<? extends Event>[] excludeEvent;
+    private String[] excludeEvent;
     private final Set<ElementContainer> elementContainers;
     private Set<Element> elements;
 
-    @SafeVarargs
-    @SuppressWarnings("unchecked")
-    LayerContainer(Layer layer, UUID identity, String name, int priority, Class<? extends Event>... events) {
+    LayerContainer(Layer layer, UUID identity, String name, int priority, String[] excludeEvents) {
         this.identity = identity;
         this.layer = layer;
-        this.excludeEvent = ObjectUtils.defaultIfNull(events, (Class<? extends Event>[]) new Class<?>[]{});
+        this.excludeEvent = excludeEvents;
         this.elementContainers = new TreeSet<>();
         setName(name);
         setPriority(priority);
@@ -78,15 +75,15 @@ final class LayerContainer implements Comparable<LayerContainer> {
         this.disabled = disabled;
     }
 
-    public Class<? extends Event>[] getExcludeEvent() {
+    public String[] getExcludeEvent() {
         return excludeEvent;
     }
 
-    public void setExcludeEvent(Class<? extends Event>[] excludeEvent) {
+    public void setExcludeEvent(String[] excludeEvent) {
         this.excludeEvent = excludeEvent;
     }
 
-    public ImmutableSet<Class<? extends Event>> getRegeisteredEvents() {
+    public ImmutableSet<String> getRegeisteredEvents() {
         return ImmutableSet.newInstance(
                 handingMap.keySet().stream().map(KeyValueObject::getKey).collect(Collectors.toSet()));
     }
@@ -121,18 +118,12 @@ final class LayerContainer implements Comparable<LayerContainer> {
         elementContainers.add(element);
     }
 
-    public void handingEevnt(Event event, final Consumer<LayerContainer> onPreHanding, final Consumer<ElementContainer> onCompleted) {
-        if (disabled) {
+    public void handingEevnt(final Event event, final Consumer<LayerContainer> onPreHanding, final Consumer<ElementContainer> onCompleted) {
+        if (disabled || ArrayUtils.contains(excludeEvent, event.getName())) {
             return;
         }
 
-        final Class<? extends Event> eventClass = event.getClass();
-
-        if (ArrayUtils.contains(excludeEvent, eventClass)) {
-            return;
-        }
-
-        KeyValueObject<Class<? extends Event>, LayerContainer> handingKey = new KeyValueObject<>(eventClass, this);
+        KeyValueObject<String, LayerContainer> handingKey = new KeyValueObject<>(event.getName(), this);
 
         Runnable handing = handingMap.get(handingKey);
 
@@ -141,37 +132,25 @@ final class LayerContainer implements Comparable<LayerContainer> {
             return;
         }
 
-        final Set<ElementContainer> handingSet = new TreeSet<>();
+        Set<ElementContainer> handingSet = new TreeSet<>();
 
-        elementContainers.stream().filter(elem -> {
-            Class<? extends Event>[] events = elem.getRegisterEvents();
-
-            if (ArrayUtils.isEmpty(events)) {
-                return false;
-            }
-
-            return ArrayUtils.contains(events, eventClass) || elem.getGlobal();
-        }).forEach(handingSet::add);
-
-        final LayerContainer that = this;
+        elementContainers.stream()
+                .filter(e -> e.getRegisterEvents().contains(event.getName()) || e.getGlobal())
+                .forEach(handingSet::add);
 
         handingMap.put(handingKey, handing = () -> {
             if (CollectionUtils.isEmpty(handingSet)) {
                 return;
             }
 
-            action(onPreHanding, that);
+            action(onPreHanding, this);
 
             forEach(handingSet, (elemCon, i) -> {
-                elemCon.setCurrentLayer(that.layer);
-
                 Element elem = elemCon.getInvocator();
 
                 elem.handing(event);
 
                 action(onCompleted, elemCon);
-
-                elemCon.setCurrentLayer(null);
 
                 return !Objects.equals(elem.getBroadcastStatus(), BroadcastStatus.Transmit);
             });

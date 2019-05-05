@@ -5,7 +5,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.reflect.InheritanceUtils;
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
 import org.drama.event.EventResult;
@@ -13,10 +12,12 @@ import org.drama.event.EventResultEntity;
 import org.drama.exception.DramaException;
 import org.drama.log.template.IStageLoggingTemplate;
 import org.drama.log.template.LoggingTemplateFactory;
+
 import java.util.*;
 import java.util.function.Consumer;
 
-import static org.drama.delegate.Delegator.*;
+import static org.drama.delegate.Delegator.action;
+import static org.drama.delegate.Delegator.forEach;
 import static org.joor.Reflect.on;
 
 /**
@@ -43,40 +44,30 @@ public class DramaStage implements Stage {
     }
 
     @Override
-    public Render play(Event[] events, PlayLisenter pLisenter, BroadcastLisenter bLisenter) throws DramaException {
+    public Render play(Event[] events, PlayLisenter playListener, BroadcastListener bLisenter) throws DramaException {
         DramaRender render = new DramaRender();
-        play(render, events, pLisenter, bLisenter);
+        play(render, events, playListener, bLisenter);
         return render;
     }
 
     @Override
-    public void play(Render render, Event[] events, PlayLisenter pLisenter, BroadcastLisenter bLisenter) throws DramaException {
+    public void play(Render render, Event[] events, PlayLisenter playListener, BroadcastListener bLisenter) throws DramaException {
         if (ArrayUtils.isEmpty(events)) {
             throw DramaException.emptyRegisterEvents();
         }
 
         getLogging().recevieEvent(events);
 
-        final PlayLisenter playLisenter = ObjectUtils.defaultIfNull(pLisenter, PlayLisenter.NULL);
-        final BroadcastLisenter broadcastlisenter = ObjectUtils.defaultIfNull(bLisenter, BroadcastLisenter.Default);
+        final PlayLisenter playLisenter = ObjectUtils.defaultIfNull(playListener, PlayLisenter.NULL);
+        final BroadcastListener broadcastlisenter = ObjectUtils.defaultIfNull(bLisenter, BroadcastListener.Default);
         final Map<String, Object> modelMap = new HashMap<>();
 
         for (Event event : events) {
-            if(!checkEvent(event)) {
-                continue;
-            }
-            
             if (playLisenter.onBeforePlay(event)) {
                 break;
             }
 
             broadcastlisenter.setBroadcastStatus(BroadcastStatus.Transmit);
-
-            Class<?> eventClazz = event.getClass();
-            // 检查注册事件类型范围
-            if (!eventClazz.equals(Event.class) && InheritanceUtils.distance(eventClazz, DramaEvent.class) == 0) {
-                throw DramaException.illegalRegisterEvent(eventClazz);
-            }
 
             playDeal(event, modelMap, broadcastlisenter);
 
@@ -91,12 +82,7 @@ public class DramaStage implements Stage {
         render.setModel(modelMap);
     }
 
-    private boolean checkEvent(Event event) {
-        int hashcode = event.getClass().getSimpleName().hashCode();
-        return Objects.nonNull(registeredEvent.get(hashcode));
-    }
-
-    private void playDeal(Event event, final Map<String, Object> modelMap, BroadcastLisenter lisenter) {
+    private void playDeal(Event event, final Map<String, Object> modelMap, BroadcastListener lisenter) {
         getLogging().dealEvent(event);
 
         playDealEvent(event, lisenter);
@@ -121,7 +107,7 @@ public class DramaStage implements Stage {
     /**
      * 根据监听器判断是否继续往下执行
      */
-    private void playDealEvent(Event event, BroadcastLisenter lisenter) {
+    private void playDealEvent(Event event, BroadcastListener lisenter) {
         if (Objects.isNull(event) || CollectionUtils.isEmpty(getLayers())) {
             return;
         }
@@ -153,7 +139,7 @@ public class DramaStage implements Stage {
 
         kernel.reset();
 
-        if(ArrayUtils.isNotEmpty(configuration.regeisterEventPackage())) {
+        if (ArrayUtils.isNotEmpty(configuration.regeisterEventPackage())) {
             registerEvent(configuration);
         }
 
@@ -187,8 +173,8 @@ public class DramaStage implements Stage {
         registeredEvent.clear();
 
         forEach(configuration.regeisterEventPackage(), p -> classloader.scan(p.getParam1(), c -> {
-            if(ObjectUtils.notEqual(c, Event.class) && ClassUtils.getAllInterfaces(c).contains(Event.class)) {
-                registeredEvent.put(c.getSimpleName().hashCode(), (Class<? extends Event>)c);
+            if (ObjectUtils.notEqual(c, Event.class) && ClassUtils.getAllInterfaces(c).contains(Event.class)) {
+                registeredEvent.put(c.getSimpleName().hashCode(), (Class<? extends Event>) c);
             }
         }));
     }
@@ -229,7 +215,7 @@ public class DramaStage implements Stage {
         }
 
         for (Element element : elements) {
-            Layer layer = kernel.registerElement(element, null);
+            Layer layer = kernel.registerElement(element);
 
             if (Objects.isNull(layer)) {
                 return false;

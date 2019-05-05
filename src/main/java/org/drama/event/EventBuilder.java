@@ -43,21 +43,29 @@ public class EventBuilder {
     public Event build() {
         final Reflect reflect;
 
-        if(!ArrayUtils.isEmpty(parameters)) {
+        if (!ArrayUtils.isEmpty(parameters)) {
             reflect = on(clazz).create(parameters);
         } else {
             reflect = on(clazz).create();
         }
 
-        if(ArrayUtils.isNotEmpty(properties)) {
+        if (ArrayUtils.isNotEmpty(properties)) {
             forEach(properties, (property, i) -> {
-               reflect.set(property.getKey(), property.getValue());
-               return false;
+                reflect.set(property.getKey(), property.getValue());
+                return false;
             });
         }
 
         Event tEvent = reflect.get();
         tEvent.setArgument(argument);
         return tEvent;
+    }
+
+    public boolean reset() {
+        clazz = null;
+        argument = null;
+        parameters = null;
+        properties = null;
+        return true;
     }
 }

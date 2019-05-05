@@ -1,7 +1,7 @@
 package org.drama.core;
 
-public interface BroadcastLisenter {
-    BroadcastLisenter Default = new BroadcastLisenter() {
+public interface BroadcastListener {
+    BroadcastListener Default = new BroadcastListener() {
         private BroadcastStatus broadcastStatus;
 
         @Override

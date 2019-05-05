@@ -7,12 +7,22 @@ import java.io.Serializable;
  */
 public interface Event extends Serializable {
     /**
+     * 获取事件名称
+     *
+     * @return 事件名称
+     */
+    default String getName() {
+        return getClass().getSimpleName();
+    }
+
+    /**
      * 获取事件参数
      */
     EventArgument<?> getArgument();
 
     /**
      * 设置时间参数
+     *
      * @param argument 参数
      */
     void setArgument(EventArgument<?> argument);

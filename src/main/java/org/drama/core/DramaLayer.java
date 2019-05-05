@@ -28,7 +28,7 @@ public class DramaLayer implements Layer {
     }
 
     @Override
-    public void broadcast(Event event, BroadcastLisenter broadcasetListener) {
+    public void broadcast(Event event, BroadcastListener broadcasetListener) {
         if (Objects.isNull(event)) {
             throw DramaException.illegalBroadcastEvent(this, null);
         }

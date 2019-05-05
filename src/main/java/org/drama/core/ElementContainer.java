@@ -2,30 +2,43 @@ package org.drama.core;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.drama.event.Event;
+import org.drama.annotation.ElementProperty;
 import org.drama.exception.DramaException;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 final class ElementContainer implements InvocationHandler, Comparable<ElementContainer> {
-    private int priority;
+    private final int priority;
     private final Element elem;
     private final Object invodicator;
-    private Layer currentLayer;
     private final String name;
     private final String simpleName;
-    private boolean global;
-    private Class<? extends Event>[] registerEvents;
+    private final boolean global;
+    private final Set<String> registerEvents;
+    private final ElementProperty elementProperty;
 
     ElementContainer(Element element) {
-        elem = Objects.requireNonNull(element);
+        this.elem = element;
 
         Class<?> clazz = element.getClass();
         name = clazz.getName();
         simpleName = clazz.getSimpleName();
+
+        ElementProperty prop = Objects.requireNonNull(clazz.getAnnotation(ElementProperty.class));
+        this.elementProperty = prop;
+        this.priority = prop.priority();
+        this.global = prop.any();
+        this.registerEvents = new HashSet<>(Arrays.asList(prop.events()));
+
+        if (!prop.any() && ArrayUtils.isEmpty(prop.events())) {
+            throw DramaException.emptyRegisterEvents();
+        }
 
         Class<?>[] interfaces = clazz.getInterfaces();
 
@@ -38,10 +51,6 @@ final class ElementContainer implements InvocationHandler, Comparable<ElementCon
 
     public int getPriority() {
         return priority;
-    }
-
-    public void setPriority(int priority) {
-        this.priority = priority;
     }
 
     public Element getInvocator() {
@@ -80,16 +89,8 @@ final class ElementContainer implements InvocationHandler, Comparable<ElementCon
         try {
             return method.invoke(elem, args);
         } catch (Exception e) {
-            throw DramaException.occurredHandingError(e, getCurrentLayer(), elem);
+            throw DramaException.occurredHandingError(e, elem);
         }
-    }
-
-    public Layer getCurrentLayer() {
-        return currentLayer;
-    }
-
-    public void setCurrentLayer(Layer currentLayer) {
-        this.currentLayer = currentLayer;
     }
 
     public String getName() {
@@ -108,16 +109,11 @@ final class ElementContainer implements InvocationHandler, Comparable<ElementCon
         return global;
     }
 
-    private void setGlobal(boolean global) {
-        this.global = global;
-    }
-
-    public Class<? extends Event>[] getRegisterEvents() {
+    public Set<String> getRegisterEvents() {
         return registerEvents;
     }
 
-    public void setRegisterEvents(Class<? extends Event>[] registerEvents) {
-        this.registerEvents = registerEvents;
-        setGlobal(ArrayUtils.contains(registerEvents, Event.class) && registerEvents.length == 1);
+    public ElementProperty getElementProperty() {
+        return elementProperty;
     }
 }

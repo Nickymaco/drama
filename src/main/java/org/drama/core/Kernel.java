@@ -16,14 +16,6 @@ interface Kernel {
     Layer registerElement(Element element);
 
     /**
-     * 注册元素
-     *
-     * @param element      需要被注册的元素
-     * @param onRegistered 完成元素注册回调通知有哪些事件被注册了
-     */
-    Layer registerElement(Element element, Consumer<Class<? extends Event>[]> onRegistered);
-
-    /**
      * 通知事件句柄
      *
      * @param layer        要执行广播的逻辑处理层

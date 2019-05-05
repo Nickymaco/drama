@@ -4,7 +4,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.drama.event.Event;
 import org.drama.event.EventArgument;
 import org.drama.event.EventBuilder;
-import org.drama.exception.DramaException;
 import org.drama.vo.KeyValueObject;
 
 import java.util.Objects;
@@ -14,10 +13,11 @@ import static org.drama.delegate.Delegator.func;
 
 class DramaPlayWizard implements PlayWizard {
     private Stage stage;
+    private String eventName;
     private Object[] parameters;
     private Class<? extends Event> clazz;
     private EventArgument<?> argument;
-    private BroadcastLisenter broadcastLisenter;
+    private BroadcastListener broadcastListener;
     private PlayLisenter playLisenter;
     private KeyValueObject<String, Object>[] properties;
     private EventBuilder builder = new EventBuilder();
@@ -30,6 +30,7 @@ class DramaPlayWizard implements PlayWizard {
 
     @Override
     public PlayWizard event(String name) {
+        this.eventName = name;
         this.clazz = func(funcGetEvenClass, name);
         return this;
     }
@@ -61,8 +62,8 @@ class DramaPlayWizard implements PlayWizard {
     }
 
     @Override
-    public PlayWizard broadcastLisenter(BroadcastLisenter lisenter) {
-        this.broadcastLisenter = lisenter;
+    public PlayWizard broadcastLisenter(BroadcastListener lisenter) {
+        this.broadcastListener = lisenter;
         return this;
     }
 
@@ -75,18 +76,22 @@ class DramaPlayWizard implements PlayWizard {
     @Override
     public Render play() {
         Event event = buidEvent();
-        return stage.play(new Event[]{event}, this.playLisenter, this.broadcastLisenter);
+        return stage.play(new Event[]{event}, this.playLisenter, this.broadcastListener);
     }
 
     @Override
     public void play(Render render) {
         Event event = buidEvent();
-        stage.play(render, new Event[]{event}, this.playLisenter, this.broadcastLisenter);
+        stage.play(render, new Event[]{event}, this.playLisenter, this.broadcastListener);
     }
 
     private Event buidEvent() {
-        if(Objects.isNull(clazz)) {
-            throw DramaException.emptyRegisterEvents();
+        builder.reset();
+
+        if (Objects.isNull(clazz)) {
+            DramaEvent event = new DramaEvent(eventName);
+            event.setArgument(this.argument);
+            return event;
         }
 
         return builder

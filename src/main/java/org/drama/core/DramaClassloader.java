@@ -32,20 +32,20 @@ class DramaClassloader extends ClassLoader {
     }
 
     void scan(final String packageName, Consumer<Class<?>> onFound) {
-        if(StringUtils.isBlank(packageName)) {
+        if (StringUtils.isBlank(packageName)) {
             return;
         }
 
         String[] parts = packageName.split(PACKAGE_SPLITER);
 
-        if(ArrayUtils.isEmpty(parts) || WILDCARD.equals(parts[0])) {
+        if (ArrayUtils.isEmpty(parts) || WILDCARD.equals(parts[0])) {
             return;
         }
 
         StringBuilder buffer = new StringBuilder();
 
-        for(int i=0, j=parts.length; i<j; i++) {
-            if(WILDCARD.equals(parts[i])) {
+        for (int i = 0, j = parts.length; i < j; i++) {
+            if (WILDCARD.equals(parts[i])) {
                 break;
             }
 
@@ -57,7 +57,7 @@ class DramaClassloader extends ClassLoader {
         try {
             Enumeration<URL> urls = getResources(packagePath);
 
-            while(urls.hasMoreElements()) {
+            while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
 
                 switch (url.getProtocol().toLowerCase()) {
@@ -95,10 +95,10 @@ class DramaClassloader extends ClassLoader {
             String name = e.getName();
             return name.indexOf(packagePath) == 0 && name.lastIndexOf(CLASS_FILE_ENDWITH) > 1;
         }).forEach(e -> {
-            try(InputStream inputStream = jarFile.getInputStream(e)) {
-                int capacity = (int)e.getSize();
+            try (InputStream inputStream = jarFile.getInputStream(e)) {
+                int capacity = (int) e.getSize();
 
-                if(capacity == 0) {
+                if (capacity == 0) {
                     return;
                 }
 
@@ -109,14 +109,14 @@ class DramaClassloader extends ClassLoader {
                     nread += n;
                 }
 
-                if(n < 0) {
+                if (n < 0) {
                     return;
                 }
 
                 String className = e.getName().replaceAll(CLASS_FILE_ENDWITH, "").replaceAll("/", PACKAGE_SPLITER);
                 Class<?> c = defineClass(className, bytes, 0, bytes.length);
 
-                if(Objects.nonNull(c)) {
+                if (Objects.nonNull(c)) {
                     action(onFound, c);
                 }
             } catch (IOException ex) {
@@ -131,7 +131,7 @@ class DramaClassloader extends ClassLoader {
 
             int endIndex;
 
-            if((endIndex = fileName.lastIndexOf(CLASS_FILE_ENDWITH)) < 1) {
+            if ((endIndex = fileName.lastIndexOf(CLASS_FILE_ENDWITH)) < 1) {
                 return;
             }
 
@@ -142,7 +142,7 @@ class DramaClassloader extends ClassLoader {
 
                 Class<?> c = defineClass(className, bytes, 0, bytes.length);
 
-                if(Objects.nonNull(c)) {
+                if (Objects.nonNull(c)) {
                     action(onFound, c);
                 }
             } catch (Exception e) {
@@ -155,13 +155,13 @@ class DramaClassloader extends ClassLoader {
         Path path = FileSystems.getDefault().getPath(filePath);
 
         try {
-            if(!Files.isDirectory(path)) {
+            if (!Files.isDirectory(path)) {
                 action(onFile, path);
                 return;
             }
 
             Files.list(path).forEach(p -> {
-                if(!Files.isDirectory(p)) {
+                if (!Files.isDirectory(p)) {
                     action(onFile, p);
                 } else {
                     scanFile(p.toString(), onFile);

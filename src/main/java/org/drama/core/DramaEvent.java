@@ -8,20 +8,20 @@ import org.drama.event.EventResult;
 import javax.annotation.PreDestroy;
 
 /**
- * 抽象事件，事件都应派生于它
- *
- * @param <T> 限定事件参数类型
+ * 默认事件对象，自定义事件可以应派生于它
  */
-public abstract class DramaEvent<T> implements Event {
-    private EventArgument<T> argument;
+public class DramaEvent implements Event {
+    private EventArgument<?> argument;
     private final DramaEventResult eventResult;
     private final DramaEventContext context;
+    private String name;
 
-    public DramaEvent() {
-        this(new DramaEventResult(), new DramaEventContext());
+    public DramaEvent(String name) {
+        this(name, new DramaEventResult(), new DramaEventContext());
     }
 
-    public DramaEvent(DramaEventResult eventResult, DramaEventContext context) {
+    public DramaEvent(String name, DramaEventResult eventResult, DramaEventContext context) {
+        this.name = name;
         this.eventResult = eventResult;
         this.context = context;
     }
@@ -37,14 +37,22 @@ public abstract class DramaEvent<T> implements Event {
     }
 
     @Override
-    public EventArgument<T> getArgument() {
+    public EventArgument<?> getArgument() {
         return argument;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void setArgument(EventArgument<?> argument) {
-        this.argument = (EventArgument<T>) argument;
+        this.argument = argument;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @PreDestroy

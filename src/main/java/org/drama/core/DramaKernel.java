@@ -1,6 +1,5 @@
 package org.drama.core;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.drama.annotation.ElementProperty;
 import org.drama.annotation.LayerDescription;
 import org.drama.annotation.LayerProperty;
@@ -15,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.drama.delegate.Delegator.*;
+import static org.drama.delegate.Delegator.func;
 
 /**
  * Stage 和 layer 的运转内核
@@ -74,9 +73,8 @@ class DramaKernel implements Kernel {
             throw DramaException.illegalLayerDesc(desc);
         }
 
-        LayerContainer layerContainer = new LayerContainer(layer, identity, desc.getName(), desc.getPriority());
+        LayerContainer layerContainer = new LayerContainer(layer, identity, desc.getName(), desc.getPriority(), desc.getExculdeEvent());
         layerContainer.setDisable(desc.getDisabled());
-        layerContainer.setExcludeEvent(desc.getExculdeEvent());
         return layerContainer;
     }
 
@@ -115,7 +113,7 @@ class DramaKernel implements Kernel {
     }
 
     private LayerDescriptor getLayerDescriptor(
-            String uuid, String name, int priority, boolean disabled, Class<? extends Event>[] event) {
+            String uuid, String name, int priority, boolean disabled, String[] event) {
 
         return new LayerDescriptor() {
             @Override
@@ -124,7 +122,7 @@ class DramaKernel implements Kernel {
             }
 
             @Override
-            public Class<? extends Event>[] getExculdeEvent() {
+            public String[] getExculdeEvent() {
                 return event;
             }
 
@@ -173,31 +171,13 @@ class DramaKernel implements Kernel {
         opt.get().handingEevnt(event, onPreHanding, onCompleted);
     }
 
+
     @Override
     public Layer registerElement(Element element) {
-        return registerElement(element, null);
-    }
+        ElementContainer elemCon = new ElementContainer(element);
 
-    @Override
-    public Layer registerElement(final Element element, Consumer<Class<? extends Event>[]> onRegistered) {
-        final ElementProperty prop = Objects.requireNonNull(element.getClass().getAnnotation(ElementProperty.class));
-        final LayerContainer layerContainer = Objects.requireNonNull(getLayerContainer(prop));
-        Class<? extends Event>[] events = Objects.requireNonNull(prop.events());
-
-        // 检查是否全局元素
-        if (ArrayUtils.contains(events, Event.class) && events.length != 1) {
-            throw DramaException.onlyGlobaleEvent(element.getClass());
-        }
-
-        forEach(events, (event, i) -> {
-            ElementContainer elemCon = new ElementContainer(element);
-            elemCon.setPriority(prop.priority());
-            elemCon.setRegisterEvents(prop.events());
-            layerContainer.addElement(elemCon);
-            return false;
-        });
-
-        action(onRegistered, events);
+        LayerContainer layerContainer = getLayerContainer(elemCon.getElementProperty());
+        layerContainer.addElement(elemCon);
 
         return layerContainer.getLayer();
     }
