@@ -16,6 +16,7 @@ public class DramaConfiguration implements Configuration, Signature {
     private LayerFactory layerFactory;
     private UUID identity = UUID.randomUUID();
     private Serializable signer = this;
+    private String[] eventPackage;
 
     @Override
     public LayerFactory getLayerFactory() {
@@ -47,6 +48,15 @@ public class DramaConfiguration implements Configuration, Signature {
     @Override
     public Signature getSignature() {
         return this;
+    }
+
+    @Override
+    public String[] regeisterEventPackage() {
+        return this.eventPackage;
+    }
+
+    public void setRegisterEventPackage(String[] eventPackage) {
+        this.eventPackage = eventPackage;
     }
 
     @Override

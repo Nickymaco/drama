@@ -25,4 +25,10 @@ public interface Configuration extends Serializable {
      * 签名, 每一个 Stage 应该需要一个签名注册到 kernel 里
      */
     Signature getSignature();
+
+    /**
+     * 要注册的事件的类包路径
+     * @return 类包路径数组
+     */
+    String[] regeisterEventPackage();
 }

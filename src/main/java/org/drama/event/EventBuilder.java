@@ -25,20 +25,17 @@ public class EventBuilder {
         return this;
     }
 
-//    @SuppressWarnings("unchecked")
-//    public <T> EventBuilder setArgumentObject(Object value) {
-//        EventArgument<T> argument = new EventArgument<>();
-//        argument.setArgument((T)value);
-//        this.argument = argument;
-//        return this;
-//    }
+    public EventBuilder setArgument(EventArgument<?> argument) {
+        this.argument = argument;
+        return this;
+    }
 
-    public EventBuilder setParameters(Object... parameters) {
+    public EventBuilder setParameters(Object[] parameters) {
         this.parameters = parameters;
         return this;
     }
 
-    public EventBuilder setProperties(KeyValueObject<String, Object>... properties) {
+    public EventBuilder setProperties(KeyValueObject<String, Object>[] properties) {
         this.properties = properties;
         return this;
     }
@@ -60,7 +57,7 @@ public class EventBuilder {
         }
 
         Event tEvent = reflect.get();
-        tEvent.setArgument(this.argument);
+        tEvent.setArgument(argument);
         return tEvent;
     }
 }
