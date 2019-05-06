@@ -21,17 +21,17 @@ class DramaPlayWizard implements PlayWizard {
     private PlayLisenter playLisenter;
     private KeyValueObject<String, Object>[] properties;
     private EventBuilder builder = new EventBuilder();
-    private Function<String, Class<? extends Event>> funcGetEvenClass;
+    private Function<String, Class<? extends Event>> classFactory;
 
-    DramaPlayWizard(Stage stage, Function<String, Class<? extends Event>> funcGetEvenClass) {
+    DramaPlayWizard(Stage stage, Function<String, Class<? extends Event>> classFactory) {
         this.stage = stage;
-        this.funcGetEvenClass = ObjectUtils.defaultIfNull(funcGetEvenClass, (name) -> null);
+        this.classFactory = ObjectUtils.defaultIfNull(classFactory, (name) -> null);
     }
 
     @Override
     public PlayWizard event(String name) {
         this.eventName = name;
-        this.clazz = func(funcGetEvenClass, name);
+        this.clazz = func(classFactory, name);
         return this;
     }
 
