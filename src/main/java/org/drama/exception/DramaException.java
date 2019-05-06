@@ -12,7 +12,7 @@ public class DramaException extends RuntimeException {
     static final String EMPTY_EVENT_MSG = "Without any event registered";
     static final String EMPTY_ELEMENS_MSG = "Without any elemen registered";
     static final String PLAYE_RROR_MSG = "Occurred errer on play";
-    static final String ILLEGAL_EVENT_MSG = "Illegal event<%s>. It should be inherited DramaEvent or implements Event interface";
+    static final String ILLEGAL_EVENT_MSG = "Illegal event<%s>. this object maybe unregister, please check event register";
     static final String ILLEGAL_BROADCAST_MSG = "Illegal broadcast event on layer<%s>";
     static final String ELEM_HANDING_ERROR = "Element<%s> occurring error on handing.";
     static final String ONLY_GLOBALE_EVENT_MSG = "Element<%s> register more event, Global Event only. don't need any other event";

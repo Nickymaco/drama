@@ -52,9 +52,7 @@ public class DramaStage implements Stage {
 
     @Override
     public void play(Render render, Event[] events, PlayLisenter playListener, BroadcastListener bLisenter) throws DramaException {
-        if (ArrayUtils.isEmpty(events)) {
-            throw DramaException.emptyRegisterEvents();
-        }
+        eventValidation(events);
 
         getLogging().recevieEvent(events);
 
@@ -80,6 +78,24 @@ public class DramaStage implements Stage {
 
         render.setCode(Render.SUCCESS);
         render.setModel(modelMap);
+    }
+
+    private void eventValidation(Event[] events) {
+        if (ArrayUtils.isEmpty(events)) {
+            throw DramaException.emptyRegisterEvents();
+        }
+
+        forEach(events, p -> {
+            Class<? extends Event> clazz = p.getParam1().getClass();
+
+            if(Objects.equals(clazz, DramaEvent.class)) {
+                return;
+            }
+
+            if(Objects.isNull(registeredEvent.get(clazz.getSimpleName().hashCode()))) {
+                throw DramaException.illegalRegisterEvent(clazz);
+            }
+        });
     }
 
     private void playDeal(Event event, final Map<String, Object> modelMap, BroadcastListener lisenter) {
