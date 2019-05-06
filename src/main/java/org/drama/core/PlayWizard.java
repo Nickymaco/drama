@@ -5,16 +5,16 @@ import org.drama.vo.KeyValueObject;
 
 public interface PlayWizard {
     /**
-     * 设置事件（Class or Name）
+     * 设置事件，匹配已注册的自定义事件{@literal Class.SimpleName}，无则启用默认事件{@code DramaEvent}
      *
      * @param name 事件名称
      */
     PlayWizard event(String name);
 
     /**
-     * 设置事件（Class or Name）
+     * 设置自定义事件
      *
-     * @param clazz 事件描述
+     * @param clazz 事件{@literal Class}描述
      */
     PlayWizard event(Class<? extends Event> clazz);
 
