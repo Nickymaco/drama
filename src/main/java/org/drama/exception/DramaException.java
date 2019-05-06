@@ -12,7 +12,7 @@ public class DramaException extends RuntimeException {
     static final String EMPTY_EVENT_MSG = "Without any event registered";
     static final String EMPTY_ELEMENS_MSG = "Without any elemen registered";
     static final String PLAYE_RROR_MSG = "Occurred errer on play";
-    static final String ILLEGAL_EVENT_MSG = "Illegal event<%s>. this object maybe unregister, please check event register";
+    static final String ILLEGAL_EVENT_MSG = "Illegal event<%s>. maybe unregister or unkonw event name, please check event register";
     static final String ILLEGAL_BROADCAST_MSG = "Illegal broadcast event on layer<%s>";
     static final String ELEM_HANDING_ERROR = "Element<%s> occurring error on handing.";
     static final String ONLY_GLOBALE_EVENT_MSG = "Element<%s> register more event, Global Event only. don't need any other event";
@@ -43,9 +43,8 @@ public class DramaException extends RuntimeException {
         return new DramaException(e, PLAYE_RROR_MSG);
     }
 
-    public static DramaException illegalRegisterEvent(Class<?> event) {
-        String eventName = event.getSimpleName();
-        String message = String.format(ILLEGAL_EVENT_MSG, eventName);
+    public static DramaException illegalRegisterEvent(Event event) {
+        String message = String.format(ILLEGAL_EVENT_MSG, event.getClass().getName());
         return new DramaException(message);
     }
 

@@ -60,27 +60,23 @@ public class DramaStage implements Stage {
         final BroadcastListener broadcastlisenter = ObjectUtils.defaultIfNull(bLisenter, BroadcastListener.Default);
         final Map<String, Object> modelMap = new HashMap<>();
 
-        forEach(events, (event, i) -> {
-            try(Event e = event){
+        forEach(events, p -> {
+            try(Event e = p.getParam1()){
+                if (Objects.equals(broadcastlisenter.getBroadcastStatus(), BroadcastStatus.Exit)) {
+                    return;
+                }
+
                 if (playLisenter.onBeforePlay(e)) {
-                    // just like continue;
-                    return true;
+                    return;
                 }
 
                 broadcastlisenter.setBroadcastStatus(BroadcastStatus.Transmit);
 
-                playDeal(event, modelMap, broadcastlisenter);
+                playDeal(e, modelMap, broadcastlisenter);
 
                 playLisenter.onCompletedPlay(e);
-
-                if (Objects.equals(broadcastlisenter.getBroadcastStatus(), BroadcastStatus.Exit)) {
-                    // just like break;
-                    return false;
-                }
-
-                return true;
             } catch (Exception ex) {
-               throw DramaException.occurredPlayError(ex, event);
+               throw DramaException.occurredPlayError(ex, p.getParam1());
             }
         });
 
@@ -94,14 +90,20 @@ public class DramaStage implements Stage {
         }
 
         forEach(events, p -> {
-            Class<? extends Event> clazz = p.getParam1().getClass();
+            Event e = p.getParam1();
+
+            if(StringUtils.isBlank(e.getName())) {
+                throw DramaException.illegalRegisterEvent(e);
+            }
+
+            Class<? extends Event> clazz = e.getClass();
 
             if(Objects.equals(clazz, DramaEvent.class)) {
                 return;
             }
 
-            if(Objects.isNull(registeredEvent.get(clazz.getSimpleName().hashCode()))) {
-                throw DramaException.illegalRegisterEvent(clazz);
+            if(Objects.isNull(registeredEvent.get(e.getName().hashCode()))) {
+                throw DramaException.illegalRegisterEvent(e);
             }
         });
     }
