@@ -1,5 +1,7 @@
 package org.drama.core;
 
+import java.util.Objects;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.drama.collections.ImmutableSet;
@@ -8,8 +10,6 @@ import org.drama.exception.DramaException;
 import org.drama.log.LoggingFactory;
 import org.drama.log.template.ILayerLoggingTemplate;
 import org.drama.log.template.LoggingTemplateFactory;
-
-import java.util.Objects;
 
 /**
  * 默认逻辑处理层，如果没有指定逻辑处理层，舞台默认使用它进行构建

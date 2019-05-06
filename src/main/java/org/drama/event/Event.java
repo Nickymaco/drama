@@ -3,19 +3,19 @@ package org.drama.event;
 import java.io.Serializable;
 
 /**
- * 事件，可以作为全局事件注册，注册全局事件后其他自定义事件不需要重复注册，为互斥
+ * 事件定义
  */
 public interface Event extends Serializable, AutoCloseable {
     /**
      * 获取事件名称
      *
-     * @return 事件名称
+     * @return 名称
      */
     String getName();
 
     /**
-     * 设置时间名称
-     * @param name 事件名称
+     * 设置事件名称
+     * @param name 名称
      */
     void setName(String name);
 

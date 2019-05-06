@@ -1,11 +1,11 @@
 package org.drama.event;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.drama.security.Signature;
-
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
+
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.drama.security.Signature;
 
 /**
  * 事件结果索引，对事件结果做一个逻辑上的业务元数据描述
@@ -15,7 +15,7 @@ public class EventResultIndex implements Serializable {
     private static final String RESULT_INDEX = "EventResultIndex-%s[%s]";
     private final Signature signature;
 
-    public EventResultIndex(final String uuid, final Event event) {
+    public EventResultIndex(String uuid, Event event) {
         this.signature = new Signature() {
             @Override
             public UUID getIdentity() {

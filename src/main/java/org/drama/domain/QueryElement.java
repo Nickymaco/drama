@@ -1,14 +1,14 @@
 package org.drama.domain;
 
+import static org.drama.delegate.Delegator.action;
+
+import java.util.function.Consumer;
+
 import org.drama.core.BroadcastStatus;
 import org.drama.core.Element;
 import org.drama.event.Event;
 import org.drama.event.EventArgument;
 import org.drama.vo.BiParameterValueObject;
-
-import java.util.function.Consumer;
-
-import static org.drama.delegate.Delegator.action;
 
 public abstract class QueryElement implements Element {
     private BroadcastStatus broadcastStatus = BroadcastStatus.Transmit;

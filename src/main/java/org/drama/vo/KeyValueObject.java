@@ -1,9 +1,9 @@
 package org.drama.vo;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.io.Serializable;
 import java.util.Objects;
+
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class KeyValueObject<K, V> implements Serializable {
     private static final long serialVersionUID = 2344632851099497825L;

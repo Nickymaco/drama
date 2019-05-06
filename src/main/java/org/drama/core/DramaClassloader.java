@@ -1,7 +1,7 @@
 package org.drama.core;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import static org.drama.delegate.Delegator.action;
+import static org.drama.text.Symbol.WILDCARD;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,11 +15,11 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.jar.JarFile;
 
-import static org.drama.delegate.Delegator.action;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 class DramaClassloader extends ClassLoader {
     private static final String CLASS_FILE_ENDWITH = ".class";
-    private static final String WILDCARD = "*";
     private static final String PACKAGE_SPLITER = "\\.";
 
     DramaClassloader() {
@@ -90,39 +90,38 @@ class DramaClassloader extends ClassLoader {
 
     private void scanJarFile(final String packagePath, String url, Consumer<Class<?>> onFound) throws IOException {
         try(final JarFile jarFile = new JarFile(url)) {
-
-        jarFile.stream().filter(e -> {
-            String name = e.getName();
-            return name.indexOf(packagePath) == 0 && name.lastIndexOf(CLASS_FILE_ENDWITH) > 1;
-        }).forEach(e -> {
-            try (InputStream inputStream = jarFile.getInputStream(e)) {
-                int capacity = (int) e.getSize();
-
-                if (capacity == 0) {
-                    return;
-                }
-
-                byte[] bytes = new byte[capacity];
-                int nread = 0;
-                int n;
-                while ((n = inputStream.read(bytes, nread, capacity - nread)) > 0) {
-                    nread += n;
-                }
-
-                if (n < 0) {
-                    return;
-                }
-
-                String className = e.getName().replaceAll(CLASS_FILE_ENDWITH, "").replaceAll("/", PACKAGE_SPLITER);
-                Class<?> c = defineClass(className, bytes, 0, bytes.length);
-
-                if (Objects.nonNull(c)) {
-                    action(onFound, c);
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        });
+	        jarFile.stream().filter(e -> {
+	            String name = e.getName();
+	            return name.indexOf(packagePath) == 0 && name.lastIndexOf(CLASS_FILE_ENDWITH) > 1;
+	        }).forEach(e -> {
+	            try (InputStream inputStream = jarFile.getInputStream(e)) {
+	                int capacity = (int) e.getSize();
+	
+	                if (capacity == 0) {
+	                    return;
+	                }
+	
+	                byte[] bytes = new byte[capacity];
+	                int nread = 0;
+	                int n;
+	                while ((n = inputStream.read(bytes, nread, capacity - nread)) > 0) {
+	                    nread += n;
+	                }
+	
+	                if (n < 0) {
+	                    return;
+	                }
+	
+	                String className = e.getName().replaceAll(CLASS_FILE_ENDWITH, "").replaceAll("/", PACKAGE_SPLITER);
+	                Class<?> c = defineClass(className, bytes, 0, bytes.length);
+	
+	                if (Objects.nonNull(c)) {
+	                    action(onFound, c);
+	                }
+	            } catch (IOException ex) {
+	                ex.printStackTrace();
+	            }
+	        });
         } catch(Exception ex) {
         	ex.printStackTrace();
         }

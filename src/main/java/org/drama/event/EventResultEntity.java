@@ -1,12 +1,14 @@
 package org.drama.event;
 
-import java.io.Serializable;
+import static org.drama.text.Symbol.EMPTY;
+
+import java.io.Serializable;;
 
 /**
- * 空接口，用于限定事件结果是一个实体避免基础类型
+ * 事件结果实体定义接口
  */
 public interface EventResultEntity extends Serializable {
     default String aliasName() {
-        return "";
+        return EMPTY;
     }
 }

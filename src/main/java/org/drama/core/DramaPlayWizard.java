@@ -1,17 +1,18 @@
 package org.drama.core;
 
+import static org.drama.delegate.Delegator.func;
+
+import java.util.Objects;
+import java.util.function.Function;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.drama.annotation.EventProperty;
 import org.drama.event.Event;
 import org.drama.event.EventArgument;
 import org.drama.event.EventBuilder;
 import org.drama.vo.KeyValueObject;
-
-import java.util.Objects;
-import java.util.function.Function;
-
-import static org.drama.delegate.Delegator.func;
 
 class DramaPlayWizard implements PlayWizard {
     private Stage stage;
@@ -102,18 +103,18 @@ class DramaPlayWizard implements PlayWizard {
         if (Objects.isNull(clazz)) {
             event = new DramaEvent();
             event.setArgument(this.argument);
-            event.setName(this.eventName);
-            return event;
+        } else {
+	        event = builder
+	                .setType(clazz)
+	                .setArgument(argument)
+	                .setParameters(parameters)
+	                .setProperties(properties)
+	                .build();
         }
-
-        event = builder
-                .setType(clazz)
-                .setArgument(argument)
-                .setParameters(parameters)
-                .setProperties(properties)
-                .build();
-
-        event.setName(this.eventName);
+        
+        if(Objects.isNull(event.getName()) && StringUtils.isNoneBlank(this.eventName)) {
+        	event.setName(this.eventName);
+        }
         return event;
     }
 }

@@ -1,8 +1,8 @@
 package org.drama.log.template;
 
-import org.drama.log.LoggingFactory;
-
 import java.util.Objects;
+
+import org.drama.log.LoggingFactory;
 
 public class LoggingTemplateFactory {
     private static StageLoggingTemplate loggingTemplate;

@@ -1,10 +1,5 @@
 package org.drama.core;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.drama.annotation.ElementProperty;
-import org.drama.exception.DramaException;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -12,6 +7,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.drama.annotation.ElementProperty;
+import org.drama.exception.DramaException;
 
 final class ElementContainer implements InvocationHandler, Comparable<ElementContainer> {
     private final int priority;

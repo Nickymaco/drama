@@ -5,8 +5,6 @@ import org.drama.event.Event;
 import org.drama.log.LoggingInteractor;
 
 public interface IStageLoggingTemplate extends LoggingInteractor {
-    String PREFIX = "[ STAGE ] ->";
-
     /**
      * 收到事件
      *

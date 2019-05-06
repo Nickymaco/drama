@@ -1,11 +1,21 @@
 package org.drama.log.template;
 
+import static org.drama.delegate.Delegator.forEach;
+import static org.drama.text.MessageText.LAYER_BROADCAST;
+import static org.drama.text.MessageText.LAYER_HANDING;
+import static org.drama.text.MessageText.REGISTERED_ELEMENT;
+import static org.drama.text.MessageText.REGISTERED_EVENT;
+import static org.drama.text.MessageText.REGISTERED_LAYER;
+import static org.drama.text.MessageText.STAGE_DEAL;
+import static org.drama.text.MessageText.STAGE_IS_RUNNING;
+import static org.drama.text.MessageText.STAGE_RECEVIE;
+import static org.drama.text.MessageText.format;
+import static org.drama.text.Symbol.WHITESPACE;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.drama.core.Stage;
 import org.drama.event.Event;
 import org.drama.log.Logging;
-
-import static org.drama.delegate.Delegator.forEach;
 
 class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLoggingTemplate, ILayerLoggingTemplate {
     public StageLoggingTemplate(Logging logging) {
@@ -27,23 +37,23 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
             build.append(p.getParam1().getName());
         });
 
-        getLogging().info(String.format(STAGE_RECEVIE, build));
+        getLogging().info(format(STAGE_RECEVIE, build));
     }
 
     @Override
     public void dealEvent(Event event) {
-        getLogging().info(String.format(STAGE_DEAL, event.getClass().getName()));
+        getLogging().info(format(STAGE_DEAL, event));
     }
 
     @Override
     public void broadcast(String layerName, Event event) {
         String eventName = event.getClass().getSimpleName();
-        getLogging().info(String.format(LAYER_BROADCAST, layerName, eventName));
+        getLogging().info(format(LAYER_BROADCAST, layerName, eventName));
     }
 
     @Override
     public void handingElement(String elementName) {
-        getLogging().info(String.format(LAYER_HANDING, elementName));
+        getLogging().info(format(LAYER_HANDING, elementName));
     }
 
     @Override
@@ -52,7 +62,7 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
             return;
         }
         for (Class<?> event : events) {
-            getLogging().info(String.format(REGISTERED_EVENT, event.getName()));
+            getLogging().info(format(REGISTERED_EVENT, event.getName()));
         }
 
     }
@@ -63,7 +73,7 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
             return;
         }
         for (Class<?> elem : elements) {
-            getLogging().info(String.format(REGISTERED_ELEMENT, elem.getName()));
+            getLogging().info(format(REGISTERED_ELEMENT, elem.getName()));
         }
     }
 
@@ -73,12 +83,12 @@ class StageLoggingTemplate extends BasicLoggingTemplate implements IStageLogging
             return;
         }
         for (String layerName : layers) {
-            getLogging().info(String.format(REGISTERED_LAYER, layerName));
+            getLogging().info(format(REGISTERED_LAYER, layerName));
         }
     }
 
     @Override
     public void setup(Stage stage) {
-        getLogging().info(String.format(STAGE_IS_RUNNING, stage.getClass().getName()));
+        getLogging().info(format(STAGE_IS_RUNNING, stage));
     }
 }

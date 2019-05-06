@@ -1,11 +1,11 @@
 package org.drama.event;
 
+import static org.drama.delegate.Delegator.forEach;
+import static org.joor.Reflect.on;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.drama.vo.KeyValueObject;
 import org.joor.Reflect;
-
-import static org.drama.delegate.Delegator.forEach;
-import static org.joor.Reflect.on;
 
 public class EventBuilder {
     private Class<? extends Event> clazz;

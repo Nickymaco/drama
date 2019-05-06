@@ -1,9 +1,9 @@
 package org.drama.core;
 
+import java.io.Serializable;
+
 import org.drama.log.LoggingFactory;
 import org.drama.security.Signature;
-
-import java.io.Serializable;
 
 public interface Configuration extends Serializable {
     /**

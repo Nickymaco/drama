@@ -1,8 +1,6 @@
 package org.drama.log;
 
 public interface LoggingInteractor {
-    String WHITESPACE = " ";
-
     /**
      * 捕获异常
      *

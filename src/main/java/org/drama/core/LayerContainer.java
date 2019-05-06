@@ -1,19 +1,24 @@
 package org.drama.core;
 
+import static org.drama.delegate.Delegator.action;
+import static org.drama.delegate.Delegator.forEach;
+
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
 import org.drama.vo.KeyValueObject;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import static org.drama.delegate.Delegator.action;
-import static org.drama.delegate.Delegator.forEach;
 
 final class LayerContainer implements Comparable<LayerContainer> {
     private final static Map<KeyValueObject<String, LayerContainer>, Runnable> handingMap = new ConcurrentHashMap<>();

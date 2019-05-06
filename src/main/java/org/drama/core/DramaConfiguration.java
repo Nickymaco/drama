@@ -1,13 +1,13 @@
 package org.drama.core;
 
+import java.io.Serializable;
+import java.util.Objects;
+import java.util.UUID;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.drama.log.LoggingFactory;
 import org.drama.security.Signature;
-
-import java.io.Serializable;
-import java.util.Objects;
-import java.util.UUID;
 
 public class DramaConfiguration implements Configuration, Signature {
     private static final long serialVersionUID = -5226125623860649004L;

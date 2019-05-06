@@ -1,8 +1,8 @@
 package org.drama.event;
 
-import org.drama.core.Layer;
-
 import java.io.Serializable;
+
+import org.drama.core.Layer;
 
 public interface EventContext extends Serializable {
     /**

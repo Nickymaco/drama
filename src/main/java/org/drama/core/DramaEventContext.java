@@ -1,13 +1,14 @@
 package org.drama.core;
 
-import org.apache.commons.lang3.StringUtils;
-import org.drama.delegate.Delegator;
-import org.drama.event.EventContext;
-
-import javax.annotation.PreDestroy;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PreDestroy;
+
+import org.apache.commons.lang3.StringUtils;
+import org.drama.delegate.Delegator;
+import org.drama.event.EventContext;
 
 public class DramaEventContext implements EventContext {
     private static final long serialVersionUID = 7285410254463046346L;

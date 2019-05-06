@@ -1,11 +1,11 @@
 package org.drama.core;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
 import org.drama.vo.BiParameterValueObject;
-
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 interface Kernel {
     /**

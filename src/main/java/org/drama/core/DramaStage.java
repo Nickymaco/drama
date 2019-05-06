@@ -1,5 +1,16 @@
 package org.drama.core;
 
+import static org.drama.delegate.Delegator.action;
+import static org.drama.delegate.Delegator.forEach;
+import static org.joor.Reflect.on;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Consumer;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
@@ -13,13 +24,6 @@ import org.drama.event.EventResultEntity;
 import org.drama.exception.DramaException;
 import org.drama.log.template.IStageLoggingTemplate;
 import org.drama.log.template.LoggingTemplateFactory;
-
-import java.util.*;
-import java.util.function.Consumer;
-
-import static org.drama.delegate.Delegator.action;
-import static org.drama.delegate.Delegator.forEach;
-import static org.joor.Reflect.on;
 
 /**
  * 默认舞台，执行逻辑处理层时按照线性关系依次执行
@@ -53,7 +57,7 @@ public class DramaStage implements Stage {
 
     @Override
     public void play(Render render, Event[] events, PlayLisenter playListener, BroadcastListener bLisenter) throws DramaException {
-        eventValidation(events);
+        checkEvent(events);
 
         getLogging().recevieEvent(events);
 
@@ -83,34 +87,6 @@ public class DramaStage implements Stage {
 
         render.setCode(Render.SUCCESS);
         render.setModel(modelMap);
-    }
-
-    private void eventValidation(Event[] events) {
-        if (ArrayUtils.isEmpty(events)) {
-            throw DramaException.emptyRegisterEvents();
-        }
-
-        forEach(events, p -> {
-            Event e = p.getParam1();
-
-            if(StringUtils.isBlank(e.getName())) {
-                throw DramaException.illegalRegisterEvent(e);
-            }
-
-            Class<?> eClazz = e.getClass();
-
-            if(Objects.equals(eClazz, DramaEvent.class)) {
-                return;
-            }
-
-            if(Objects.isNull(registeredEvent.get(eClazz.getSimpleName().hashCode()))) {
-                Class<?> aClass = registeredEvent.get(e.getName().hashCode());
-
-                if(ObjectUtils.notEqual(aClass, eClazz)) {
-                    throw DramaException.illegalRegisterEvent(e);
-                }
-            }
-        });
     }
 
     private void playDeal(Event event, final Map<String, Object> modelMap, BroadcastListener lisenter) {
@@ -154,6 +130,34 @@ public class DramaStage implements Stage {
                 break;
             }
         }
+    }
+    
+    private void checkEvent(Event[] events) {
+        if (ArrayUtils.isEmpty(events)) {
+            throw DramaException.emptyRegisterEvents();
+        }
+
+        forEach(events, p -> {
+            Event e = p.getParam1();
+
+            if(StringUtils.isBlank(e.getName())) {
+                throw DramaException.illegalRegisterEvent(e);
+            }
+
+            Class<?> eClazz = e.getClass();
+
+            if(Objects.equals(eClazz, DramaEvent.class)) {
+                return;
+            }
+
+            if(Objects.isNull(registeredEvent.get(eClazz.getSimpleName().hashCode()))) {
+                Class<?> aClass = registeredEvent.get(e.getName().hashCode());
+
+                if(ObjectUtils.notEqual(aClass, eClazz)) {
+                    throw DramaException.illegalRegisterEvent(e);
+                }
+            }
+        });
     }
 
     @Override
@@ -204,18 +208,13 @@ public class DramaStage implements Stage {
         registeredEvent.clear();
 
         forEach(configuration.regeisterEventPackage(), p -> classloader.scan(p.getParam1(), c -> {
-            if (ObjectUtils.notEqual(c, Event.class)
-                    && ObjectUtils.notEqual(c, DramaEvent.class)
-                    && ClassUtils.getAllInterfaces(c).contains(Event.class)) {
-
+            if (!c.equals(Event.class) && !c.equals(DramaEvent.class) && ClassUtils.getAllInterfaces(c).contains(Event.class)) {
                 Class<? extends Event> c1 = (Class<? extends Event>) c;
-
-                EventProperty eventProperty = c.getAnnotation(EventProperty.class);
+                EventProperty eventProperty = c1.getAnnotation(EventProperty.class);
 
                 if(Objects.nonNull(eventProperty) && ArrayUtils.isNotEmpty(eventProperty.aliasFor())) {
                     forEach(eventProperty.aliasFor(), p1 -> registeredEvent.put(p1.getParam1().hashCode(), c1));
                 }
-
                 registeredEvent.put(c.getSimpleName().hashCode(), c1);
             }
         }));
@@ -223,11 +222,11 @@ public class DramaStage implements Stage {
 
     @Override
     public PlayWizard wizard() {
-        return new DramaPlayWizard(this, (name) -> registeredEvent.get(name.hashCode()));
+        return new DramaPlayWizard(this, name -> registeredEvent.get(name.hashCode()));
     }
 
     private void addLayerGenerator(final LayerFactory layerFacotry, final Consumer<LayerDescriptor> onCreated) {
-        kernel.setLayerGenerator((p) -> {
+        kernel.setLayerGenerator(p -> {
             Layer layer;
 
             if (Objects.equals(Layer.Null.class, p.getParam1())) {
