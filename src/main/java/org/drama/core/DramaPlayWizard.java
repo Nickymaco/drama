@@ -1,6 +1,8 @@
 package org.drama.core;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.drama.annotation.EventProperty;
 import org.drama.event.Event;
 import org.drama.event.EventArgument;
 import org.drama.event.EventBuilder;
@@ -38,6 +40,13 @@ class DramaPlayWizard implements PlayWizard {
     @Override
     public PlayWizard event(Class<? extends Event> clazz) {
         this.clazz = clazz;
+        EventProperty eventProperty = clazz.getAnnotation(EventProperty.class);
+
+        if(Objects.nonNull(eventProperty) && ArrayUtils.isNotEmpty(eventProperty.aliasFor())) {
+            if(!ArrayUtils.contains(eventProperty.aliasFor(), this.eventName)) {
+                this.eventName = clazz.getSimpleName();
+            }
+        }
         return this;
     }
 
@@ -88,17 +97,23 @@ class DramaPlayWizard implements PlayWizard {
     private Event buidEvent() {
         builder.reset();
 
+        Event event;
+
         if (Objects.isNull(clazz)) {
-            DramaEvent event = new DramaEvent(eventName);
+            event = new DramaEvent();
             event.setArgument(this.argument);
+            event.setName(this.eventName);
             return event;
         }
 
-        return builder
+        event = builder
                 .setType(clazz)
                 .setArgument(argument)
                 .setParameters(parameters)
                 .setProperties(properties)
                 .build();
+
+        event.setName(this.eventName);
+        return event;
     }
 }

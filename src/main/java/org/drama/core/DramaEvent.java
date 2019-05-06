@@ -15,12 +15,11 @@ public class DramaEvent implements Event {
     private final DramaEventContext context;
     private String name;
 
-    public DramaEvent(String name) {
-        this(name, new DramaEventResult(), new DramaEventContext());
+    public DramaEvent() {
+        this(new DramaEventResult(), new DramaEventContext());
     }
 
-    public DramaEvent(String name, DramaEventResult eventResult, DramaEventContext context) {
-        this.name = name;
+    public DramaEvent(DramaEventResult eventResult, DramaEventContext context) {
         this.eventResult = eventResult;
         this.context = context;
     }
@@ -50,6 +49,7 @@ public class DramaEvent implements Event {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }

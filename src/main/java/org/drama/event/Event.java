@@ -11,9 +11,13 @@ public interface Event extends Serializable, AutoCloseable {
      *
      * @return 事件名称
      */
-    default String getName() {
-        return getClass().getSimpleName();
-    }
+    String getName();
+
+    /**
+     * 设置时间名称
+     * @param name 事件名称
+     */
+    void setName(String name);
 
     /**
      * 获取事件参数

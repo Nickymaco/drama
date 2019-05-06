@@ -5,6 +5,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.drama.annotation.EventProperty;
 import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
 import org.drama.event.EventResult;
@@ -96,14 +97,18 @@ public class DramaStage implements Stage {
                 throw DramaException.illegalRegisterEvent(e);
             }
 
-            Class<? extends Event> clazz = e.getClass();
+            Class<?> eClazz = e.getClass();
 
-            if(Objects.equals(clazz, DramaEvent.class)) {
+            if(Objects.equals(eClazz, DramaEvent.class)) {
                 return;
             }
 
-            if(Objects.isNull(registeredEvent.get(e.getName().hashCode()))) {
-                throw DramaException.illegalRegisterEvent(e);
+            if(Objects.isNull(registeredEvent.get(eClazz.getSimpleName().hashCode()))) {
+                Class<?> aClass = registeredEvent.get(e.getName().hashCode());
+
+                if(ObjectUtils.notEqual(aClass, eClazz)) {
+                    throw DramaException.illegalRegisterEvent(e);
+                }
             }
         });
     }
@@ -199,8 +204,19 @@ public class DramaStage implements Stage {
         registeredEvent.clear();
 
         forEach(configuration.regeisterEventPackage(), p -> classloader.scan(p.getParam1(), c -> {
-            if (ObjectUtils.notEqual(c, Event.class) && ClassUtils.getAllInterfaces(c).contains(Event.class)) {
-                registeredEvent.put(c.getSimpleName().hashCode(), (Class<? extends Event>) c);
+            if (ObjectUtils.notEqual(c, Event.class)
+                    && ObjectUtils.notEqual(c, DramaEvent.class)
+                    && ClassUtils.getAllInterfaces(c).contains(Event.class)) {
+
+                Class<? extends Event> c1 = (Class<? extends Event>) c;
+
+                EventProperty eventProperty = c.getAnnotation(EventProperty.class);
+
+                if(Objects.nonNull(eventProperty) && ArrayUtils.isNotEmpty(eventProperty.aliasFor())) {
+                    forEach(eventProperty.aliasFor(), p1 -> registeredEvent.put(p1.getParam1().hashCode(), c1));
+                }
+
+                registeredEvent.put(c.getSimpleName().hashCode(), c1);
             }
         }));
     }
