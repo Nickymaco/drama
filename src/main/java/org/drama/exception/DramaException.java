@@ -15,7 +15,6 @@ public class DramaException extends RuntimeException {
     static final String ILLEGAL_EVENT_MSG = "Illegal event<%s>. maybe unregister or unkonw event name, please check event register";
     static final String ILLEGAL_BROADCAST_MSG = "Illegal broadcast event on layer<%s>";
     static final String ELEM_HANDING_ERROR = "Element<%s> occurring error on handing.";
-    static final String ONLY_GLOBALE_EVENT_MSG = "Element<%s> register more event, Global Event only. don't need any other event";
     static final String NO_SPECIAL_LAYER_PROP_MSG = "Layer<%s> must special a LayerProperty annotaioin";
     static final String ILLEGAL_LAYER_DESC = "Illegal layer special target [%s] to enum [%s] in LayerDescription annotation";
     static final String ILLEGAL_LAYER_DESCRIPTOR = "Illegal layer descripter[%s] with name [%s] not found";
@@ -59,11 +58,6 @@ public class DramaException extends RuntimeException {
         String elemName = elem.getClass().getSimpleName();
         String msg = String.format(ELEM_HANDING_ERROR, elemName);
         return new DramaException(e, msg);
-    }
-
-    public static DramaException onlyGlobaleEvent(Class<? extends Element> elem) {
-        String message = String.format(ONLY_GLOBALE_EVENT_MSG, elem.getName());
-        return new DramaException(message);
     }
 
     public static DramaException noSpecialLayerProp(Class<? extends Layer> layer) {
