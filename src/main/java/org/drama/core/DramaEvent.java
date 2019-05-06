@@ -5,8 +5,6 @@ import org.drama.event.EventArgument;
 import org.drama.event.EventContext;
 import org.drama.event.EventResult;
 
-import javax.annotation.PreDestroy;
-
 /**
  * 默认事件对象，自定义事件可以应派生于它
  */
@@ -56,8 +54,8 @@ public class DramaEvent implements Event {
         this.name = name;
     }
 
-    @PreDestroy
-    private void destroy() {
+    @Override
+    public void close() throws Exception {
         eventResult.destroy();
         context.destroy();
     }

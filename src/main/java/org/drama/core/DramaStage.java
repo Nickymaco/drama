@@ -60,21 +60,29 @@ public class DramaStage implements Stage {
         final BroadcastListener broadcastlisenter = ObjectUtils.defaultIfNull(bLisenter, BroadcastListener.Default);
         final Map<String, Object> modelMap = new HashMap<>();
 
-        for (Event event : events) {
-            if (playLisenter.onBeforePlay(event)) {
-                break;
+        forEach(events, (event, i) -> {
+            try(Event e = event){
+                if (playLisenter.onBeforePlay(e)) {
+                    // just like continue;
+                    return true;
+                }
+
+                broadcastlisenter.setBroadcastStatus(BroadcastStatus.Transmit);
+
+                playDeal(event, modelMap, broadcastlisenter);
+
+                playLisenter.onCompletedPlay(e);
+
+                if (Objects.equals(broadcastlisenter.getBroadcastStatus(), BroadcastStatus.Exit)) {
+                    // just like break;
+                    return false;
+                }
+
+                return true;
+            } catch (Exception ex) {
+               throw DramaException.occurredPlayError(ex, event);
             }
-
-            broadcastlisenter.setBroadcastStatus(BroadcastStatus.Transmit);
-
-            playDeal(event, modelMap, broadcastlisenter);
-
-            playLisenter.onCompletedPlay(event);
-
-            if (Objects.equals(broadcastlisenter.getBroadcastStatus(), BroadcastStatus.Exit)) {
-                break;
-            }
-        }
+        });
 
         render.setCode(Render.SUCCESS);
         render.setModel(modelMap);

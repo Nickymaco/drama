@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * 事件，可以作为全局事件注册，注册全局事件后其他自定义事件不需要重复注册，为互斥
  */
-public interface Event extends Serializable {
+public interface Event extends Serializable, AutoCloseable {
     /**
      * 获取事件名称
      *
