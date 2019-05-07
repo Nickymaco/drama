@@ -40,7 +40,7 @@ public abstract class QueryElement implements Element {
         Class<?> objectClass = object.getClass();
         Queriable<Object> queriable = queryFactory.getQuerier(objectClass);
 
-        if (queriable == null) {
+        if (Objects.isNull(queriable)) {
             return null;
         }
 
