@@ -28,7 +28,7 @@ class DramaPlayWizard implements PlayWizard {
 
     DramaPlayWizard(Stage stage, Function<String, Class<? extends Event>> classFactory) {
         this.stage = stage;
-        this.classFactory = ObjectUtils.defaultIfNull(classFactory, (name) -> null);
+        this.classFactory = ObjectUtils.defaultIfNull(classFactory, name -> null);
     }
 
     @Override
@@ -44,8 +44,8 @@ class DramaPlayWizard implements PlayWizard {
         EventProperty eventProperty = clazz.getAnnotation(EventProperty.class);
 
         if(Objects.nonNull(eventProperty) && ArrayUtils.isNotEmpty(eventProperty.aliasFor())) {
-            if(!ArrayUtils.contains(eventProperty.aliasFor(), this.eventName)) {
-                this.eventName = clazz.getSimpleName();
+            if(!ArrayUtils.contains(eventProperty.aliasFor(), eventName)) {
+                eventName = clazz.getSimpleName();
             }
         }
         return this;
