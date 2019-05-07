@@ -2,6 +2,7 @@ package org.drama.domain;
 
 import static org.drama.delegate.Delegator.action;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.drama.core.BroadcastStatus;
@@ -23,7 +24,9 @@ public abstract class QueryElement implements Element {
     public void handing(Event event) {
         Object queryResult = doQuery(event);
 
-        action(getResultRenderHandler(), new BiParameterValueObject<>(event, queryResult));
+        if(Objects.nonNull(queryResult)) {
+        	action(getResultRenderHandler(), new BiParameterValueObject<>(event, queryResult));
+        }
     }
 
     protected Object doQuery(Event event) {
