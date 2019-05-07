@@ -18,6 +18,7 @@ import org.drama.annotation.ElementProperty;
 import org.drama.annotation.LayerDescription;
 import org.drama.annotation.LayerProperty;
 import org.drama.collections.ImmutableSet;
+import org.drama.core.LayerContants.NullLayer;
 import org.drama.event.Event;
 import org.drama.exception.DramaException;
 import org.drama.security.Signature;
@@ -91,7 +92,7 @@ class DramaKernel implements Kernel {
         Class<? extends Layer> layerClazz = elemProp.layer();
 
         // 如果指定的 layer 有描述注解，则按描述注解进行查找和分配
-        if (!Objects.equals(layerClazz, Layer.Null.class)) {
+        if (!Objects.equals(layerClazz, NullLayer.class)) {
             layerContainer = getLayerContainer(layerClazz);
         } else {
             // 根据指定的 layer 没有找到，则通过 ElementProperty 提供给的 layerDesc 进行分配

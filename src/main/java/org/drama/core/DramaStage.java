@@ -18,6 +18,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.drama.annotation.EventProperty;
 import org.drama.collections.ImmutableSet;
+import org.drama.core.LayerContants.NullLayer;
 import org.drama.event.Event;
 import org.drama.event.EventResult;
 import org.drama.event.EventResultEntity;
@@ -61,8 +62,23 @@ public class DramaStage implements Stage {
 
         getLogging().recevieEvent(events);
 
-        final PlayListener playLisenter = ObjectUtils.defaultIfNull(playListener, PlayListener.NULL);
-        final BroadcastListener broadcastlisenter = ObjectUtils.defaultIfNull(bLisenter, BroadcastListener.Default);
+        // set play listener
+        final PlayListener playLisenter = ObjectUtils.defaultIfNull(playListener, event -> {});
+        // set broadcast listener
+        final BroadcastListener broadcastlisenter = ObjectUtils.defaultIfNull(bLisenter, new BroadcastListener() {
+            private BroadcastStatus broadcastStatus;
+
+            @Override
+            public BroadcastStatus getBroadcastStatus() {
+                return broadcastStatus;
+            }
+
+            @Override
+            public void setBroadcastStatus(BroadcastStatus broadcastStatus) {
+                this.broadcastStatus = broadcastStatus;
+            }
+        });
+
         final Map<String, Object> modelMap = new HashMap<>();
 
         forEach(events, p -> {
@@ -222,14 +238,14 @@ public class DramaStage implements Stage {
 
     @Override
     public PlayWizard wizard() {
-        return new DramaPlayWizard(this, name -> registeredEvent.get(name.hashCode()));
+        return new DramaPlayWizard(this, this::getEventClass);
     }
 
     private void addLayerGenerator(final LayerFactory layerFacotry, final Consumer<LayerDescriptor> onCreated) {
         kernel.setLayerGenerator(p -> {
             Layer layer;
 
-            if (Objects.equals(Layer.Null.class, p.getParam1())) {
+            if (Objects.equals(NullLayer.class, p.getParam1())) {
                 layer = on(DramaLayer.class).create().get();
             } else if (Objects.isNull(layerFacotry)) {
                 layer = on(p.getParam1()).create().get();
@@ -274,5 +290,9 @@ public class DramaStage implements Stage {
 
     protected IStageLoggingTemplate getLogging() {
         return logging;
+    }
+
+    private Class<? extends Event> getEventClass(String name) {
+        return registeredEvent.get(name.hashCode());
     }
 }

@@ -1,6 +1,9 @@
 package org.drama.annotation;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.drama.core.LayerContants.DEFAULT_NAME;
+import static org.drama.core.LayerContants.DEFAULT_PRIORITY;
+import static org.drama.core.LayerContants.DEFAULT_UUID;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -18,17 +21,17 @@ public @interface LayerProperty {
     /**
      * 逻辑层处理名称，建议与priority通过枚举设定
      */
-    String name() default Layer.DEFAULT_NAME;
+    String name() default DEFAULT_NAME;
 
     /**
      * 逻辑处理层优先级，用户控制stage优先处理哪一个逻辑层，建议通过与name枚举设定
      */
-    int priority() default Layer.DEFAULT_PRIORITY;
+    int priority() default DEFAULT_PRIORITY;
 
     /**
      * 逻辑处理层的唯一标示（UUID）
      */
-    String uuid() default Layer.DEFAULT_UUID;
+    String uuid() default DEFAULT_UUID;
 
     /**
      * 是否禁用
