@@ -49,19 +49,19 @@ public class DramaStage implements Stage {
     }
 
     @Override
-    public Render play(Event[] events, PlayLisenter playListener, BroadcastListener bLisenter) throws DramaException {
+    public Render play(Event[] events, PlayListener playListener, BroadcastListener bLisenter) throws DramaException {
         DramaRender render = new DramaRender();
         play(render, events, playListener, bLisenter);
         return render;
     }
 
     @Override
-    public void play(Render render, Event[] events, PlayLisenter playListener, BroadcastListener bLisenter) throws DramaException {
+    public void play(Render render, Event[] events, PlayListener playListener, BroadcastListener bLisenter) throws DramaException {
         checkEvent(events);
 
         getLogging().recevieEvent(events);
 
-        final PlayLisenter playLisenter = ObjectUtils.defaultIfNull(playListener, PlayLisenter.NULL);
+        final PlayListener playLisenter = ObjectUtils.defaultIfNull(playListener, PlayListener.NULL);
         final BroadcastListener broadcastlisenter = ObjectUtils.defaultIfNull(bLisenter, BroadcastListener.Default);
         final Map<String, Object> modelMap = new HashMap<>();
 

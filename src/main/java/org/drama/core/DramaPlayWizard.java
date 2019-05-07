@@ -21,7 +21,7 @@ class DramaPlayWizard implements PlayWizard {
     private Class<? extends Event> clazz;
     private EventArgument<?> argument;
     private BroadcastListener broadcastListener;
-    private PlayLisenter playLisenter;
+    private PlayListener playLisenter;
     private KeyValueObject<String, Object>[] properties;
     private EventBuilder builder = new EventBuilder();
     private Function<String, Class<? extends Event>> classFactory;
@@ -78,7 +78,7 @@ class DramaPlayWizard implements PlayWizard {
     }
 
     @Override
-    public PlayWizard playLisenter(PlayLisenter lisenter) {
+    public PlayWizard playListener(PlayListener lisenter) {
         this.playLisenter = lisenter;
         return this;
     }

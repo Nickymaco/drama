@@ -43,16 +43,16 @@ public interface PlayWizard {
     /**
      * 广播监听器
      *
-     * @param lisenter 监听器
+     * @param listener 监听器
      */
-    PlayWizard broadcastLisenter(BroadcastListener lisenter);
+    PlayWizard broadcastLisenter(BroadcastListener listener);
 
     /**
      * 演出监听器
      *
-     * @param lisenter
+     * @param listener
      */
-    PlayWizard playLisenter(PlayLisenter lisenter);
+    PlayWizard playListener(PlayListener listener);
 
     /**
      * 演出

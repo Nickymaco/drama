@@ -29,7 +29,7 @@ public interface Stage {
      * @param broadcastListener 逻辑处理层广播监听器 (Option)
      * @return 渲染
      */
-    Render play(Event[] events, PlayLisenter playListener, BroadcastListener broadcastListener) throws DramaException;
+    Render play(Event[] events, PlayListener playListener, BroadcastListener broadcastListener) throws DramaException;
 
     /**
      * 演出（提供自定义 Render）
@@ -39,7 +39,7 @@ public interface Stage {
      * @param playListener      Stag play 监听器 (Option)
      * @param broadcastListener 逻辑处理层广播监听器 (Option)
      */
-    void play(Render render, Event[] events, PlayLisenter playListener, BroadcastListener broadcastListener) throws DramaException;
+    void play(Render render, Event[] events, PlayListener playListener, BroadcastListener broadcastListener) throws DramaException;
 
     /**
      * 参数配置

@@ -2,11 +2,11 @@ package org.drama.core;
 
 import org.drama.event.Event;
 
-public interface PlayLisenter {
+public interface PlayListener {
     /**
      * 占位符，防止抛空指针异常
      */
-    PlayLisenter NULL = event -> {
+    PlayListener NULL = event -> {
     };
 
     /**
