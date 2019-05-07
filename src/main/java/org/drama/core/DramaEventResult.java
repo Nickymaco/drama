@@ -1,5 +1,7 @@
 package org.drama.core;
 
+import static org.drama.text.MessageText.format;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
@@ -19,7 +21,7 @@ import org.drama.event.EventResultValue;
  */
 public class DramaEventResult implements EventResult {
     private static final long serialVersionUID = 4555755009367480736L;
-    private static final String INDEX_KEY = "KEY[%s-%s]";
+    private static final String INDEX_KEY = "KEY[{0}-{1}]";
     private final static Map<String, EventResultValue> RESULT_MAP = new ConcurrentHashMap<>();
     private final String identity = UUID.randomUUID().toString().toUpperCase();
 
@@ -75,7 +77,7 @@ public class DramaEventResult implements EventResult {
     }
 
     private String getKey(EventResultIndex index) {
-        return String.format(INDEX_KEY, identity, index);
+        return format(INDEX_KEY, identity, index);
     }
 
 	@Override

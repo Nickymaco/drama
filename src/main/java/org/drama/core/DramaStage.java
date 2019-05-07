@@ -80,8 +80,6 @@ public class DramaStage implements Stage {
 
         broadcastlisenter.setBroadcastStatus(BroadcastStatus.Transmit);
         
-        final Map<String, Object> modelMap = new HashMap<>();
-        
         forEach(events, p -> {
             try(Event e = p.getParam1()){
                 if (Objects.equals(broadcastlisenter.getBroadcastStatus(), BroadcastStatus.Exit)) {
@@ -92,7 +90,7 @@ public class DramaStage implements Stage {
                     return;
                 }
 
-                play(e, modelMap, broadcastlisenter);
+                play(e, Objects.requireNonNull(render.getModel()), broadcastlisenter);
 
                 playLisenter.onCompletedPlay(e);
             } catch (Exception ex) {
@@ -101,7 +99,6 @@ public class DramaStage implements Stage {
         });
 
         render.setCode(Render.SUCCESS);
-        render.setModel(modelMap);
     }
 
     /**

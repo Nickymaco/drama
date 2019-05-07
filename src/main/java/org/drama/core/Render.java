@@ -1,12 +1,9 @@
 package org.drama.core;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public interface Render extends Serializable, AutoCloseable {
-    String ERROR_MSG = "Stage service occurred exception";
-    String UNFOUND_EVENT_MSG = "Any event unfound";
-    String ABEND_MSG = "The proccess occurred abend";
-
     int SUCCESS = 0;
     int FAILURE = 1;
 
@@ -25,14 +22,14 @@ public interface Render extends Serializable, AutoCloseable {
     /**
      * 响应模型
      */
-    Object getModel();
+    Map<String, Object> getModel();
 
     /**
      * 设置响应模型
      *
      * @param model 响应模型
      */
-    void setModel(Object model);
+    void setModel(Map<String, Object> model);
 
     /**
      * 响应消息

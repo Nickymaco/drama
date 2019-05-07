@@ -50,9 +50,8 @@ public class EventBuilder {
         }
 
         if (ArrayUtils.isNotEmpty(properties)) {
-            forEach(properties, (property, i) -> {
-                reflect.set(property.getKey(), property.getValue());
-                return false;
+            forEach(properties, p -> {
+                reflect.set(p.getParam1().getKey(), p.getParam1().getValue());
             });
         }
 

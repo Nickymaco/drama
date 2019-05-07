@@ -15,6 +15,10 @@ import org.drama.vo.BiParameterValueObject;
  * 委托传递器
  */
 public final class Delegator {
+	/**
+	 * Delegate no parameter function
+	 * @param delegate no parameter function
+	 */
     public static void action(Runnable delegate) {
         if (delegate == null) {
             return;
@@ -23,6 +27,12 @@ public final class Delegator {
         delegate.run();
     }
 
+    /**
+     * Deleget one parameter function
+     * @param <P> Parameter Type
+     * @param delegate one parameter function
+     * @param arg function parameter
+     */
     public static <P> void action(Consumer<P> delegate, P arg) {
         if (delegate == null) {
             return;
@@ -31,6 +41,15 @@ public final class Delegator {
         delegate.accept(arg);
     }
 
+    /**
+     * Delegate one parameter with return function
+     * @param <T> parameter type
+     * @param <R> return type
+     * @param delegate one paraemter function
+     * @param arg function parameter
+     * @return {@code R} type return
+     * @throws NullPointerException
+     */
     public static <T, R> R func(Function<T, R> delegate, T arg) throws NullPointerException {
         if (delegate == null) {
             return null;
@@ -38,6 +57,12 @@ public final class Delegator {
         return delegate.apply(arg);
     }
 
+    /**
+     * Array foreach deletegate
+     * @param <T> Array item type
+     * @param arr foreach target
+     * @param handler {@code Integer} is the item position, Boolean {@code true} break foreach or {@code false} continue
+     */
     public static <T> void forEach(T[] arr, BiFunction<T, Integer, Boolean> handler) {
         if (ArrayUtils.isEmpty(arr) || Objects.isNull(handler)) {
             return;
@@ -50,6 +75,12 @@ public final class Delegator {
         }
     }
 
+    /**
+     * Array foreach deletegate
+     * @param <T> Array item type
+     * @param arr foreach target
+     * @param handler {@code Integer} is the item position
+     */
     public static <T> void forEach(T[] arr, Consumer<BiParameterValueObject<T, Integer>> handler) {
         if (ArrayUtils.isEmpty(arr) || Objects.isNull(handler)) {
             return;
@@ -64,6 +95,12 @@ public final class Delegator {
         }
     }
 
+    /**
+     * Collection foreach deletegate
+     * @param <T> Collection item type
+     * @param coll foreach target
+     * @param handler {@code Integer} is the item position, Boolean {@code true} break foreach or {@code false} continue
+     */
     public static <T> void forEach(Collection<T> coll, BiFunction<T, Integer, Boolean> handler) {
         if (CollectionUtils.isEmpty(coll) || Objects.isNull(handler)) {
             return;
