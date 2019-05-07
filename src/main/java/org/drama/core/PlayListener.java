@@ -4,12 +4,6 @@ import org.drama.event.Event;
 
 public interface PlayListener {
     /**
-     * 占位符，防止抛空指针异常
-     */
-    PlayListener NULL = event -> {
-    };
-
-    /**
      * 在 Stage play 前触发
      *
      * @param event 事件

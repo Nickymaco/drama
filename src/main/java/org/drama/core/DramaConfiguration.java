@@ -38,7 +38,7 @@ public class DramaConfiguration implements Configuration, Signature {
 
     @Override
     public LoggingFactory getLoggingFactory() {
-        return ObjectUtils.defaultIfNull(loggingFactory, LoggingFactory.NULL);
+        return ObjectUtils.defaultIfNull(loggingFactory, new LoggingFactory.NullLogging());
     }
 
     public void setLoggingFactory(LoggingFactory loggingFactory) {

@@ -42,7 +42,7 @@ public class DramaException extends RuntimeException {
     }
 
     public static DramaException occurredPlayError(Throwable e, Event event) {
-        return new DramaException(e, PLAYE_RROR_MSG);
+        return new DramaException(e, format(PLAYE_RROR_MSG, event));
     }
 
     public static DramaException illegalRegisterEvent(Event event) {

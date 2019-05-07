@@ -17,7 +17,7 @@ public final class MessageText {
     
     public static final String EMPTY_EVENT_MSG = "Without any event registered";
     public static final String EMPTY_ELEMENS_MSG = "Without any elemen registered";
-    public static final String PLAYE_RROR_MSG = "Occurred errer on play";
+    public static final String PLAYE_RROR_MSG = "Occurred errer on play {0}";
     public static final String ILLEGAL_EVENT_MSG = "Illegal event<{0}>. maybe unregister or unkonw event name, please check event register";
     public static final String ILLEGAL_BROADCAST_MSG = "Illegal broadcast event on layer<{0}>";
     public static final String ELEM_HANDING_ERROR = "Element<{0}> occurring error on handing.";
