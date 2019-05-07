@@ -3,7 +3,7 @@ package org.drama.log.template;
 import org.drama.event.Event;
 import org.drama.log.LoggingInteractor;
 
-public interface ILayerLoggingTemplate extends LoggingInteractor {
+public interface LayerLoggingTemplate extends LoggingInteractor {
     /**
      * 记录传播事件
      *

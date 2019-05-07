@@ -11,8 +11,6 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.drama.core.Layer;
-
 @Documented
 @Retention(RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})

@@ -8,7 +8,7 @@ import org.drama.collections.ImmutableSet;
 import org.drama.event.Event;
 import org.drama.exception.DramaException;
 import org.drama.log.LoggingFactory;
-import org.drama.log.template.ILayerLoggingTemplate;
+import org.drama.log.template.LayerLoggingTemplate;
 import org.drama.log.template.LoggingTemplateFactory;
 
 /**
@@ -16,7 +16,7 @@ import org.drama.log.template.LoggingTemplateFactory;
  */
 public class DramaLayer implements Layer {
     private Configuration configuration;
-    private ILayerLoggingTemplate logging;
+    private LayerLoggingTemplate logging;
     private ImmutableSet<Element> elementSet;
     private Kernel kernel;
 
@@ -54,7 +54,7 @@ public class DramaLayer implements Layer {
         }
     }
 
-    protected ILayerLoggingTemplate getLogging() {
+    protected LayerLoggingTemplate getLogging() {
         if (Objects.isNull(logging)) {
             logging = LoggingTemplateFactory.getLayerLoggingTemplate(
                     ObjectUtils.defaultIfNull(configuration.getLoggingFactory(), new LoggingFactory.NullLogging()));

@@ -5,18 +5,18 @@ import java.util.Objects;
 import org.drama.log.LoggingFactory;
 
 public class LoggingTemplateFactory {
-    private static StageLoggingTemplate loggingTemplate;
+    private static DramaLoggingTemplate loggingTemplate;
 
-    public static ILayerLoggingTemplate getLayerLoggingTemplate(LoggingFactory loggingFactory) {
+    public static LayerLoggingTemplate getLayerLoggingTemplate(LoggingFactory loggingFactory) {
         if (Objects.isNull(loggingTemplate)) {
-            loggingTemplate = new StageLoggingTemplate(loggingFactory.logging());
+            loggingTemplate = new DramaLoggingTemplate(loggingFactory.logging());
         }
         return loggingTemplate;
     }
 
-    public static IStageLoggingTemplate getStageLoggingTemplate(LoggingFactory loggingFactory) {
+    public static StageLoggingTemplate getStageLoggingTemplate(LoggingFactory loggingFactory) {
         if (Objects.isNull(loggingTemplate)) {
-            loggingTemplate = new StageLoggingTemplate(loggingFactory.logging());
+            loggingTemplate = new DramaLoggingTemplate(loggingFactory.logging());
         }
         return loggingTemplate;
     }

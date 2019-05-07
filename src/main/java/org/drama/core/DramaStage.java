@@ -23,14 +23,14 @@ import org.drama.event.Event;
 import org.drama.event.EventResult;
 import org.drama.event.EventResultEntity;
 import org.drama.exception.DramaException;
-import org.drama.log.template.IStageLoggingTemplate;
+import org.drama.log.template.StageLoggingTemplate;
 import org.drama.log.template.LoggingTemplateFactory;
 
 /**
  * 默认舞台，执行逻辑处理层时按照线性关系依次执行
  */
 public class DramaStage implements Stage {
-    private IStageLoggingTemplate logging;
+    private StageLoggingTemplate logging;
     private ImmutableSet<Layer> layers;
     private Configuration configuration;
     private Kernel kernel;
@@ -288,7 +288,7 @@ public class DramaStage implements Stage {
         return configuration;
     }
 
-    protected IStageLoggingTemplate getLogging() {
+    protected StageLoggingTemplate getLogging() {
         return logging;
     }
 
