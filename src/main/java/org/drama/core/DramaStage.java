@@ -20,7 +20,6 @@ import org.drama.annotation.EventProperty;
 import org.drama.collections.ImmutableSet;
 import org.drama.core.LayerContants.NullLayer;
 import org.drama.event.Event;
-import org.drama.event.EventResult;
 import org.drama.event.EventResultEntity;
 import org.drama.exception.DramaException;
 import org.drama.log.template.StageLoggingTemplate;
@@ -79,8 +78,10 @@ public class DramaStage implements Stage {
             }
         });
 
+        broadcastlisenter.setBroadcastStatus(BroadcastStatus.Transmit);
+        
         final Map<String, Object> modelMap = new HashMap<>();
-
+        
         forEach(events, p -> {
             try(Event e = p.getParam1()){
                 if (Objects.equals(broadcastlisenter.getBroadcastStatus(), BroadcastStatus.Exit)) {
@@ -90,8 +91,6 @@ public class DramaStage implements Stage {
                 if (playLisenter.onBeforePlay(e)) {
                     return;
                 }
-
-                broadcastlisenter.setBroadcastStatus(BroadcastStatus.Transmit);
 
                 playDeal(e, modelMap, broadcastlisenter);
 
@@ -110,20 +109,10 @@ public class DramaStage implements Stage {
 
         playDealEvent(event, lisenter);
 
-        EventResult result = Objects.requireNonNull(event.getEventResult());
-
-        result.allResults().forEach(r -> {
-            if (!r.getOutput()) {
-                return;
-            }
-
+        event.getEventResult().allResults().stream().filter(r -> r.getOutput()).forEach(r -> {
             EventResultEntity entity = r.getValue();
-
-            if (StringUtils.isNotBlank(entity.aliasName())) {
-                modelMap.put(entity.aliasName(), entity);
-            } else {
-                modelMap.put(entity.getClass().getSimpleName(), entity);
-            }
+            String aliasName = entity.aliasName();
+            modelMap.put(StringUtils.isBlank(aliasName) ? entity.getClass().getSimpleName() : aliasName, entity);
         });
     }
 
@@ -134,18 +123,11 @@ public class DramaStage implements Stage {
         if (Objects.isNull(event) || CollectionUtils.isEmpty(getLayers())) {
             return;
         }
-
-        for (Layer layer : getLayers()) {
-            try {
-                layer.broadcast(event, lisenter);
-            } catch (Throwable e) {
-                throw DramaException.occurredPlayError(e, event);
-            }
-
-            if (Objects.equals(lisenter.getBroadcastStatus(), BroadcastStatus.Exit)) {
-                break;
-            }
-        }
+        
+        forEach(getLayers(), (layer, i) -> {
+        	layer.broadcast(event, lisenter);
+        	return Objects.equals(lisenter.getBroadcastStatus(), BroadcastStatus.Exit);
+        });
     }
     
     private void checkEvent(Event[] events) {

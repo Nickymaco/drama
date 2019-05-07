@@ -16,7 +16,7 @@ public class EventResultIndex implements Serializable {
     private final Signature signature;
 
     public EventResultIndex(String uuid, Event event) {
-        this.signature = new Signature() {
+        signature = new Signature() {
             @Override
             public UUID getIdentity() {
                 return UUID.fromString(uuid);

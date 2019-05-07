@@ -86,13 +86,13 @@ class DramaPlayWizard implements PlayWizard {
     @Override
     public Render play() {
         Event event = buidEvent();
-        return stage.play(new Event[]{event}, this.playLisenter, this.broadcastListener);
+        return stage.play(new Event[]{event}, playLisenter, broadcastListener);
     }
 
     @Override
     public void play(Render render) {
         Event event = buidEvent();
-        stage.play(render, new Event[]{event}, this.playLisenter, this.broadcastListener);
+        stage.play(render, new Event[]{event}, playLisenter, broadcastListener);
     }
 
     private Event buidEvent() {
@@ -112,8 +112,8 @@ class DramaPlayWizard implements PlayWizard {
 	                .build();
         }
         
-        if(Objects.isNull(event.getName()) && StringUtils.isNoneBlank(this.eventName)) {
-        	event.setName(this.eventName);
+        if(Objects.isNull(event.getName()) && StringUtils.isNoneBlank(eventName)) {
+        	event.setName(eventName);
         }
         return event;
     }
