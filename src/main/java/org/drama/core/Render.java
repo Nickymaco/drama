@@ -2,7 +2,7 @@ package org.drama.core;
 
 import java.io.Serializable;
 
-public interface Render extends Serializable {
+public interface Render extends Serializable, AutoCloseable {
     String ERROR_MSG = "Stage service occurred exception";
     String UNFOUND_EVENT_MSG = "Any event unfound";
     String ABEND_MSG = "The proccess occurred abend";

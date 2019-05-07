@@ -57,7 +57,7 @@ public class DramaStage implements Stage {
 
     @Override
     public void play(Render render, Event[] events, PlayListener playListener, BroadcastListener bLisenter) throws DramaException {
-        checkEvent(events);
+        validation(events);
 
         getLogging().recevieEvent(events);
 
@@ -92,7 +92,7 @@ public class DramaStage implements Stage {
                     return;
                 }
 
-                playDeal(e, modelMap, broadcastlisenter);
+                play(e, modelMap, broadcastlisenter);
 
                 playLisenter.onCompletedPlay(e);
             } catch (Exception ex) {
@@ -104,33 +104,29 @@ public class DramaStage implements Stage {
         render.setModel(modelMap);
     }
 
-    private void playDeal(Event event, final Map<String, Object> modelMap, BroadcastListener lisenter) {
+    /**
+     * 根据监听器判断是否继续往下执行
+     */
+    private void play(Event event, final Map<String, Object> modelMap, BroadcastListener lisenter) {
+        if (Objects.isNull(event) || CollectionUtils.isEmpty(getLayers())) {
+            return;
+        }
+        
         getLogging().dealEvent(event);
-
-        playDealEvent(event, lisenter);
-
+        // layer execute broadcast
+        forEach(getLayers(), (layer, i) -> {
+        	layer.broadcast(event, lisenter);
+        	return Objects.equals(lisenter.getBroadcastStatus(), BroadcastStatus.Exit);
+        });
+        // collect results
         event.getEventResult().allResults().stream().filter(r -> r.getOutput()).forEach(r -> {
             EventResultEntity entity = r.getValue();
             String aliasName = entity.aliasName();
             modelMap.put(StringUtils.isBlank(aliasName) ? entity.getClass().getSimpleName() : aliasName, entity);
         });
     }
-
-    /**
-     * 根据监听器判断是否继续往下执行
-     */
-    private void playDealEvent(Event event, BroadcastListener lisenter) {
-        if (Objects.isNull(event) || CollectionUtils.isEmpty(getLayers())) {
-            return;
-        }
-        
-        forEach(getLayers(), (layer, i) -> {
-        	layer.broadcast(event, lisenter);
-        	return Objects.equals(lisenter.getBroadcastStatus(), BroadcastStatus.Exit);
-        });
-    }
     
-    private void checkEvent(Event[] events) {
+    private void validation(Event[] events) {
         if (ArrayUtils.isEmpty(events)) {
             throw DramaException.emptyRegisterEvents();
         }

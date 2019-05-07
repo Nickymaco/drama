@@ -61,10 +61,10 @@ class DramaLoggingTemplate extends BasicLoggingTemplate implements StageLoggingT
         if (ArrayUtils.isEmpty(events)) {
             return;
         }
-        for (Class<?> event : events) {
-            getLogging().info(format(REGISTERED_EVENT, event.getName()));
-        }
-
+        
+        forEach(events, p -> {
+        	getLogging().info(format(REGISTERED_EVENT, p.getParam1().getName()));
+        });
     }
 
     @Override
@@ -72,9 +72,10 @@ class DramaLoggingTemplate extends BasicLoggingTemplate implements StageLoggingT
         if (ArrayUtils.isEmpty(elements)) {
             return;
         }
-        for (Class<?> elem : elements) {
-            getLogging().info(format(REGISTERED_ELEMENT, elem.getName()));
-        }
+        
+        forEach(elements, p -> {
+        	format(REGISTERED_ELEMENT, p.getParam1().getName());
+        });
     }
 
     @Override
@@ -82,9 +83,10 @@ class DramaLoggingTemplate extends BasicLoggingTemplate implements StageLoggingT
         if (ArrayUtils.isEmpty(layers)) {
             return;
         }
-        for (String layerName : layers) {
-            getLogging().info(format(REGISTERED_LAYER, layerName));
-        }
+        
+        forEach(layers, p -> {
+        	getLogging().info(format(REGISTERED_LAYER, p.getParam1()));
+        });
     }
 
     @Override

@@ -1,5 +1,7 @@
 package org.drama.event;
 
+import static org.drama.text.MessageText.format;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
@@ -12,7 +14,7 @@ import org.drama.security.Signature;
  */
 public class EventResultIndex implements Serializable {
     private static final long serialVersionUID = -7453443690549858336L;
-    private static final String RESULT_INDEX = "EventResultIndex-%s[%s]";
+    private static final String RESULT_INDEX = "EventResultIndex-{0}[{1}]";
     private final Signature signature;
 
     public EventResultIndex(String uuid, Event event) {
@@ -53,6 +55,6 @@ public class EventResultIndex implements Serializable {
 
     @Override
     public String toString() {
-        return String.format(RESULT_INDEX, signature.getSigner().getClass().getSimpleName(), signature.getIdentity());
+        return format(RESULT_INDEX, signature.getSigner(), signature.getIdentity());
     }
 }

@@ -1,5 +1,7 @@
 package org.drama.core;
 
+import static org.drama.text.MessageText.format;
+
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,7 +15,7 @@ import org.drama.event.EventContext;
 public class DramaEventContext implements EventContext {
     private static final long serialVersionUID = 7285410254463046346L;
     private static final Map<String, Object> CONTEXT = new ConcurrentHashMap<>();
-    private static final String KEY_FORMAT = "%s:%s";
+    private static final String KEY_FORMAT = "{0}:{1}";
     private final String identity = UUID.randomUUID().toString();
     private Layer currentLayer;
 
@@ -38,7 +40,7 @@ public class DramaEventContext implements EventContext {
     }
 
     private String getKey(Object key) {
-        return String.format(KEY_FORMAT, identity, key);
+        return format(KEY_FORMAT, identity, key);
     }
 
     @PreDestroy

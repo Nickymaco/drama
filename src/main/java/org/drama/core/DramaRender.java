@@ -49,4 +49,8 @@ public class DramaRender implements Render {
     public void setMessage(String message) {
         this.message = message;
     }
+
+	@Override
+	public void close() throws Exception {
+	}
 }
