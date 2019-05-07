@@ -56,7 +56,7 @@ public class DramaEvent implements Event {
 
     @Override
     public void close() throws Exception {
-        eventResult.destroy();
-        context.destroy();
+        eventResult.close();
+        context.close();
     }
 }

@@ -77,4 +77,9 @@ public class DramaEventResult implements EventResult {
     private String getKey(EventResultIndex index) {
         return String.format(INDEX_KEY, identity, index);
     }
+
+	@Override
+	public void close() throws Exception {
+		destroy();
+	}
 }

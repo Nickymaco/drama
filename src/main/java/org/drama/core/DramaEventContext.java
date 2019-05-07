@@ -50,4 +50,9 @@ public class DramaEventContext implements EventContext {
             return false;
         });
     }
+
+	@Override
+	public void close() throws Exception {
+		destroy();
+	}
 }

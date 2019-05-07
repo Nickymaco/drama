@@ -3,7 +3,7 @@ package org.drama.event;
 import java.io.Serializable;
 import java.util.Collection;
 
-public interface EventResult extends Serializable {
+public interface EventResult extends Serializable, AutoCloseable {
     /**
      * 增加事件结果
      *

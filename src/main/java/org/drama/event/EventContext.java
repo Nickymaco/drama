@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.drama.core.Layer;
 
-public interface EventContext extends Serializable {
+public interface EventContext extends Serializable, AutoCloseable {
     /**
      * 事件上下文添加参数
      *

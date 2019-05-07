@@ -32,9 +32,9 @@ class DramaLoggingTemplate extends BasicLoggingTemplate implements StageLoggingT
         StringBuilder build = new StringBuilder();
 
         forEach(events, p -> {
-        	int idx = p.getParam2();
-        	Event event = p.getParam1();
-        	build.append(format("{0}{1}", event.getName(), idx != 0 ? WHITESPACE : EMPTY));
+        	int i = p.getParam2();
+        	String name = p.getParam1().getName();
+        	build.append(format("{0}{1}", name, i != 0 ? WHITESPACE : EMPTY));
         });
 
         getLogging().info(format(STAGE_RECEVIE, build));
