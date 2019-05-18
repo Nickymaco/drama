@@ -1,6 +1,6 @@
 # Drama
 
-**Hey guys, when you are reading this document point out the syntax error if you found, thanks. If you interesting this project, fork and join me build togther** :-D
+**Hey guys, when you are reading this document point out the syntax error if you found, thanks. If you interesting this project please fork it and let’s build togther** :-D
 
 ## Introdution 
 
