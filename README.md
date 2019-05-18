@@ -25,24 +25,24 @@ For example, assume that you are developing a application with spring mvc framew
 ```java
 @Bean
 public org.drama.core.Configuration configuration(
-		LoggingFactory loggingFactory, final List<Element> elements, JohncrawlerProperties properties) {
+        LoggingFactory loggingFactory, final List<Element> elements, JohncrawlerProperties properties) {
     // any stage object need a configuration
-	DramaConfiguration config = new DramaConfiguration();
+    DramaConfiguration config = new DramaConfiguration();
     // set a element register factory
-	config.setRegisterElementFactory(() -> new HashSet<>(elements));
+    config.setRegisterElementFactory(() -> new HashSet<>(elements));
     // set a logging
-	config.setLoggingFactory(loggingFactory);
+    config.setLoggingFactory(loggingFactory);
     // set a register event path for scan
-	config.setRegisterEventPackage("org.drama.events");
-	return config;
+    config.setRegisterEventPackage("org.drama.events");
+    return config;
 }
 
 @Bean
 public Stage stage(org.drama.core.Configuration configuration) throws DramaException {
-	DramaStage stage = new DramaStage();
+    DramaStage stage = new DramaStage();
     // important! this is help stage initially
-	stage.setup(configuration);
-	return stage;
+    stage.setup(configuration);
+    return stage;
 }
 ```
 
@@ -57,48 +57,48 @@ public class TokenElem implements Element
 Usually, logic layer doesn't need to be created. You just only create a logic layer enumerator and implements LayerDescriptor interface and be indicated in ‘ElementProperty’ annotation.
 ```java
 public enum LogicLayer implements LayerDescriptor {
-	DataAccess("DataAccess", 10, "DB640CCD-E18D-442B-BF16-BC54DB6A4A8", false, null),
-	Validated("Vallidated", 0, "F16727D8-CE44-4B25-8792-593E7705576E", false, null);
-	
-	private final String name;
-	private final int priority;
-	private final String uuid;
-	private final boolean disable;
-	private final String[] excludeEvent;
-	
-	LogicLayer(String name, int priority, String uuid, boolean disable, String[] events) {
-		this.name = name;
-		this.priority = priority;
-		this.uuid = uuid;
-		this.disable = disable;
-		this.excludeEvent = events;
-	}
+    DataAccess("DataAccess", 10, "DB640CCD-E18D-442B-BF16-BC54DB6A4A8", false, null),
+    Validated("Vallidated", 0, "F16727D8-CE44-4B25-8792-593E7705576E", false, null);
+    
+    private final String name;
+    private final int priority;
+    private final String uuid;
+    private final boolean disable;
+    private final String[] excludeEvent;
+    
+    LogicLayer(String name, int priority, String uuid, boolean disable, String[] events) {
+        this.name = name;
+        this.priority = priority;
+        this.uuid = uuid;
+        this.disable = disable;
+        this.excludeEvent = events;
+    }
 
-	@Override
-	public String getName() {
-		return name;
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public int getPriority() {
-		return priority;
-	}
+    @Override
+    public int getPriority() {
+        return priority;
+    }
 
 
-	@Override
-	public String getUUID() {
-		return uuid;
-	}
+    @Override
+    public String getUUID() {
+        return uuid;
+    }
 
-	@Override
-	public boolean getDisabled() {
-		return this.disable;
-	}
+    @Override
+    public boolean getDisabled() {
+        return this.disable;
+    }
 
-	@Override
-	public String[] getExculdeEvent() {
-		return excludeEvent;
-	}
+    @Override
+    public String[] getExculdeEvent() {
+        return excludeEvent;
+    }
 }
 ```
 Or you want to custom a logic layer, you can implements the Layer interface or inherit the DramaLayer object override broadcast method. And add a LayerProperty annotation. At the end set the ElementProperty annotation 'layer()' property.
