@@ -1,10 +1,10 @@
 # Drama
 
-**Hey guys, when you are reading this document point out the syntax error if you found, thanks. If you interesting this project please fork it and let’s build togther** :-D
+**Hey guys, reading this document point out the syntax error where you found, thanks. Fork if you interesting this project, let’s together** :-D
 
 ## Introdution 
 
-Drama is a lightweight develop libaray base on event driving. It does not replace any framework what you are using. It just add an event driving logic scene on the application and help you build N-Layers logic code struct.  <br /><br />Your 90% of applicatoins maybe base on spring framework and the code struct could be three layers at least, it looks like “DAO Layer”, “Service Layer”, “Presentation Layer”. It’s greate in a simple project, but when become large, it created more and more module packages and you could see that too much services in a mvc controller or too much models or dao in a service. So A lot of modules had duplication code and strong coupling and difficult to controll the business flow etc. Coding some would be need to modify many other associated code in a same time. OMG !  <br /><br />You can try drama to build a new logic code struct. It will help you focused event data flow and reduce “layer struct” hard code design. Core objects on below:
+Drama is a lightweight develop libaray base on event driving. It does not replace any framework what you are using. It just add an event driving logic scene on the application and help you build N-Layers logic code struct.  <br /><br />Your 90% of applicatoins maybe base on spring framework and the code struct could be three layers at least, it looks like “DAO Layer”, “Service Layer”, “Presentation Layer”. It’s greate in a simple project, but when become large, it created more and more module packages and you could see that too many services in a mvc controller or too many models or dao in a service. A lot of modules have duplication code and strong coupling and difficult to control business flow. Coding one would be need to modify many other associated code in a same time. OMG !  <br /><br />You can try drama to build a new logic code struct. It will help you focused event data flow and reduce “layer struct” hard code design. Core objects on below:
 
 + Event: encapsulate parameters or data which you focused. 
 + Stage: receive events and notify the layer objects. At the end stage will be output a render object.
@@ -47,14 +47,14 @@ public Stage stage(org.drama.core.Configuration configuration) throws DramaExcep
 ```
 
 ### Element
-Just need to implements the ‘Element’ interface.  The annotation “ElementProperty” is important, it tell the stage that element will be registered to which logic layer and listened which events. 
+Just need to implements the `Element` interface. The annotation `ElementProperty` is important that tell the stage element will be registered to which logic layer and which events be listening. 
 ```java
 @ElementProperty(any = true, layerDesc = @LayerDescription(desc = LogicLayer.class, target = "Vallidated"))
 public class TokenElem implements Element
 ```
 
 ### Layer
-Usually, logic layer doesn't need to be created. You just only create a logic layer enumerator and implements LayerDescriptor interface and be indicated in ‘ElementProperty’ annotation.
+Usually, logic layer doesn't need to be created. You just only create a logic layer enumerator and implements `LayerDescriptor` interface and set `ElementProperty` annotation desc and target property.
 ```java
 public enum LogicLayer implements LayerDescriptor {
     DataAccess("DataAccess", 10, "DB640CCD-E18D-442B-BF16-BC54DB6A4A8", false, null),
@@ -101,14 +101,14 @@ public enum LogicLayer implements LayerDescriptor {
     }
 }
 ```
-Or you want to custom a logic layer, you can implements the Layer interface or inherit the DramaLayer object override broadcast method. And add a LayerProperty annotation. At the end set the ElementProperty annotation 'layer()' property.
+Custom a logic layer just implements the `Layer` interface or inherit the `DramaLayer` object override broadcast method. Add a LayerProperty annotation and set the `ElementProperty` annotation 'layer' property.
 ```java
 @LayerProperty(name="Some", priority=0, uuid="9B092786-C66B-49B4-8535-0D0EA4D900D2")
 public class SomeLayer implements Layer
 ```
 
 ### Event
-Usually, it just need to special a string name of registered event and tell the Stage start play. If you want to custom event, please implements the Event interface or inherit the DramaEvent object override which method you want. The EventProperty annotation mean that which event using this object instance.
+Usually, it just need to special a string name of registered event and tell the Stage start play. Custom event please implements the `Event` interface or inherit the `DramaEvent` object override which method you want. The `EventProperty` annotation mean that which event using this object instance.
 ```java
 // Stage instance play a event
 stage.wizard().event("CrawlingEvent").play();
