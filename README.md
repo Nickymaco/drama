@@ -4,14 +4,14 @@
 
 ## Introduction 
 
-Drama is a lightweight development libaray base on event driving. It does not replace any framework what you are using. It just add an event driving logic scene on the application and help you build N-Layers logic code struct.  <br /><br />Your 90% of applicatoins maybe base on spring framework and the code struct has three logic layers normally, it looks like “DAO Layer”, “Service Layer”, “Presentation Layer”. It’s greate in a simple project, but when become large, it created more and more module packages and you could see that too many services in a mvc controller or too many models or dao in a service. A lot of modules have duplication code and strong coupling and difficult to control business flow. Coding one would be need to modify many other associated code in a same time. OMG !  <br /><br />You can try drama to build a new logic code struct. It will help you focused event data flow and reduce “layer struct” hard code design. Core objects on below:
+Drama is a lightweight development libaray base on event driving. It does not replace any framework what you are using. It just add an event driving logic scene on the application and help you build N-Layers logic code struct.  <br /><br />Your 90% of applicatoins maybe base on spring framework and the code struct has three logic layers normally, it looks like “DAO Layer”, “Service Layer”, “Presentation Layer”. It’s greate in a simple project, but when become large, it created more and more module packages and you could see that too many services in a mvc controller or too many models or dao in a service. A lot of modules have duplication code and strong coupling and difficult to control business flow. Coding one would be need to modify many other associated code in a same time. OMG !  <br /><br />You can try drama to build a new logic code struct. It will help you focused event data flow and reduce logic layer hard code struct design. Core objects on below:
 
 + Event: Encapsulate parameters or data which you focused. 
 + Stage: Receive events and notify logic layer objects. At the end stage will be output a render object.
 + Layer: A logic layer object that broadcast event to the element objects. 
 + Element: Handing the events which it listening. 
 
-For example, assume that you are developing a application with spring mvc framework. In a controller method, you can new an event object and then invoke the stage object to receive and start play. The event will be broadcasted by the logic layers in an order. In current layer any element if listening the event will be handing in an order prioriy. It looks like the image on below:
+For example, assume that you are developing a application with spring mvc framework. In a controller method that can new an event instance and invoke stage to receive and start play. Event will be broadcasted in a sequence logic layers. Any element listening the current event will execute handing by it’s prioriy. It looks like the image on below:
 
 <img src="https://raw.githubusercontent.com/Nickymaco/drama/master/images/drama.png" style="height:400px;width:500px" />
 
