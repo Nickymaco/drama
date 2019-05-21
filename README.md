@@ -1,10 +1,10 @@
 # Drama
 
-**Hey guys, reading this document point out the syntax error where you found, thanks. Fork if you interesting this project, hope you enjoy** :-D
+**Hey guys, reading this document point out the syntax error where you found, thanks. Fork if you interesting this project and hope you enjoy** :-D
 
 ## Introduction 
 
-Drama is a lightweight development libaray base on event driving. It does not replace any framework what you are using. It just add an event driving logic scene on the application and help you build N-Layers logic code struct.  <br /><br />Your 90% of applicatoins maybe base on spring framework and the code struct could be three layers at least, it looks like “DAO Layer”, “Service Layer”, “Presentation Layer”. It’s greate in a simple project, but when become large, it created more and more module packages and you could see that too many services in a mvc controller or too many models or dao in a service. A lot of modules have duplication code and strong coupling and difficult to control business flow. Coding one would be need to modify many other associated code in a same time. OMG !  <br /><br />You can try drama to build a new logic code struct. It will help you focused event data flow and reduce “layer struct” hard code design. Core objects on below:
+Drama is a lightweight development libaray base on event driving. It does not replace any framework what you are using. It just add an event driving logic scene on the application and help you build N-Layers logic code struct.  <br /><br />Your 90% of applicatoins maybe base on spring framework and the code struct has three logic layers normally, it looks like “DAO Layer”, “Service Layer”, “Presentation Layer”. It’s greate in a simple project, but when become large, it created more and more module packages and you could see that too many services in a mvc controller or too many models or dao in a service. A lot of modules have duplication code and strong coupling and difficult to control business flow. Coding one would be need to modify many other associated code in a same time. OMG !  <br /><br />You can try drama to build a new logic code struct. It will help you focused event data flow and reduce “layer struct” hard code design. Core objects on below:
 
 + Event: Encapsulate parameters or data which you focused. 
 + Stage: Receive events and notify logic layer objects. At the end stage will be output a render object.
@@ -111,7 +111,7 @@ public class SomeLayer implements Layer
 Usually, it just need to special a string name of registered event and tell the Stage start play. Custom event please implements the `Event` interface or inherit the `DramaEvent` object override which method you want. The `EventProperty` annotation mean that which event using this object instance.
 ```java
 // Stage instance play a event
-stage.wizard().event("CrawlingEvent").play();
+stage.wizard().event("SomeEvent").play();
 
 // custom event
 @EventProperty(aliasFor = {"SomeEvent"})
