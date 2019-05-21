@@ -1,4 +1,4 @@
-# Drama
+# Drama(a lightweight event driving development libaray)
 
 **Hey guys, reading this document point out the syntax error where you found, thanks. Fork if you interesting this project and hope you enjoy** :-D
 
